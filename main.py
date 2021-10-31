@@ -184,8 +184,8 @@ class XboxController(object):
     FULL_NEUTRAL = 'Neutral'
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
-    TRIGGER_HIGH_DOWN_VAL = 8000
-    diff_threshold = 300
+    TRIGGER_HIGH_DOWN_VAL = 14000
+    diff_threshold = 800
 
     def detect_trigger_zone(self, value):
         if value > self.TRIGGER_HIGH_DOWN_VAL:
