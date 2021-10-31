@@ -1,7 +1,5 @@
+from functools import partial
 from time import sleep
-import pygame
-
-from inputs import get_gamepad, UnpluggedError
 import math
 
 from collections import deque
@@ -33,94 +31,23 @@ def load_layout():
     return layout
 
 
-class InputsController:
-    @staticmethod
-    def read_events():
-        events = get_gamepad()
-        state = {}
-        for event in events:
-            if event.code == 'ABS_Y':
-                state["LeftJoystickY"] = event.state
-            elif event.code == 'ABS_X':
-                state["LeftJoystickX"] = event.state
-            elif event.code == 'ABS_RY':
-                state["RightJoystickY"] = event.state
-            elif event.code == 'ABS_RX':
-                state["RightJoystickX"] = event.state
-            elif event.code == 'ABS_Z':
-                state["LeftTrigger"] = event.state
-            elif event.code == 'ABS_RZ':
-                state["RightTrigger"] = event.state
-            elif event.code == 'BTN_TL':
-                state["LeftBumper"] = event.state
-            elif event.code == 'BTN_TR':
-                state["RightBumper"] = event.state
-            elif event.code == 'BTN_SOUTH':
-                state["A"] = event.state
-            elif event.code == 'BTN_NORTH':
-                state["X"] = event.state
-            elif event.code == 'BTN_WEST':
-                state["Y"] = event.state
-            elif event.code == 'BTN_EAST':
-                state["B"] = event.state
-            elif event.code == 'BTN_THUMBL':
-                state["LeftThumb"] = event.state
-            elif event.code == 'BTN_THUMBR':
-                state["RightThumb"] = event.state
-            elif event.code == 'BTN_SELECT':
-                state["Back"] = event.state
-            elif event.code == 'BTN_START':
-                state["Start"] = event.state
-            elif event.code == 'BTN_TRIGGER_HAPPY1':
-                state["LeftDPad"] = event.state
-            elif event.code == 'BTN_TRIGGER_HAPPY2':
-                state["RightDPad"] = event.state
-            elif event.code == 'BTN_TRIGGER_HAPPY3':
-                state["UpDPad"] = event.state
-            elif event.code == 'BTN_TRIGGER_HAPPY4':
-                state["DownDPad"] = event.state
-        return state
-
-
-class XboxController:
-
+class JoysticksController:
     def __init__(self):
         self.layout = load_layout()
 
-        self.LeftTrigger = 0
-        self.RightTrigger = 0
-        self.LeftBumper = 0
-        self.RightBumper = 0
-        self.A = 0
-        self.X = 0
-        self.Y = 0
-        self.B = 0
-        self.LeftThumb = 0
-        self.RightThumb = 0
-        self.Back = 0
-        self.Start = 0
-        self.LeftDPad = 0
-        self.RightDPad = 0
-        self.UpDPad = 0
-        self.DownDPad = 0
-
-        self.InTriggerZone = {
-            "LeftJoystickX": TriggerZone.Middle,
-            "LeftJoystickY": TriggerZone.Middle,
-            "RightJoystickX": TriggerZone.Middle,
-            "RightJoystickY": TriggerZone.Middle,
-        }
+        self.LeftStickZone = TriggerZone.Middle
+        self.RightStickZone = TriggerZone.Middle
 
         self.awaiting_full_neutral = False
 
         self.val_history = {
-            "LeftJoystickX": self.init_val_history(),
-            "LeftJoystickY": self.init_val_history(),
-            "RightJoystickX": self.init_val_history(),
-            "RightJoystickY": self.init_val_history(),
+            "LeftAngle": self.init_val_history(),
+            "LeftMagnitude": self.init_val_history(),
+            "RightAngle": self.init_val_history(),
+            "RightMagnitude": self.init_val_history(),
         }
 
-    def init_val_history(self, stack_size=4):
+    def init_val_history(self, stack_size=2):
         return deque(stack_size * [0], maxlen=stack_size)
 
     def get_stick_last_val(self, attr_name):
@@ -247,72 +174,158 @@ class XboxController:
         return None
 
 
-def inputs_main():
-    controller = XboxController()
-    while True:
-        try:
-            letter = controller.update_state(InputsController.read_events)
-        except UnpluggedError as error:
-            print(error)
-            sleep(0.5)
+from kivy.app import App
+from garden_joystick import Joystick
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+
+
+class Controller:
+    def detect_zone(self, magnitude, angle):
+        if magnitude > self.magnitude_threshold:
+            for boundary, arrow in self.boundary_mapping.items():
+                for cur_angle in boundary:
+                    if cur_angle == angle:
+                        return arrow
+            return self.EDGE_ZONE
         else:
-            if letter:
-                print(letter)
+            return self.NEUTRAL_ZONE
+
+    def gen_range(self, lower_bound, upper_bound):
+        return [cur_angle for cur_angle in range(lower_bound, upper_bound)]
+
+    def gen_boundary_mapping(self):
+        mapping = {
+            0: "🢂",
+            45: "🢅",
+            90: "🢁",
+            135: "🢄",
+            180: "🢀",
+            225: "🢇",
+            270: "🢃",
+            315: "🢆",
+        }
+        boundary_mapping = {}
+
+        for map_angle, arrow in mapping.items():
+            upper_bound = map_angle + self.angle_margin
+            boundary_range = self.gen_range(map_angle, upper_bound)
+            if map_angle == 0:
+                lower_bound = 360 - self.angle_margin
+                boundary_range += self.gen_range(lower_bound, 360)
+            else:
+                lower_bound = map_angle - self.angle_margin
+                boundary_range += self.gen_range(lower_bound, map_angle)
+
+            boundary_mapping[tuple(boundary_range)] = arrow
+
+        return boundary_mapping
+
+    def detect_letter(self):
+        for zone in [(self.LeftStickZone, self.RightStickZone)]:
+            if zone in [self.NEUTRAL_ZONE, self.EDGE_ZONE]:
+                raise ValueError()
+        try:
+            return self.layout[(self.LeftStickZone, self.RightStickZone)]
+        except KeyError as error:
+            print(error)
+            return 'Undefined'
+
+    def get_zone(self, attr_prefix):
+        attr_name = attr_prefix + "StickZone"
+        zone = getattr(self, attr_name)
+        return {
+            "🢂": 1,
+            "🢅": 2,
+            "🢁": 3,
+            "🢄": 4,
+            "🢀": 5,
+            "🢇": 6,
+            "🢃": 7,
+            "🢆": 8,
+            "⬤": -1,
+            "❌": -2,
+        }[zone]
+
+    def update_zone(self, magnitude, angle, attr_prefix):
+        angle = int(angle)
+        attr_name = attr_prefix + "StickZone"
+        prev_zone = getattr(self, attr_name)
+        new_zone = self.detect_zone(magnitude, angle)
+        if new_zone == self.EDGE_ZONE:
+            return None
+
+        if new_zone != prev_zone:
+            setattr(self, attr_name, new_zone)
+            if self.awaiting_neutral_pos:
+                if new_zone == self.NEUTRAL_ZONE:
+                    self.awaiting_neutral_pos = False
+            else:
+                if self.LeftStickZone != self.NEUTRAL_ZONE and self.RightStickZone != self.NEUTRAL_ZONE:
+                    return self.detect_letter()
+
+        return None
+
+    NEUTRAL_ZONE = '⬤'
+    EDGE_ZONE = '❌'
+    angle_margin = 20
+    magnitude_threshold_pct = 75
+    magnitude_threshold = magnitude_threshold_pct / 100
+
+    def __init__(self) -> None:
+        self.layout = load_layout()
+        self.boundary_mapping = self.gen_boundary_mapping()
+
+        self.LeftStickZone = self.NEUTRAL_ZONE
+        self.RightStickZone = self.NEUTRAL_ZONE
+
+        self.awaiting_neutral_pos = False
 
 
-class BACKEND_TYPE:
-    Pygame = "Pygame"
-    Inputs = "Inputs"
+controller = Controller()
 
 
-def pygame_read_events():
-    proper_events = {}
-    for event in pygame.event.get():
-        if event.type == pygame.JOYAXISMOTION:
-            value = int(XboxController.MAX_JOY_VAL * event.value)
-            axis = event.axis
-            try:
-                attr_name = {
-                    0: "LeftJoystickX",
-                    1: "LeftJoystickY",
-                    3: "RightJoystickX",
-                    4: "RightJoystickY",
-                }[axis]
-            except KeyError as error:
-                print(error)
-                continue
+class DemoApp(App):
+    def build(self):
+        self.root = BoxLayout()
+        self.root.padding = 50
 
-            if attr_name.endswith("Y"):
-                value *= -1
+        left_joystick = Joystick()
+        left_joystick.bind(pad=self.update_left)
+        self.root.add_widget(left_joystick)
+        self.left_label = Label()
+        self.root.add_widget(self.left_label)
 
-            proper_events[attr_name] = value
-            # print(attr_name, value)
+        right_joystick = Joystick()
+        right_joystick.bind(pad=self.update_right)
+        self.root.add_widget(right_joystick)
+        self.right_label = Label()
+        self.root.add_widget(self.right_label)
 
-    return proper_events
+    def update_coordinates(self, joystick, pad, attr_prefix):
+        x = str(pad[0])[0:5]
+        y = str(pad[1])[0:5]
+        radians = str(joystick.radians)[0:5]
+        magnitude = str(joystick.magnitude)[0:5]
+        angle = str(joystick.angle)[0:5]
 
-
-def pygame_main():
-    pygame.init()
-    joysticks = []
-    clock = pygame.time.Clock()
-    keepPlaying = True
-
-    controller = XboxController()
-
-    # for al the connected joysticks
-    for i in range(0, pygame.joystick.get_count()):
-        # create an Joystick object in our list
-        joysticks.append(pygame.joystick.Joystick(i))
-        # initialize them all (-1 means loop forever)
-        joysticks[-1].init()
-        # print a statement telling what the name of the controller is
-        print("Detected joystick "), joysticks[-1].get_name(), "'"
-    while keepPlaying:
-        clock.tick(60)
-        letter = controller.update_state(pygame_read_events)
+        letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
             print(letter)
+            letter = ord(letter)
+        else:
+            letter = ""
+
+        text = "Zone: {}\nletter: {}\nx: {}\ny: {}\nradians: {}\nmagnitude: {}\nangle: {}"
+
+        return text.format(controller.get_zone(attr_prefix), letter, x, y, radians, magnitude, angle)
+
+    def update_left(self, joystick, pad):
+        self.left_label.text = self.update_coordinates(joystick, pad, "Left")
+
+    def update_right(self, joystick, pad):
+        self.right_label.text = self.update_coordinates(joystick, pad, "Right")
 
 
 if __name__ == '__main__':
-    pygame_main()
+    DemoApp().run()
