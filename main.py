@@ -1,4 +1,5 @@
 from time import sleep
+import pygame
 
 from inputs import get_gamepad, UnpluggedError
 import math
@@ -159,7 +160,7 @@ class XboxController:
 
         return not diff_detected
 
-    def convert_to_position(self, attr_name):
+    def convert_to_arrow(self, attr_name):
         x_zone, y_zone = self.InTriggerZone[attr_name + "X"], self.InTriggerZone[attr_name + "Y"]
         return {
             (TriggerZone.Middle, TriggerZone.Up): "🢁",
@@ -173,9 +174,12 @@ class XboxController:
             (TriggerZone.Middle, TriggerZone.Middle): self.FULL_NEUTRAL,
         }[(x_zone, y_zone)]
 
+    def get_arrow_directions(self):
+        return self.convert_to_arrow("LeftJoystick"), self.convert_to_arrow("RightJoystick")
+
     def detect_current_letter(self):
-        left_stick_pos = self.convert_to_position("LeftJoystick")
-        right_stick_pos = self.convert_to_position("RightJoystick")
+        left_stick_pos, right_stick_pos = self.get_arrow_directions()
+
         if left_stick_pos == self.FULL_NEUTRAL or right_stick_pos == self.FULL_NEUTRAL:
             # return "Only one stick is used"
             return None
@@ -184,7 +188,7 @@ class XboxController:
         except KeyError:
             return "Not defined"
 
-    FULL_NEUTRAL = 'Neutral'
+    FULL_NEUTRAL = '⬤'
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
     TRIGGER_HIGH_DOWN_VAL = 14000
@@ -207,12 +211,12 @@ class XboxController:
 
     def check_full_neutral(self):
         if self.awaiting_full_neutral:
-            if self.convert_to_position("LeftJoystick") == self.FULL_NEUTRAL or \
-                    self.convert_to_position("RightJoystick") == self.FULL_NEUTRAL:
+            if self.convert_to_arrow("LeftJoystick") == self.FULL_NEUTRAL or \
+                    self.convert_to_arrow("RightJoystick") == self.FULL_NEUTRAL:
                 self.awaiting_full_neutral = False
 
-    def update_state(self):
-        events = InputsController.read_events()
+    def update_state(self, read_events_func):
+        events = read_events_func()
         if events:
             self.set_val_from_events(events)
             return None
@@ -234,8 +238,8 @@ class XboxController:
 
         self.check_full_neutral()
 
-        # if changed_zones:
-        #     print(self.InTriggerZone)
+        if changed_zones:
+            print(self.get_arrow_directions())
 
         if not self.awaiting_full_neutral and zone_not_neutral:
             self.awaiting_full_neutral = True
@@ -243,11 +247,11 @@ class XboxController:
         return None
 
 
-def main():
+def inputs_main():
     controller = XboxController()
     while True:
         try:
-            letter = controller.update_state()
+            letter = controller.update_state(InputsController.read_events)
         except UnpluggedError as error:
             print(error)
             sleep(0.5)
@@ -256,26 +260,59 @@ def main():
                 print(letter)
 
 
-def gen_layout():
-    arrows = [
-        "🢀",
-        "🢄",
-        "🢁",
-        "🢅",
-        "🢂",
-        "🢆",
-        "🢃",
-        "🢇",
-    ]
+class BACKEND_TYPE:
+    Pygame = "Pygame"
+    Inputs = "Inputs"
 
-    arrows_layout = []
-    for left in arrows:
-        for right in arrows[:5]:
-            arrows_layout.append((left, right))
 
-    import string
-    alpabet = string.ascii_uppercase + string.digits
+def pygame_read_events():
+    proper_events = {}
+    for event in pygame.event.get():
+        if event.type == pygame.JOYAXISMOTION:
+            value = int(XboxController.MAX_JOY_VAL * event.value)
+            axis = event.axis
+            try:
+                attr_name = {
+                    0: "LeftJoystickX",
+                    1: "LeftJoystickY",
+                    3: "RightJoystickX",
+                    4: "RightJoystickY",
+                }[axis]
+            except KeyError as error:
+                print(error)
+                continue
+
+            if attr_name.endswith("Y"):
+                value *= -1
+
+            proper_events[attr_name] = value
+            # print(attr_name, value)
+
+    return proper_events
+
+
+def pygame_main():
+    pygame.init()
+    joysticks = []
+    clock = pygame.time.Clock()
+    keepPlaying = True
+
+    controller = XboxController()
+
+    # for al the connected joysticks
+    for i in range(0, pygame.joystick.get_count()):
+        # create an Joystick object in our list
+        joysticks.append(pygame.joystick.Joystick(i))
+        # initialize them all (-1 means loop forever)
+        joysticks[-1].init()
+        # print a statement telling what the name of the controller is
+        print("Detected joystick "), joysticks[-1].get_name(), "'"
+    while keepPlaying:
+        clock.tick(60)
+        letter = controller.update_state(pygame_read_events)
+        if letter:
+            print(letter)
 
 
 if __name__ == '__main__':
-    main()
+    pygame_main()
