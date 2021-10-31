@@ -222,11 +222,16 @@ class Controller:
         return boundary_mapping
 
     def detect_letter(self):
-        for zone in [(self.LeftStickZone, self.RightStickZone)]:
-            if zone in [self.NEUTRAL_ZONE, self.EDGE_ZONE]:
+        cur_zones = (self.LeftStickZone, self.RightStickZone)
+        for zone in cur_zones:
+            if zone == self.NEUTRAL_ZONE:
+                return None
+            elif zone == self.EDGE_ZONE:
                 raise ValueError()
+
+        self.awaiting_neutral_pos = True
         try:
-            return self.layout[(self.LeftStickZone, self.RightStickZone)]
+            return self.layout[cur_zones]
         except KeyError as error:
             print(error)
             return 'Undefined'
@@ -261,14 +266,13 @@ class Controller:
                 if new_zone == self.NEUTRAL_ZONE:
                     self.awaiting_neutral_pos = False
             else:
-                if self.LeftStickZone != self.NEUTRAL_ZONE and self.RightStickZone != self.NEUTRAL_ZONE:
-                    return self.detect_letter()
+                return self.detect_letter()
 
         return None
 
     NEUTRAL_ZONE = '⬤'
     EDGE_ZONE = '❌'
-    angle_margin = 20
+    angle_margin = 15
     magnitude_threshold_pct = 75
     magnitude_threshold = magnitude_threshold_pct / 100
 
@@ -312,7 +316,8 @@ class DemoApp(App):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
             print(letter)
-            letter = ord(letter)
+
+            letter = ord(letter[0])
         else:
             letter = ""
 
