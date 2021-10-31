@@ -32,7 +32,7 @@ def load_layout():
     return layout
 
 
-class XboxController(object):
+class InputsController:
     @staticmethod
     def read_events():
         events = get_gamepad()
@@ -79,6 +79,9 @@ class XboxController(object):
             elif event.code == 'BTN_TRIGGER_HAPPY4':
                 state["DownDPad"] = event.state
         return state
+
+
+class XboxController:
 
     def __init__(self):
         self.layout = load_layout()
@@ -209,7 +212,7 @@ class XboxController(object):
                 self.awaiting_full_neutral = False
 
     def update_state(self):
-        events = XboxController.read_events()
+        events = InputsController.read_events()
         if events:
             self.set_val_from_events(events)
             return None
