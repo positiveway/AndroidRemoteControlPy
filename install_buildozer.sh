@@ -1,0 +1,1 @@
+sudo apt install -y git zip unzip default-jdk python3-pip autoconf libtool pkg-config zlib1g-dev cmake libffi-dev libssl-dev debhelper python3-dev
