@@ -2,3 +2,4 @@ sudo apt install -y git zip unzip default-jdk python3-pip python3-setuptools aut
 sudo pip install cython
 sudo pip install kivy
 sudo pip install buildozer
+sudo buildozer -v android debug
