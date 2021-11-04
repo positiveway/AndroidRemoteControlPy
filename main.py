@@ -1,3 +1,4 @@
+import uvicorn
 from kivy.app import App
 from pydantic import BaseModel
 
@@ -16,15 +17,19 @@ class SticksParams(BaseModel):
     right_angle: int
 
 
+@app.get("/")
+def root():
+    return {"hello world": ""}
+
+
 @app.post("/get_letter/")
 async def get_letter(stick_params: SticksParams):
-    letter = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, attr_prefix)
-    if letter:
-        print(letter)
+    letter1 = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, "Left")
+    letter2 = controller.update_zone(stick_params.right_magnitude, stick_params.right_angle, "Right")
 
-        letter = ord(letter[0])
-    else:
-        letter = ""
+    if letter1:
+        return letter1
+    return letter2
 
 
 def load_layout():
@@ -119,6 +124,12 @@ class Controller:
         }[zone]
 
     def update_zone(self, magnitude, angle, attr_prefix):
+        letter = self._update_zone(magnitude, angle, attr_prefix)
+        if letter is None:
+            letter = ""
+        return letter
+
+    def _update_zone(self, magnitude, angle, attr_prefix):
         angle = int(angle)
         attr_name = attr_prefix + "StickZone"
         prev_zone = getattr(self, attr_name)
@@ -184,8 +195,6 @@ class DemoApp(App):
             print(letter)
 
             letter = ord(letter[0])
-        else:
-            letter = ""
 
         text = "Zone: {}\nletter: {}\nx: {}\ny: {}\nradians: {}\nmagnitude: {}\nangle: {}"
 
@@ -199,4 +208,5 @@ class DemoApp(App):
 
 
 if __name__ == '__main__':
-    DemoApp().run()
+    # DemoApp().run()
+    uvicorn.run(app, host="0.0.0.0", port=8000)
