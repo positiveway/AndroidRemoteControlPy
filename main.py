@@ -1,3 +1,5 @@
+from functools import partial
+
 import uvicorn
 from kivy.app import App
 from pydantic import BaseModel
@@ -13,6 +15,8 @@ middleware = Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=T
                         allow_headers=['*'])
 
 app = FastAPI(middleware=[middleware])
+
+
 # app = FastAPI()
 
 
@@ -34,8 +38,16 @@ async def get_letter(stick_params: SticksParams):
     letter2 = controller.update_zone(stick_params.right_magnitude, stick_params.right_angle, "Right")
 
     if letter1:
-        return letter1
-    return letter2
+        letter = letter1
+    else:
+        letter = letter2
+
+    if letter:
+        print('=' * 40)
+        print(letter)
+        print('=' * 40)
+
+    return letter
 
 
 def load_layout():
@@ -59,17 +71,15 @@ def load_layout():
 
 class Controller:
     def detect_zone(self, magnitude, angle):
+        angle = int(angle)
         if magnitude > self.magnitude_threshold:
-            for boundary, arrow in self.boundary_mapping.items():
-                for cur_angle in boundary:
-                    if cur_angle == angle:
-                        return arrow
-            return self.EDGE_ZONE
+            return self.boundary_mapping.get(angle, self.EDGE_ZONE)
         else:
             return self.NEUTRAL_ZONE
 
-    def gen_range(self, lower_bound, upper_bound):
-        return [cur_angle for cur_angle in range(lower_bound, upper_bound)]
+    def _gen_range(self, lower_bound, upper_bound, boundary_mapping, arrow):
+        for cur_angle in range(lower_bound, upper_bound):
+            boundary_mapping[cur_angle] = arrow
 
     def gen_boundary_mapping(self):
         mapping = {
@@ -85,16 +95,16 @@ class Controller:
         boundary_mapping = {}
 
         for map_angle, arrow in mapping.items():
+            gen_range = partial(self._gen_range, boundary_mapping=boundary_mapping, arrow=arrow)
+
             upper_bound = map_angle + self.angle_margin
-            boundary_range = self.gen_range(map_angle, upper_bound)
+            gen_range(map_angle, upper_bound)
             if map_angle == 0:
                 lower_bound = 360 - self.angle_margin
-                boundary_range += self.gen_range(lower_bound, 360)
+                gen_range(lower_bound, 360)
             else:
                 lower_bound = map_angle - self.angle_margin
-                boundary_range += self.gen_range(lower_bound, map_angle)
-
-            boundary_mapping[tuple(boundary_range)] = arrow
+                gen_range(lower_bound, map_angle)
 
         return boundary_mapping
 
