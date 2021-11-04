@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 app = FastAPI()
 
@@ -17,13 +17,20 @@ class SticksParams(BaseModel):
     right_angle: int
 
 
+headers = {
+    "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type",
+}
+
+
 @app.get("/")
-def root():
+def root(response: Response):
+    response.headers.update(headers)
     return {"hello world": ""}
 
 
 @app.post("/get_letter/")
-async def get_letter(stick_params: SticksParams):
+async def get_letter(response: Response, stick_params: SticksParams):
+    response.headers.update(headers)
     letter1 = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, "Left")
     letter2 = controller.update_zone(stick_params.right_magnitude, stick_params.right_angle, "Right")
 
