@@ -6,8 +6,14 @@ from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from fastapi import FastAPI, Response
+from fastapi.middleware import Middleware
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+middleware = Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=True, allow_methods=['*'],
+                        allow_headers=['*'])
+
+app = FastAPI(middleware=[middleware])
+# app = FastAPI()
 
 
 class SticksParams(BaseModel):
@@ -17,20 +23,13 @@ class SticksParams(BaseModel):
     right_angle: int
 
 
-headers = {
-    "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type",
-}
-
-
 @app.get("/")
-def root(response: Response):
-    response.headers.update(headers)
+def root():
     return {"hello world": ""}
 
 
 @app.post("/get_letter/")
-async def get_letter(response: Response, stick_params: SticksParams):
-    response.headers.update(headers)
+async def get_letter(stick_params: SticksParams):
     letter1 = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, "Left")
     letter2 = controller.update_zone(stick_params.right_magnitude, stick_params.right_angle, "Right")
 
