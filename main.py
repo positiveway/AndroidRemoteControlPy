@@ -1,7 +1,30 @@
 from kivy.app import App
+from pydantic import BaseModel
+
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
+class SticksParams(BaseModel):
+    left_magnitude: float
+    right_magnitude: float
+    left_angle: int
+    right_angle: int
+
+
+@app.post("/get_letter/")
+async def get_letter(stick_params: SticksParams):
+    letter = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, attr_prefix)
+    if letter:
+        print(letter)
+
+        letter = ord(letter[0])
+    else:
+        letter = ""
 
 
 def load_layout():
