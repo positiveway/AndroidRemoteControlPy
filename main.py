@@ -3,75 +3,17 @@ from kivy.app import App
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-
-
-class ConnectionType:
-    GREQ = 0
-    SOCK = 2
-    THREADED = 3
-    AIOHTTP = 4
-
+import socket
 
 server_ip_num = 54
 server_ip = f'192.168.1.{server_ip_num}'
-server_port = 8000
-server_address = f'http://{server_ip}:{server_port}'
-endpoint_addr = f'{server_address}/send_letter'
+server_port = 5005
 
-CONNECTION_TYPE = ConnectionType.SOCK
-
-if CONNECTION_TYPE == ConnectionType.GREQ:
-    import grequests
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
 
-    def send_letter(letter):
-        rs = [grequests.post(endpoint_addr, json={'letter': letter})]
-        grequests.map(rs)
-
-elif CONNECTION_TYPE == ConnectionType.SOCK:
-    import socket
-
-    server_port = 5005
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-
-
-    def send_letter(letter: str):
-        sock.sendto(letter.encode('utf-8'), (server_ip, server_port))
-
-elif CONNECTION_TYPE == ConnectionType.THREADED:
-    print('THREADED')
-    import requests
-    import threading
-
-
-    def request_task(letter):
-        requests.post(endpoint_addr, json={'letter': letter})
-
-
-    def send_letter(letter):
-        threading.Thread(target=request_task, args=[letter]).start()
-
-elif CONNECTION_TYPE == ConnectionType.AIOHTTP:
-    import aiohttp
-    import asyncio
-    from aiohttp import ClientConnectionError
-
-    loop = asyncio.get_event_loop()
-    session = aiohttp.ClientSession()
-
-
-    async def _send(letter):
-        try:
-            await session.post(endpoint_addr, json={'letter': letter})
-        except ClientConnectionError as err:
-            pass
-
-
-    def send_letter(letter):
-        loop.run_until_complete(_send(letter))
-
-else:
-    raise NotImplemented()
+def send_letter(letter: str):
+    sock.sendto(letter.encode('utf-8'), (server_ip, server_port))
 
 
 def get_zone_number(attr_prefix):
@@ -150,11 +92,11 @@ class APISenderApp(App):
     def update_coordinates(self, joystick, pad, attr_prefix):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
-            # send_letter(letter)
+            send_letter(letter)
             self.label.text = letter
 
     def update_left(self, joystick, pad):
-        send_letter('n')
+        # send_letter('n')
         self.update_coordinates(joystick, pad, "Left")
 
     def update_right(self, joystick, pad):
