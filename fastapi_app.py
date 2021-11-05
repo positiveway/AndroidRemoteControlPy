@@ -1,5 +1,4 @@
 import uvicorn
-import grequests
 from pydantic import BaseModel
 
 from fastapi import FastAPI, Response, WebSocket

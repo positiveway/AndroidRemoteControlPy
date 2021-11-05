@@ -18,7 +18,7 @@ server_port = 8000
 server_address = f'http://{server_ip}:{server_port}'
 endpoint_addr = f'{server_address}/send_letter'
 
-CONNECTION_TYPE = ConnectionType.GREQ
+CONNECTION_TYPE = ConnectionType.SOCK
 
 if CONNECTION_TYPE == ConnectionType.GREQ:
     import grequests
@@ -31,12 +31,12 @@ if CONNECTION_TYPE == ConnectionType.GREQ:
 elif CONNECTION_TYPE == ConnectionType.SOCK:
     import socket
 
-    clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    clientSocket.connect((server_ip, server_port))
+    server_port = 5005
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
 
-    def send_letter(letter):
-        pass
+    def send_letter(letter: str):
+        sock.sendto(letter.encode('utf-8'), (server_ip, server_port))
 
 elif CONNECTION_TYPE == ConnectionType.THREADED:
     print('THREADED')
@@ -154,7 +154,7 @@ class APISenderApp(App):
             self.label.text = letter
 
     def update_left(self, joystick, pad):
-        # send_letter('n')
+        send_letter('n')
         self.update_coordinates(joystick, pad, "Left")
 
     def update_right(self, joystick, pad):
