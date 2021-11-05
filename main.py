@@ -66,12 +66,17 @@ class DemoApp(App):
 
 class APISenderApp(App):
     server_ip_num = 54
-    server_ip = '192.168.1.'
+    server_ip = 'http://192.168.1.'
     server_port = 8000
     server_address = f'{server_ip}{server_ip_num}:{server_port}'
 
     def send_letter(self, letter):
-        requests.post(f'{self.server_address}/send_letter', data={'letter': letter})
+        try:
+            resp = requests.post(f'{self.server_address}/send_letter', json={'letter': letter})
+            if resp.status_code != 200:
+                return 'SrvErr'
+        except requests.exceptions.ConnectionError as err:
+            return 'NoConnect'
         return letter
 
     def build(self):
