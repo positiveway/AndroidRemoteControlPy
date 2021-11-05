@@ -154,7 +154,7 @@ class APISenderApp(App):
             self.label.text = letter
 
     def update_left(self, joystick, pad):
-        send_letter('n')
+        # send_letter('n')
         self.update_coordinates(joystick, pad, "Left")
 
     def update_right(self, joystick, pad):
