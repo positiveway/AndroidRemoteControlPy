@@ -1,7 +1,8 @@
 import uvicorn
+import grequests
 from pydantic import BaseModel
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, WebSocket
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -50,6 +51,14 @@ async def get_letter(stick_params: SticksParams):
 @app.post("/send_letter/", status_code=200)
 async def send_letter(letter: Letter):
     print(letter.letter)
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        letter = await websocket.receive_text()
+        print(letter)
 
 
 if __name__ == '__main__':

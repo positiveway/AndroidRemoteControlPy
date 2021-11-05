@@ -1,4 +1,6 @@
-import requests
+import socket
+
+import grequests
 
 from controller import controller
 from kivy.app import App
@@ -64,19 +66,22 @@ class DemoApp(App):
         self.right_label.text = self.update_coordinates(joystick, pad, "Right")
 
 
-class APISenderApp(App):
-    server_ip_num = 54
-    server_ip = 'http://192.168.1.'
-    server_port = 8000
-    server_address = f'{server_ip}{server_ip_num}:{server_port}'
+server_ip_num = 54
+server_ip = f'192.168.1.{server_ip_num}'
+server_port = 8000
+server_address = f'http://{server_ip}:{server_port}'
+endpoint_addr = f'{server_address}/send_letter'
 
+
+# clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# clientSocket.connect((server_ip, server_port))
+
+
+class APISenderApp(App):
     def send_letter(self, letter):
-        try:
-            resp = requests.post(f'{self.server_address}/send_letter', json={'letter': letter})
-            if resp.status_code != 200:
-                return 'SrvErr'
-        except requests.exceptions.ConnectionError as err:
-            return 'NoConnect'
+        rs = [grequests.post(endpoint_addr, json={'letter': letter})]
+        grequests.map(rs)
+        # return 'NoConnect'
         return letter
 
     def build(self):
@@ -107,6 +112,10 @@ class APISenderApp(App):
         self.update_coordinates(joystick, pad, "Right")
 
 
-if __name__ == '__main__':
+def main():
     # DemoApp().run()
     APISenderApp().run()
+
+
+if __name__ == '__main__':
+    main()
