@@ -20,11 +20,6 @@ class SticksParams(BaseModel):
     right_angle: int
 
 
-@app.get("/")
-def root():
-    return {"hello world": ""}
-
-
 @app.post("/get_letter/")
 async def get_letter(stick_params: SticksParams):
     letter1 = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, "Left")
@@ -41,6 +36,11 @@ async def get_letter(stick_params: SticksParams):
         print('=' * 40)
 
     return letter
+
+
+@app.post("/send_letter")
+def send_letter(letter: str):
+    print(letter)
 
 
 if __name__ == '__main__':
