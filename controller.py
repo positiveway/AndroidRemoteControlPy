@@ -103,8 +103,7 @@ class Controller:
 
         return None
 
-    NEUTRAL_ZONE = '⨁'
-    CENTRE_ZONE = '⬤'
+    NEUTRAL_ZONE = '⬤'
     EDGE_ZONE = '❌'
     angle_margin = 15
     magnitude_threshold_pct = 75

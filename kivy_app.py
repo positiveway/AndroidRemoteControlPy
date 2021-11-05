@@ -17,7 +17,6 @@ def get_zone_number(attr_prefix):
         "🢇": 6,
         "🢃": 7,
         "🢆": 8,
-        controller.CENTRE_ZONE: 0,
         controller.NEUTRAL_ZONE: -1,
         controller.EDGE_ZONE: -2,
     }[zone]
