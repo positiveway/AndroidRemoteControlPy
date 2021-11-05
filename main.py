@@ -82,12 +82,12 @@ class APISenderApp(App):
         left_joystick.bind(pad=self.update_left)
         self.root.add_widget(left_joystick)
 
+        self.label = Label()
+        self.root.add_widget(self.label)
+
         right_joystick = Joystick()
         right_joystick.bind(pad=self.update_right)
         self.root.add_widget(right_joystick)
-
-        self.label = Label()
-        self.root.add_widget(self.label)
 
     def update_coordinates(self, joystick, pad, attr_prefix):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
