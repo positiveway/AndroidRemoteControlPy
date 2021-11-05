@@ -1,0 +1,6 @@
+cython
+kivy
+buildozer
+pydantic
+fastapi
+uvicorn

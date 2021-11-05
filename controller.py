@@ -1,54 +1,5 @@
 from functools import partial
 
-import uvicorn
-from kivy.app import App
-from pydantic import BaseModel
-
-from garden_joystick import Joystick
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from fastapi import FastAPI, Response
-from fastapi.middleware import Middleware
-from fastapi.middleware.cors import CORSMiddleware
-
-middleware = Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=True, allow_methods=['*'],
-                        allow_headers=['*'])
-
-app = FastAPI(middleware=[middleware])
-
-
-# app = FastAPI()
-
-
-class SticksParams(BaseModel):
-    left_magnitude: float
-    right_magnitude: float
-    left_angle: int
-    right_angle: int
-
-
-@app.get("/")
-def root():
-    return {"hello world": ""}
-
-
-@app.post("/get_letter/")
-async def get_letter(stick_params: SticksParams):
-    letter1 = controller.update_zone(stick_params.left_magnitude, stick_params.left_angle, "Left")
-    letter2 = controller.update_zone(stick_params.right_magnitude, stick_params.right_angle, "Right")
-
-    if letter1:
-        letter = letter1
-    else:
-        letter = letter2
-
-    if letter:
-        print('=' * 40)
-        print(letter)
-        print('=' * 40)
-
-    return letter
-
 
 def load_layout():
     layout = {}
@@ -126,18 +77,7 @@ class Controller:
     def get_zone(self, attr_prefix):
         attr_name = attr_prefix + "StickZone"
         zone = getattr(self, attr_name)
-        return {
-            "🢂": 1,
-            "🢅": 2,
-            "🢁": 3,
-            "🢄": 4,
-            "🢀": 5,
-            "🢇": 6,
-            "🢃": 7,
-            "🢆": 8,
-            "⬤": -1,
-            "❌": -2,
-        }[zone]
+        return zone
 
     def update_zone(self, magnitude, angle, attr_prefix):
         letter = self._update_zone(magnitude, angle, attr_prefix)
@@ -163,7 +103,8 @@ class Controller:
 
         return None
 
-    NEUTRAL_ZONE = '⬤'
+    NEUTRAL_ZONE = '⨁'
+    CENTRE_ZONE = '⬤'
     EDGE_ZONE = '❌'
     angle_margin = 15
     magnitude_threshold_pct = 75
@@ -180,49 +121,3 @@ class Controller:
 
 
 controller = Controller()
-
-
-class DemoApp(App):
-    def build(self):
-        self.root = BoxLayout()
-        self.root.padding = 50
-
-        left_joystick = Joystick()
-        left_joystick.bind(pad=self.update_left)
-        self.root.add_widget(left_joystick)
-        self.left_label = Label()
-        self.root.add_widget(self.left_label)
-
-        right_joystick = Joystick()
-        right_joystick.bind(pad=self.update_right)
-        self.root.add_widget(right_joystick)
-        self.right_label = Label()
-        self.root.add_widget(self.right_label)
-
-    def update_coordinates(self, joystick, pad, attr_prefix):
-        x = str(pad[0])[0:5]
-        y = str(pad[1])[0:5]
-        radians = str(joystick.radians)[0:5]
-        magnitude = str(joystick.magnitude)[0:5]
-        angle = str(joystick.angle)[0:5]
-
-        letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
-        if letter:
-            print(letter)
-
-            letter = ord(letter[0])
-
-        text = "Zone: {}\nletter: {}\nx: {}\ny: {}\nradians: {}\nmagnitude: {}\nangle: {}"
-
-        return text.format(controller.get_zone(attr_prefix), letter, x, y, radians, magnitude, angle)
-
-    def update_left(self, joystick, pad):
-        self.left_label.text = self.update_coordinates(joystick, pad, "Left")
-
-    def update_right(self, joystick, pad):
-        self.right_label.text = self.update_coordinates(joystick, pad, "Right")
-
-
-if __name__ == '__main__':
-    # DemoApp().run()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
