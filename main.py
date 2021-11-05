@@ -150,7 +150,7 @@ class APISenderApp(App):
     def update_coordinates(self, joystick, pad, attr_prefix):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
-            send_letter(letter)
+            # send_letter(letter)
             self.label.text = letter
 
     def update_left(self, joystick, pad):
