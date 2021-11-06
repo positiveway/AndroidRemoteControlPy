@@ -6,7 +6,14 @@ from kivy.uix.label import Label
 import socket
 from kivy.utils import platform
 
-if platform == "android":
+ENABLE_VIBRATE = True
+
+
+def is_vibro_enabled():
+    return platform == "android" and ENABLE_VIBRATE
+
+
+if is_vibro_enabled():
     from android.permissions import request_permissions, Permission
     from plyer import vibrator
 
@@ -99,7 +106,8 @@ class APISenderApp(App):
     def update_coordinates(self, joystick, pad, attr_prefix):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
-            vibrator.vibrate(0.5)
+            if is_vibro_enabled():
+                vibrator.vibrate(0.5)
             send_letter(letter)
             self.label.text = letter
 
