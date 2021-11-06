@@ -3,6 +3,7 @@ from kivy.app import App
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from plyer import vibrator
 import socket
 
 server_ip_num = 54
@@ -92,6 +93,7 @@ class APISenderApp(App):
     def update_coordinates(self, joystick, pad, attr_prefix):
         letter = controller.update_zone(joystick.magnitude, joystick.angle, attr_prefix)
         if letter:
+            vibrator.vibrate(0.5)
             send_letter(letter)
             self.label.text = letter
 
