@@ -5,6 +5,12 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from plyer import vibrator
 import socket
+from kivy.utils import platform
+
+if platform == "android":
+    from android.permissions import request_permissions, Permission
+
+    request_permissions([Permission.VIBRATE])
 
 server_ip_num = 54
 server_ip = f'192.168.1.{server_ip_num}'
