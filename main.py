@@ -3,12 +3,12 @@ from kivy.app import App
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from plyer import vibrator
 import socket
 from kivy.utils import platform
 
 if platform == "android":
     from android.permissions import request_permissions, Permission
+    from plyer import vibrator
 
     request_permissions([Permission.VIBRATE])
 
