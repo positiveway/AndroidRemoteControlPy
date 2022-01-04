@@ -5,7 +5,7 @@ from fastapi import FastAPI, Response, WebSocket
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 
-from controller import controller
+from backend import controller
 
 middleware = Middleware(CORSMiddleware, allow_origins=['*'], allow_credentials=True, allow_methods=['*'],
                         allow_headers=['*'])

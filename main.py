@@ -1,4 +1,4 @@
-from controller import controller
+from backend import controller
 from kivy.app import App
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
@@ -33,14 +33,14 @@ def send_letter(letter: str):
 def get_zone_number(attr_prefix):
     zone = controller.get_zone(attr_prefix)
     return {
-        "🢂": 1,
-        "🢅": 2,
-        "🢁": 3,
-        "🢄": 4,
-        "🢀": 5,
-        "🢇": 6,
-        "🢃": 7,
-        "🢆": 8,
+        "Right": 1,
+        "UpRight": 2,
+        "Up": 3,
+        "UpLeft": 4,
+        "Left": 5,
+        "DownLeft": 6,
+        "Down": 7,
+        "DownRight": 8,
         controller.NEUTRAL_ZONE: -1,
         controller.EDGE_ZONE: -2,
     }[zone]
