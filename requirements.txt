@@ -1,3 +1,4 @@
 kivy
 python-for-android
 plyer
+pygame
