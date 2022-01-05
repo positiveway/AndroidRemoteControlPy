@@ -8,7 +8,7 @@ class ReversedEnum(Enum):
     def get_reversed_map(cls):
         filter_func = lambda attr: not attr.startswith('__')
         attr_list = list(filter(filter_func, dir(cls)))
-        return {getattr(ButtonsMap, attr): attr for attr in attr_list}
+        return {getattr(cls, attr): attr for attr in attr_list}
 
 
 class ButtonsMap(ReversedEnum):
