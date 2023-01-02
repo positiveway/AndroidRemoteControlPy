@@ -22,8 +22,7 @@ if is_vibro_enabled():
     request_permissions([Permission.VIBRATE])
 
 server_ip_num = 104
-# server_ip = f'192.168.1.{server_ip_num}'
-server_ip = '127.0.0.1'
+server_ip = f'192.168.1.{server_ip_num}'
 server_port = 5005
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
@@ -49,8 +48,14 @@ class APISenderApp(App):
         self.root.add_widget(self.label)
 
         joystick = Joystick()
+
+        joystick.size_hint_x = 0.5
+        joystick.size_hint_y = 0.5
+        joystick.pos_hint = {'top': 0.9}
+
         joystick.pad_size = 0.4
         joystick.inner_size = 0
+
         joystick.bind(pad=self.update_coordinates)
         self.root.add_widget(joystick)
 
