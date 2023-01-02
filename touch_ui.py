@@ -101,7 +101,7 @@ class APISenderApp(App):
         self.label.text = f'{letter}\n{hints}\n{cur_stage}: {zone}'
 
     def update_coordinates(self, joystick, pad):
-        send_typing_params(joystick.magnitude, joystick.angle)
+        # send_typing_params(joystick.magnitude, joystick.angle)
 
         # print(joystick.magnitude, joystick.angle)
 
