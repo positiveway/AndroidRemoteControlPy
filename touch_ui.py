@@ -40,18 +40,21 @@ def send_typing(magnitude, angle):
 class APISenderApp(App):
     def build(self):
         self.root = BoxLayout()
-        self.root.padding = 50
+        # self.root.padding = 100
 
         self.label = Label()
         self.label.font_size = 50
         self.label.text = "Empty"
         self.root.add_widget(self.label)
 
+        self.label.size_hint_x = 0.25
+        self.label.size_hint_y = 0.9
+
         joystick = Joystick()
 
-        joystick.size_hint_x = 0.5
-        joystick.size_hint_y = 0.5
-        joystick.pos_hint = {'top': 0.9}
+        joystick.size_hint_x = 0.25
+        joystick.size_hint_y = 0.25
+        joystick.pos_hint = {'top': 0.5}
 
         joystick.pad_size = 0.4
         joystick.inner_size = 0
