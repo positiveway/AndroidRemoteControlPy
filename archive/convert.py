@@ -11,9 +11,20 @@ mapping = {
     "🢆": 'DownRight',
 }
 
+mapping = {
+    "🢂": '→',
+    "🢅": '↗',
+    "🢁": '↑',
+    "🢄": '↖',
+    "🢀": '←',
+    "🢇": '↙',
+    "🢃": '↓',
+    "🢆": '↘',
+}
 
 def main():
-    cur_project = Path(__file__).parent.resolve()
+    cur_project = Path(__file__).parent.parent.resolve()
+    print(cur_project)
     base_directory = cur_project
     for p in base_directory.iterdir():
         if p.name == 'convert.py' or not (p.is_file() and (p.match('*.py') or p.match('*.csv'))):

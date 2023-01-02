@@ -94,7 +94,7 @@ class Controller:
     def print_layout_error(self, stick_positions, error):
         print(f'no letter for this position: {stick_positions} or lang: {self.lang}, error: {error}')
 
-    def detect_letter(self) -> str | None:
+    def detect_letter(self):
         stick_positions = (self.stick_pos_1, self.stick_pos_2)
 
         try:
@@ -114,7 +114,7 @@ class Controller:
 
         return letter
 
-    def update_zone(self, magnitude, angle) -> str | None:
+    def update_zone(self, magnitude, angle):
         if self.cur_stage == 0 or self.cur_stage == 0.5:
             prev_zone = self.stick_pos_1
         elif self.cur_stage == 1 or self.cur_stage == 1.5:
