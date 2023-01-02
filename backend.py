@@ -86,9 +86,9 @@ class Controller:
         return letter
 
     def update_zone(self, magnitude, angle) -> str | None:
-        if self.stick_1_not_set:
+        if self.cur_stage == 0 or self.cur_stage == 0.5:
             prev_zone = self.stick_pos_1
-        else:
+        elif self.cur_stage == 1 or self.cur_stage == 1.5:
             prev_zone = self.stick_pos_2
 
         new_zone = self.detect_zone(magnitude, angle)
@@ -100,25 +100,24 @@ class Controller:
 
         if new_zone == self.NEUTRAL_ZONE:
             self.awaiting_neutral_pos = False
+            self.cur_stage += 0.5
 
-            if self.stick_1_not_set:
-                self.stick_1_not_set = False
-                # print("set 1 full")
-            else:
+            if self.cur_stage == 2:
                 self.reset()
         else:
             if self.awaiting_neutral_pos:
                 return None
             else:
                 self.awaiting_neutral_pos = True
+                self.cur_stage += 0.5
 
-            if self.stick_1_not_set:
-                # print("set 1 init")
-                self.stick_pos_1 = new_zone
-            else:
-                self.stick_pos_2 = new_zone
-                letter = self.detect_letter()
-                return letter
+                if self.cur_stage == 0.5:
+                    self.stick_pos_1 = new_zone
+
+                elif self.cur_stage == 1.5:
+                    self.stick_pos_2 = new_zone
+                    letter = self.detect_letter()
+                    return letter
 
         return None
 
@@ -126,7 +125,7 @@ class Controller:
         self.stick_pos_1 = self.NEUTRAL_ZONE
         self.stick_pos_2 = self.NEUTRAL_ZONE
 
-        self.stick_1_not_set = True
+        self.cur_stage = 0
         self.awaiting_neutral_pos = False
 
     NEUTRAL_ZONE = '⬤'

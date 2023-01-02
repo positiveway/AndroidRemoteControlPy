@@ -1,4 +1,6 @@
 from kivy.app import App
+
+from backend import controller
 from garden_joystick import Joystick
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -33,8 +35,12 @@ def send_command_to_ws(command_type, info: str):
     sock.sendto(msg.encode('utf-8'), (server_ip, server_port))
 
 
-def send_typing(magnitude, angle):
+def send_typing_params(magnitude, angle):
     send_command_to_ws('t', f'{magnitude},{angle}')
+
+
+def send_typing_letter(letter):
+    send_command_to_ws('l', letter)
 
 
 class APISenderApp(App):
@@ -44,7 +50,6 @@ class APISenderApp(App):
 
         self.label = Label()
         self.label.font_size = 50
-        self.label.text = "Empty"
         self.root.add_widget(self.label)
 
         self.label.size_hint_x = 0.25
@@ -62,16 +67,49 @@ class APISenderApp(App):
         joystick.bind(pad=self.update_coordinates)
         self.root.add_widget(joystick)
 
+        self.prev_letter = ""
+        self.update_label()
+
+    def update_label(self):
+        cur_stage = controller.cur_stage
+        if cur_stage == 0 or cur_stage == 0.5:
+            zone = controller.stick_pos_1
+        elif cur_stage == 1 or cur_stage == 1.5:
+            zone = controller.stick_pos_2
+
+        if cur_stage == 1.5 or cur_stage == 0:
+            letter_to_display = self.prev_letter
+        else:
+            letter_to_display = ''
+
+        zone = {
+            "🢂": 'Right',
+            "🢅": 'UpRight',
+            "🢁": 'Up',
+            "🢄": 'UpLeft',
+            "🢀": 'Left',
+            "🢇": 'DownLeft',
+            "🢃": 'Down',
+            "🢆": 'DownRight',
+            "⬤": 'Neutral',
+            "❌": 'Unmapped',
+        }[zone]
+
+        self.label.text = f'{letter_to_display}\n{cur_stage}: {zone}'
+
     def update_coordinates(self, joystick, pad):
-        send_typing(joystick.magnitude, joystick.angle)
+        send_typing_params(joystick.magnitude, joystick.angle)
 
         # print(joystick.magnitude, joystick.angle)
 
-        # letter = controller.update_zone(joystick.magnitude, joystick.angle)  # test
-        # if letter is not None:
-        #     if is_vibro_enabled():
-        #         vibrator.vibrate(0.5)
-        # self.label.text = letter
+        letter = controller.update_zone(joystick.magnitude, joystick.angle)
+        if letter is not None:
+            #     if is_vibro_enabled():
+            #         vibrator.vibrate(0.5)
+            send_typing_letter(letter)
+            self.prev_letter = letter
+
+        self.update_label()
 
 
 def main():

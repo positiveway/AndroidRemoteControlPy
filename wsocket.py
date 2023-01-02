@@ -19,7 +19,10 @@ def custom_ws():
         command_type = data[0]
         command = data[1:]
 
-        if command_type == 't':  # typing
+        if command_type == 'l':  # letter
+            print(command)
+
+        elif command_type == 't':  # typing
             magnitude, angle = command.split(',')
             magnitude, angle = float(magnitude), float(angle)
             letter = controller.update_zone(magnitude, angle)
