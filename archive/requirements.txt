@@ -1,4 +1,4 @@
 kivy
-plyer
 python-for-android
-websockets
+plyer
+pygame

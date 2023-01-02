@@ -1,0 +1,18 @@
+{
+  "mouse": {
+    "speed": {
+      "normal": 1,
+      "fast": 2
+    }
+  },
+  "scroll": {
+    "speed": {
+      "normal": 1,
+      "fast": 2
+    }
+  },
+  "typing": {
+    "thresholdPct": 35,
+    "angleMargin": 22
+  }
+}
