@@ -99,19 +99,26 @@ class Controller:
             return None
 
         if new_zone == self.NEUTRAL_ZONE:
+            self.awaiting_neutral_pos = False
+
             if self.stick_1_not_set:
                 self.stick_1_not_set = False
                 # print("set 1 full")
             else:
-                letter = self.detect_letter()
                 self.reset()
-                return letter
         else:
+            if self.awaiting_neutral_pos:
+                return None
+            else:
+                self.awaiting_neutral_pos = True
+
             if self.stick_1_not_set:
                 # print("set 1 init")
                 self.stick_pos_1 = new_zone
             else:
                 self.stick_pos_2 = new_zone
+                letter = self.detect_letter()
+                return letter
 
         return None
 
@@ -120,6 +127,7 @@ class Controller:
         self.stick_pos_2 = self.NEUTRAL_ZONE
 
         self.stick_1_not_set = True
+        self.awaiting_neutral_pos = False
 
     NEUTRAL_ZONE = '⬤'
     UNMAPPED_ZONE = '❌'
