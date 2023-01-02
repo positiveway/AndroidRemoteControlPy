@@ -24,6 +24,32 @@ def load_layout():
     return layout
 
 
+def generate_hints(layout):
+    langs = ['en', 'ru']
+    directions = ["🢂", "🢅", "🢁", "🢄", "🢀", "🢇", "🢃", "🢆"]
+    lang_direction_hints = {}
+
+    for lang in langs:
+        lang_direction_hints[lang] = {}
+        for direction in directions:
+            lang_direction_hints[lang][direction] = []
+
+    for direction in directions:
+        for stick_positions, letters in layout.items():
+            if stick_positions[0] == direction:
+                for lang, letter in letters.items():
+                    lang_direction_hints[lang][direction].append(letter)
+
+    for lang in langs:
+        for direction in directions:
+            hints = lang_direction_hints[lang][direction]
+            hints = [hint for hint in hints if hint]
+            hints = ', '.join(hints)
+            lang_direction_hints[lang][direction] = hints
+
+    return lang_direction_hints
+
+
 def load_configs():
     with open("configs.json", encoding="utf8") as file:
         return json.load(file)
@@ -34,6 +60,9 @@ def resole_angle(angle):
 
 
 class Controller:
+    def get_direction_hints(self, direction):
+        return self.direction_hints[self.lang][direction]
+
     def gen_boundary_mapping(self, angle_margin):
         base_mapping = {
             0: "🢂",
@@ -134,6 +163,8 @@ class Controller:
     def __init__(self):
         self.layout = load_layout()
         self.configs = load_configs()
+
+        self.direction_hints = generate_hints(self.layout)
 
         self.lang = 'en'
 

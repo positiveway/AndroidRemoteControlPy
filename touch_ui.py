@@ -77,10 +77,13 @@ class APISenderApp(App):
         elif cur_stage == 1 or cur_stage == 1.5:
             zone = controller.stick_pos_2
 
+        letter = ''
         if cur_stage == 1.5 or cur_stage == 0:
-            letter_to_display = self.prev_letter
-        else:
-            letter_to_display = ''
+            letter = f'{self.prev_letter}'
+
+        hints = ''
+        if cur_stage == 0.5 or cur_stage == 1:
+            hints = f'{controller.get_direction_hints(controller.stick_pos_1)}'
 
         zone = {
             "🢂": 'Right',
@@ -95,7 +98,7 @@ class APISenderApp(App):
             "❌": 'Unmapped',
         }[zone]
 
-        self.label.text = f'{letter_to_display}\n{cur_stage}: {zone}'
+        self.label.text = f'{letter}\n{hints}\n{cur_stage}: {zone}'
 
     def update_coordinates(self, joystick, pad):
         send_typing_params(joystick.magnitude, joystick.angle)
