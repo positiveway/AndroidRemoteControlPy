@@ -1,4 +1,6 @@
 from kivy.app import App
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 
 from backend import controller
 from garden_joystick import Joystick
@@ -45,27 +47,40 @@ def send_typing_letter(letter):
 
 class APISenderApp(App):
     def build(self):
-        self.root = BoxLayout()
-        # self.root.padding = 100
+        self.root = GridLayout(cols=2, rows=3)
+        # self.root = BoxLayout()
+        # self.root.padding = 110
+
+        self.buttons = GridLayout(cols=2,rows=2)
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
 
         self.label = Label()
         self.label.font_size = 50
         self.root.add_widget(self.label)
 
-        self.label.size_hint_x = 0.25
-        self.label.size_hint_y = 0.9
+        # self.label.size_hint_x = 0.25
+        # self.label.size_hint_y = 0.9
+
+        self.root.add_widget(Label())
+        self.root.add_widget(self.buttons)
 
         joystick = Joystick()
 
-        joystick.size_hint_x = 0.25
-        joystick.size_hint_y = 0.25
-        joystick.pos_hint = {'top': 0.5}
+        # joystick.size_hint_x = 0.25
+        # joystick.size_hint_y = 0.25
+        # joystick.pos_hint = {'top': 0.5}
 
         joystick.pad_size = 0.4
         joystick.inner_size = 0
 
         joystick.bind(pad=self.update_coordinates)
         self.root.add_widget(joystick)
+
+        self.root.add_widget(Label())
+        self.root.add_widget(Label())
 
         self.prev_letter = ""
         self.update_label()
@@ -109,8 +124,10 @@ class APISenderApp(App):
         if letter is not None:
             #     if is_vibro_enabled():
             #         vibrator.vibrate(0.5)
-            send_typing_letter(letter)
+
             self.prev_letter = letter
+            if letter != controller.UNMAPPED_POSITION:
+                send_typing_letter(letter)
 
         self.update_label()
 

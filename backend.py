@@ -15,6 +15,7 @@ def load_layout():
 
             letters = letters.replace('none', '')
             letters = letters.split(',')
+            letters = [letter.capitalize() for letter in letters]
 
             if stick_positions in layout:
                 raise ValueError(f"Repeated: {letters}")
@@ -92,7 +93,7 @@ class Controller:
             return self.NEUTRAL_ZONE
 
     def print_layout_error(self, stick_positions, error):
-        print(f'no letter for this position: {stick_positions} or lang: {self.lang}, error: {error}')
+        print(f'no letter for this position: {stick_positions} or lang: {self.lang}, error key: {error}')
 
     def detect_letter(self):
         stick_positions = (self.stick_pos_1, self.stick_pos_2)
@@ -110,7 +111,7 @@ class Controller:
             return None
 
         if letter == '':
-            letter = 'Undef'
+            letter = self.UNMAPPED_POSITION
 
         return letter
 
@@ -159,6 +160,7 @@ class Controller:
 
     NEUTRAL_ZONE = '⬤'
     UNMAPPED_ZONE = '❌'
+    UNMAPPED_POSITION = "Unmapped"
 
     def __init__(self):
         self.layout = load_layout()
