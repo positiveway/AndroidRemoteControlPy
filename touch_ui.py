@@ -46,7 +46,6 @@ def send_mouse_move(x, y):
     send_command_to_ws('m', f'{int(x)},{int(y)}')
 
 
-from random import random
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
