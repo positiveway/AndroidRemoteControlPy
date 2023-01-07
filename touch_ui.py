@@ -54,10 +54,12 @@ from kivy.graphics import Color, Ellipse, Line
 
 
 def update_coord_get_number_to_move(cur, prev):
+    move_every_n_pixels = controller.move_every_n_pixels
+
     diff = cur - prev
-    if abs(diff) > controller.move_every_n_pixels:
-        prev = cur - diff % controller.move_every_n_pixels
-        move_by = diff // controller.move_every_n_pixels * controller.move_by_n_pixels
+    if abs(diff) > move_every_n_pixels:
+        prev = cur - diff % move_every_n_pixels
+        move_by = diff // move_every_n_pixels * controller.move_by_n_pixels
         return prev, move_by
     else:
         return prev, 0
@@ -81,6 +83,10 @@ def is_in_zone(x, y, height, width):
 max_color = 255
 color = (80 / max_color, 200 / max_color, 1 / max_color)
 
+diameter = 30.
+radius = diameter / 2
+ellipse_size = (diameter, diameter)
+
 cols = 2
 rows = 3
 root = GridLayout(cols=cols, rows=rows)
@@ -94,8 +100,7 @@ class TouchpadWidget(Widget):
 
         with self.canvas:
             Color(*color)
-            d = 30.
-            Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
+            Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
     def on_touch_down(self, touch):
         if not is_in_zone(touch.x, touch.y, root.height, root.width):
@@ -115,6 +120,9 @@ class TouchpadWidget(Widget):
         send_mouse_move(move_x, move_y)
 
         self.draw_touch(touch)
+
+    def on_touch_up(self, touch):
+        self.canvas.clear()
 
 
 class APISenderApp(App):
@@ -167,9 +175,9 @@ class APISenderApp(App):
 
     def update_label(self):
         cur_stage = controller.cur_stage
-        if cur_stage == 0 or cur_stage == 0.5:
+        if cur_stage < 1:  # cur_stage == 0 or cur_stage == 0.5:
             zone = controller.stick_pos_1
-        elif cur_stage == 1 or cur_stage == 1.5:
+        else:  # elif cur_stage == 1 or cur_stage == 1.5:
             zone = controller.stick_pos_2
 
         letter = ''

@@ -116,9 +116,9 @@ class Controller:
         return letter
 
     def update_zone(self, magnitude, angle):
-        if self.cur_stage == 0 or self.cur_stage == 0.5:
+        if self.cur_stage < 1:  # self.cur_stage == 0 or self.cur_stage == 0.5:
             prev_zone = self.stick_pos_1
-        elif self.cur_stage == 1 or self.cur_stage == 1.5:
+        else:  # elif self.cur_stage == 1 or self.cur_stage == 1.5:
             prev_zone = self.stick_pos_2
 
         new_zone = self.detect_zone(magnitude, angle)
