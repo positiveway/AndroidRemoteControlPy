@@ -1,5 +1,3 @@
-from functools import partial
-
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
@@ -33,9 +31,12 @@ def update_coord_get_number_to_move(cur, prev):
     move_every_n_pixels = controller.move_every_n_pixels
 
     diff = cur - prev
-    if abs(diff) > move_every_n_pixels:
-        prev = cur - diff % move_every_n_pixels
-        move_by = diff // move_every_n_pixels * controller.move_by_n_pixels
+    if abs(diff) >= move_every_n_pixels:  # greater or EQUAL
+        multiplier, remainder = divmod(diff, move_every_n_pixels)
+
+        prev = cur - remainder
+        move_by = multiplier * controller.move_by_n_pixels
+
         return prev, move_by
     else:
         return prev, 0
