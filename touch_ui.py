@@ -158,11 +158,16 @@ class APISenderApp(App):
 
         joystick.bind(pad=self.update_coordinates)
 
-        self.left_side = GridLayout(cols=1, rows=3)
+        self.left_buttons = GridLayout(cols=2, rows=1)
+        self.shift_button = Button(text="Shift", font_size=buttons_font_size)
+        self.caps_button = Button(text="Caps", font_size=buttons_font_size)
+        self.left_buttons.add_widget(self.caps_button)
+        self.left_buttons.add_widget(self.shift_button)
 
+        self.left_side = GridLayout(cols=1, rows=3)
         self.left_side.add_widget(self.label)
         self.left_side.add_widget(joystick)
-        self.left_side.add_widget(Label())
+        self.left_side.add_widget(self.left_buttons)
 
         self.prev_letter = ""
         self.update_label()
@@ -176,17 +181,17 @@ class APISenderApp(App):
         )
         self.right_click = Button()
 
-        self.buttons = GridLayout(cols=2, rows=2)
-        self.buttons.add_widget(self.button1)
-        self.buttons.add_widget(self.middle_click)
-        self.buttons.add_widget(self.left_click)
-        self.buttons.add_widget(self.right_click)
+        self.right_buttons = GridLayout(cols=2, rows=2)
+        self.right_buttons.add_widget(self.button1)
+        self.right_buttons.add_widget(self.middle_click)
+        self.right_buttons.add_widget(self.left_click)
+        self.right_buttons.add_widget(self.right_click)
 
         self.touchpad = TouchpadWidget()
 
         self.right_side = GridLayout(cols=1, rows=2)
 
-        self.right_side.add_widget(self.buttons)
+        self.right_side.add_widget(self.right_buttons)
         self.right_side.add_widget(self.touchpad)
 
         self.root.add_widget(self.left_side)
