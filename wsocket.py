@@ -1,37 +1,29 @@
 import socket
-from backend import controller
 
-port = 5005
+server_ip_num = 104
+server_ip = f'192.168.1.{server_ip_num}'
+server_port = 5005
 
-
-def custom_ws():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    # Bind the socket to the port
-    server_address = ('0.0.0.0', port)
-    s.bind(server_address)
-    print("####### Server is listening #######")
-
-    while True:
-        data, address = s.recvfrom(1024)
-        data = data.decode('utf-8')
-        # print(data)
-
-        command_type = data[0]
-        command = data[1:]
-
-        if command_type == 'l':  # letter
-            print(command)
-
-        elif command_type == 't':  # typing
-            magnitude, angle = command.split(',')
-            magnitude, angle = float(magnitude), float(angle)
-            letter = controller.update_zone(magnitude, angle)
-            if letter is not None:
-                print(letter)
-
-        #######
-        # s.sendto(send_data.encode('utf-8'), address)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
 
-if __name__ == '__main__':
-    custom_ws()
+def send_command_to_ws(command_type, info: str):
+    msg = f'{command_type}{info}'
+    sock.sendto(msg.encode('utf-8'), (server_ip, server_port))
+
+
+def send_typing_letter(letter):
+    send_command_to_ws('l', letter)
+
+
+def send_pressed(button):
+    send_command_to_ws('p', button)
+
+
+def send_released(button):
+    send_command_to_ws('r', button)
+
+
+def send_mouse_move(x, y):
+    send_command_to_ws('m', f'{int(x)},{int(y)}')
+

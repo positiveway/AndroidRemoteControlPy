@@ -1,10 +1,9 @@
-import socket
-
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
 from backend import controller
 from garden_joystick import Joystick
+from wsocket import send_mouse_move, send_pressed, send_released, send_typing_letter
 
 ENABLE_VIBRATE = False
 
@@ -21,34 +20,6 @@ if is_vibro_enabled():
     from android.permissions import request_permissions, Permission
 
     request_permissions([Permission.VIBRATE])
-
-server_ip_num = 104
-server_ip = f'192.168.1.{server_ip_num}'
-server_port = 5005
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-
-
-def send_command_to_ws(command_type, info: str):
-    msg = f'{command_type}{info}'
-    sock.sendto(msg.encode('utf-8'), (server_ip, server_port))
-
-
-def send_typing_letter(letter):
-    send_command_to_ws('l', letter)
-
-
-def send_pressed(button):
-    send_command_to_ws('p', button)
-
-
-def send_released(button):
-    send_command_to_ws('r', button)
-
-
-def send_mouse_move(x, y):
-    send_command_to_ws('m', f'{int(x)},{int(y)}')
-
 
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -137,6 +108,8 @@ class TouchpadWidget(Widget):
         self.draw_touch(touch)
 
     def on_double_tap(self, touch):
+        print("Double tap")
+
         if controller.press(controller.LeftMouse):
             send_pressed(controller.LeftMouse)
 
