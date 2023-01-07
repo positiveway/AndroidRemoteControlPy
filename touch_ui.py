@@ -64,14 +64,16 @@ def update_coord_get_number_to_move(cur, prev):
 
 
 def is_in_zone(x, y, height, width):
-    max_x, max_y = width, height
     y = height - y
 
-    min_x = max_x / cols * (col_num - 1)
-    min_y = max_y / rows * (row_num - 1)
+    x_sector = width / cols
+    y_sector = height / rows
 
-    max_x = max_x / cols * col_num
-    max_y = max_y / rows * row_num
+    max_x = x_sector * col_num
+    max_y = y_sector * row_num
+
+    min_x = max_x - x_sector
+    min_y = max_y - y_sector
 
     return min_x < x < max_x and min_y < y < max_y
 
