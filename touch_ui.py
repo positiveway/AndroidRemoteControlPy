@@ -34,12 +34,16 @@ def send_command_to_ws(command_type, info: str):
     sock.sendto(msg.encode('utf-8'), (server_ip, server_port))
 
 
-def send_typing_params(magnitude, angle):
-    send_command_to_ws('t', f'{magnitude},{angle}')
-
-
 def send_typing_letter(letter):
     send_command_to_ws('l', letter)
+
+
+def send_pressed(button):
+    send_command_to_ws('p', button)
+
+
+def send_released(button):
+    send_command_to_ws('r', button)
 
 
 def send_mouse_move(x, y):
@@ -86,15 +90,27 @@ diameter = 30.
 radius = diameter / 2
 ellipse_size = (diameter, diameter)
 
+root = GridLayout(cols=2, rows=1)
+
 cols = 2
-rows = 3
-root = GridLayout(cols=cols, rows=rows)
+rows = 2
 col_num = 2
-row_num = 1
+row_num = 2
+
+visuals_for_touchpad = False
 
 
 class TouchpadWidget(Widget):
+    def clear_canvas(self):
+        if not visuals_for_touchpad:
+            return
+
+        self.canvas.clear()
+
     def draw_touch(self, touch):
+        if not visuals_for_touchpad:
+            return
+
         self.canvas.clear()
 
         with self.canvas:
@@ -108,7 +124,7 @@ class TouchpadWidget(Widget):
         self.prev_x = touch.x
         self.prev_y = touch.y
 
-        # self.draw_touch(touch)
+        self.draw_touch(touch)
 
     def on_touch_move(self, touch):
         if not is_in_zone(touch.x, touch.y, root.height, root.width):
@@ -118,42 +134,34 @@ class TouchpadWidget(Widget):
         self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
         send_mouse_move(move_x, move_y)
 
-        # self.draw_touch(touch)
+        self.draw_touch(touch)
+
+    def on_double_tap(self, touch):
+        if controller.press(controller.LeftMouse):
+            send_pressed(controller.LeftMouse)
 
     def on_touch_up(self, touch):
-        pass
-        # self.canvas.clear()
+        if controller.release(controller.LeftMouse):
+            send_released(controller.LeftMouse)
+
+        self.clear_canvas()
 
 
 class APISenderApp(App):
-    def clear_canvas(self, obj):
-        self.touchpad.canvas.clear()
-
     def build(self):
         self.root = root
 
-        self.touchpad = TouchpadWidget()
-        clearbtn = Button(text='Clear')
-        clearbtn.bind(on_release=self.clear_canvas)
+        # clearbtn = Button(text='Clear')
+        # clearbtn.bind(on_release=self.clear_canvas)
 
         # self.root = BoxLayout()
         # self.root.padding = 110
 
-        self.buttons = GridLayout(cols=2, rows=2)
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
-
         self.label = Label()
         self.label.font_size = 50
-        self.root.add_widget(self.label)
 
         # self.label.size_hint_x = 0.25
         # self.label.size_hint_y = 0.9
-
-        self.root.add_widget(Label())
-        self.root.add_widget(self.buttons)
 
         joystick = Joystick()
 
@@ -165,13 +173,31 @@ class APISenderApp(App):
         joystick.inner_size = 0
 
         joystick.bind(pad=self.update_coordinates)
-        self.root.add_widget(joystick)
 
-        self.root.add_widget(self.touchpad)
-        self.root.add_widget(clearbtn)
+        self.left_side = GridLayout(cols=1, rows=3)
+
+        self.left_side.add_widget(self.label)
+        self.left_side.add_widget(joystick)
+        self.left_side.add_widget(Label())
 
         self.prev_letter = ""
         self.update_label()
+
+        self.buttons = GridLayout(cols=2, rows=2)
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
+        self.buttons.add_widget(Button())
+
+        self.touchpad = TouchpadWidget()
+
+        self.right_side = GridLayout(cols=1, rows=2)
+
+        self.right_side.add_widget(self.buttons)
+        self.right_side.add_widget(self.touchpad)
+
+        self.root.add_widget(self.left_side)
+        self.root.add_widget(self.right_side)
 
     def update_label(self):
         cur_stage = controller.cur_stage
@@ -204,8 +230,6 @@ class APISenderApp(App):
         self.label.text = f'{letter}\n{hints}\n{cur_stage}: {zone}'
 
     def update_coordinates(self, joystick, pad):
-        # send_typing_params(joystick.magnitude, joystick.angle)
-
         # print(joystick.magnitude, joystick.angle)
 
         letter = controller.update_zone(joystick.magnitude, joystick.angle)

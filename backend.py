@@ -133,7 +133,7 @@ class Controller:
             self.cur_stage += 0.5
 
             if self.cur_stage == 2:
-                self.reset()
+                self.reset_typing()
         else:
             if self.awaiting_neutral_pos:
                 return None
@@ -151,16 +151,37 @@ class Controller:
 
         return None
 
-    def reset(self):
+    def reset_typing(self):
         self.stick_pos_1 = self.NEUTRAL_ZONE
         self.stick_pos_2 = self.NEUTRAL_ZONE
 
         self.cur_stage = 0
         self.awaiting_neutral_pos = False
 
+    def reset_pressed(self):
+        self.pressed = {self.LeftMouse: False, self.RightMouse: False, self.MiddleMouse: False}
+
+    def press(self, button):
+        if self.pressed[button]:
+            return False
+        else:
+            self.pressed[button] = True
+            return True
+
+    def release(self, button):
+        if self.pressed[button]:
+            self.pressed[button] = False
+            return True
+        else:
+            return False
+
     NEUTRAL_ZONE = '⬤'
     UNMAPPED_ZONE = '❌'
     UNMAPPED_POSITION = "Unmapped"
+
+    LeftMouse = -1
+    RightMouse = -2
+    MiddleMouse = -3
 
     def __init__(self):
         self.layout = load_layout()
@@ -180,7 +201,9 @@ class Controller:
 
         self.boundary_mapping = self.gen_boundary_mapping(angle_margin)
 
-        self.reset()
+        self.reset_typing()
+
+        self.reset_pressed()
 
 
 controller = Controller()
