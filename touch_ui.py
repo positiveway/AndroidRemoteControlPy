@@ -1,12 +1,10 @@
-from kivy.app import App
-from kivy.uix.button import Button
+import socket
+
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
 
 from backend import controller
 from garden_joystick import Joystick
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-import socket
 
 ENABLE_VIBRATE = False
 
@@ -21,7 +19,6 @@ def is_vibro_enabled():
 
 if is_vibro_enabled():
     from android.permissions import request_permissions, Permission
-    from plyer import vibrator
 
     request_permissions([Permission.VIBRATE])
 
@@ -45,13 +42,94 @@ def send_typing_letter(letter):
     send_command_to_ws('l', letter)
 
 
+def send_mouse_move(x, y):
+    send_command_to_ws('m', f'{int(x)},{int(y)}')
+
+
+from random import random
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.graphics import Color, Ellipse, Line
+
+
+def update_coord_get_number_to_move(cur, prev):
+    diff = cur - prev
+    if abs(diff) > controller.move_every_n_pixels:
+        prev = cur - diff % controller.move_every_n_pixels
+        move_by = diff // controller.move_every_n_pixels * controller.move_by_n_pixels
+        return prev, move_by
+    else:
+        return prev, 0
+
+
+def is_in_zone(x, y, height, width):
+    max_x, max_y = width, height
+    y = height - y
+
+    min_x = max_x / cols * (col_num - 1)
+    min_y = max_y / rows * (row_num - 1)
+
+    max_x = max_x / cols * col_num
+    max_y = max_y / rows * row_num
+
+    return min_x < x < max_x and min_y < y < max_y
+
+
+max_color = 255
+color = (80 / max_color, 200 / max_color, 1 / max_color)
+
+cols = 2
+rows = 3
+root = GridLayout(cols=cols, rows=rows)
+col_num = 2
+row_num = 1
+
+
+class TouchpadWidget(Widget):
+    def draw_touch(self, touch):
+        self.canvas.clear()
+
+        with self.canvas:
+            Color(*color)
+            d = 30.
+            Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
+
+    def on_touch_down(self, touch):
+        if not is_in_zone(touch.x, touch.y, root.height, root.width):
+            return
+
+        self.prev_x = touch.x
+        self.prev_y = touch.y
+
+        self.draw_touch(touch)
+
+    def on_touch_move(self, touch):
+        if not is_in_zone(touch.x, touch.y, root.height, root.width):
+            return
+
+        self.prev_x, move_x = update_coord_get_number_to_move(touch.x, self.prev_x)
+        self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
+        send_mouse_move(move_x, move_y)
+
+        self.draw_touch(touch)
+
+
 class APISenderApp(App):
+    def clear_canvas(self, obj):
+        self.touchpad.canvas.clear()
+
     def build(self):
-        self.root = GridLayout(cols=2, rows=3)
+        self.root = root
+
+        self.touchpad = TouchpadWidget()
+        clearbtn = Button(text='Clear')
+        clearbtn.bind(on_release=self.clear_canvas)
+
         # self.root = BoxLayout()
         # self.root.padding = 110
 
-        self.buttons = GridLayout(cols=2,rows=2)
+        self.buttons = GridLayout(cols=2, rows=2)
         self.buttons.add_widget(Button())
         self.buttons.add_widget(Button())
         self.buttons.add_widget(Button())
@@ -79,8 +157,8 @@ class APISenderApp(App):
         joystick.bind(pad=self.update_coordinates)
         self.root.add_widget(joystick)
 
-        self.root.add_widget(Label())
-        self.root.add_widget(Label())
+        self.root.add_widget(self.touchpad)
+        self.root.add_widget(clearbtn)
 
         self.prev_letter = ""
         self.update_label()

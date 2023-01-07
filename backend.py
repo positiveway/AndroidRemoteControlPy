@@ -174,6 +174,10 @@ class Controller:
         self.magnitude_threshold = typing_cfg['thresholdPct'] / 100
         angle_margin = typing_cfg['angleMargin']
 
+        mouse_speed = self.configs['mouse']['speed']['normal']
+        self.move_every_n_pixels = mouse_speed['move_every_n_pixels']
+        self.move_by_n_pixels = mouse_speed['move_by_n_pixels']
+
         self.boundary_mapping = self.gen_boundary_mapping(angle_margin)
 
         self.reset()

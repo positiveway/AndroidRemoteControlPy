@@ -1,7 +1,10 @@
 {
   "mouse": {
     "speed": {
-      "normal": 1,
+      "normal": {
+        "move_every_n_pixels": 1,
+        "move_by_n_pixels": 2
+      },
       "fast": 2
     }
   },
