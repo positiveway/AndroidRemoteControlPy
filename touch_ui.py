@@ -1,3 +1,5 @@
+from functools import partial
+
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
@@ -70,6 +72,8 @@ row_num = 2
 
 visuals_for_touchpad = False
 
+buttons_font_size = 50
+
 
 class TouchpadWidget(Widget):
     def clear_canvas(self):
@@ -108,19 +112,29 @@ class TouchpadWidget(Widget):
         self.draw_touch(touch)
 
     def on_double_tap(self, touch):
+        if not is_in_zone(touch.x, touch.y, root.height, root.width):
+            return
+
         print("Double tap")
 
-        if controller.press(controller.LeftMouse):
-            send_pressed(controller.LeftMouse)
+        controller.press_and_send(controller.LeftMouse)
 
     def on_touch_up(self, touch):
-        if controller.release(controller.LeftMouse):
-            send_released(controller.LeftMouse)
+        if not is_in_zone(touch.x, touch.y, root.height, root.width):
+            return
+
+        controller.release_and_send(controller.LeftMouse)
 
         self.clear_canvas()
 
 
 class APISenderApp(App):
+    def left_pressed(self, button):
+        controller.press_and_send(controller.LeftMouse)
+
+    def left_released(self, button):
+        controller.release_and_send(controller.LeftMouse)
+
     def build(self):
         self.root = root
 
@@ -156,11 +170,20 @@ class APISenderApp(App):
         self.prev_letter = ""
         self.update_label()
 
+        self.button1 = Button()
+        self.middle_click = Button()
+        self.left_click = Button(
+            text="Left", font_size=buttons_font_size,
+            on_press=self.left_pressed,
+            on_release=self.left_released
+        )
+        self.right_click = Button()
+
         self.buttons = GridLayout(cols=2, rows=2)
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
-        self.buttons.add_widget(Button())
+        self.buttons.add_widget(self.button1)
+        self.buttons.add_widget(self.middle_click)
+        self.buttons.add_widget(self.left_click)
+        self.buttons.add_widget(self.right_click)
 
         self.touchpad = TouchpadWidget()
 

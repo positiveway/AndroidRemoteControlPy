@@ -1,5 +1,7 @@
 import json
 
+from wsocket import send_pressed, send_released
+
 
 def load_layout():
     layout = {}
@@ -174,6 +176,14 @@ class Controller:
             return True
         else:
             return False
+
+    def press_and_send(self, button):
+        if controller.press(button):
+            send_pressed(button)
+
+    def release_and_send(self, button):
+        if controller.release(button):
+            send_released(button)
 
     NEUTRAL_ZONE = '⬤'
     UNMAPPED_ZONE = '❌'
