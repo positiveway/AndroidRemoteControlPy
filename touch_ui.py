@@ -96,6 +96,10 @@ class TouchpadWidget(Widget):
         if not is_in_zone(touch.x, touch.y, root.height, root.width):
             return
 
+        if touch.is_double_tap:
+            # print("Double tap")
+            controller.press_and_send(controller.LeftMouse)
+
         self.prev_x = touch.x
         self.prev_y = touch.y
 
@@ -110,14 +114,6 @@ class TouchpadWidget(Widget):
         send_mouse_move(move_x, move_y)
 
         self.draw_touch(touch)
-
-    def on_double_tap(self, touch):
-        if not is_in_zone(touch.x, touch.y, root.height, root.width):
-            return
-
-        print("Double tap")
-
-        controller.press_and_send(controller.LeftMouse)
 
     def on_touch_up(self, touch):
         if not is_in_zone(touch.x, touch.y, root.height, root.width):
