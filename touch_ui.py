@@ -109,7 +109,7 @@ class TouchpadWidget(Widget):
         self.prev_x = touch.x
         self.prev_y = touch.y
 
-        self.draw_touch(touch)
+        # self.draw_touch(touch)
 
     def on_touch_move(self, touch):
         if not is_in_zone(touch.x, touch.y, root.height, root.width):
@@ -119,10 +119,11 @@ class TouchpadWidget(Widget):
         self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
         send_mouse_move(move_x, move_y)
 
-        self.draw_touch(touch)
+        # self.draw_touch(touch)
 
     def on_touch_up(self, touch):
-        self.canvas.clear()
+        pass
+        # self.canvas.clear()
 
 
 class APISenderApp(App):
