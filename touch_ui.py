@@ -42,34 +42,12 @@ def update_coord_get_number_to_move(cur, prev):
         return prev, 0
 
 
-def is_in_zone(x, y, height, width):
-    y = height - y
-
-    x_sector = width / cols
-    y_sector = height / rows
-
-    max_x = x_sector * col_num
-    max_y = y_sector * row_num
-
-    min_x = max_x - x_sector
-    min_y = max_y - y_sector
-
-    return min_x < x < max_x and min_y < y < max_y
-
-
 max_color = 255
 color = (80 / max_color, 200 / max_color, 1 / max_color)
 
 diameter = 30.
 radius = diameter / 2
 ellipse_size = (diameter, diameter)
-
-root = GridLayout(cols=2, rows=1)
-
-cols = 2
-rows = 2
-col_num = 2
-row_num = 2
 
 visuals_for_touchpad = False
 
@@ -94,35 +72,41 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
     def on_touch_down(self, touch):
-        if not is_in_zone(touch.x, touch.y, root.height, root.width):
-            return
+        if is_in_zone(self, touch):
+            if touch.is_double_tap:
+                # print("Double tap")
+                controller.press_and_send(controller.LeftMouse)
 
-        if touch.is_double_tap:
-            # print("Double tap")
-            controller.press_and_send(controller.LeftMouse)
+            self.prev_x = touch.x
+            self.prev_y = touch.y
 
-        self.prev_x = touch.x
-        self.prev_y = touch.y
-
-        self.draw_touch(touch)
+            self.draw_touch(touch)
 
     def on_touch_move(self, touch):
-        if not is_in_zone(touch.x, touch.y, root.height, root.width):
-            return
+        if is_in_zone(self, touch):
+            self.prev_x, move_x = update_coord_get_number_to_move(touch.x, self.prev_x)
+            self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
+            send_mouse_move(move_x, move_y)
 
-        self.prev_x, move_x = update_coord_get_number_to_move(touch.x, self.prev_x)
-        self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
-        send_mouse_move(move_x, move_y)
-
-        self.draw_touch(touch)
+            self.draw_touch(touch)
 
     def on_touch_up(self, touch):
-        if not is_in_zone(touch.x, touch.y, root.height, root.width):
-            return
+        if is_in_zone(self, touch):
+            controller.release_and_send(controller.LeftMouse)
 
-        controller.release_and_send(controller.LeftMouse)
+            self.clear_canvas()
 
-        self.clear_canvas()
+    def on_resize(self, obj, values):
+        self.max_x = self.x + self.width
+        self.max_y = self.y + self.height
+        # print(values)
+        # print(self.max_x, self.max_y)
+
+
+def is_in_zone(touchpad, event):
+    # print(touchpad.x, event.x, touchpad.width, touchpad.y, event.y, touchpad.height)
+
+    return touchpad.x < event.x < touchpad.max_x and touchpad.y < event.y < touchpad.max_y
 
 
 class APISenderApp(App):
@@ -133,7 +117,21 @@ class APISenderApp(App):
         controller.release_and_send(controller.LeftMouse)
 
     def build(self):
-        self.root = root
+        self.touchpad = TouchpadWidget()
+        self.touchpad.bind(size=self.touchpad.on_resize)
+
+        joystick = Joystick()
+
+        # joystick.size_hint_x = 0.25
+        # joystick.size_hint_y = 0.25
+        # joystick.pos_hint = {'top': 0.5}
+
+        joystick.pad_size = 0.4
+        joystick.inner_size = 0
+
+        joystick.bind(pad=self.update_coordinates)
+
+        self.root = GridLayout(cols=2, rows=1)
 
         # clearbtn = Button(text='Clear')
         # clearbtn.bind(on_release=self.clear_canvas)
@@ -146,17 +144,6 @@ class APISenderApp(App):
 
         # self.label.size_hint_x = 0.25
         # self.label.size_hint_y = 0.9
-
-        joystick = Joystick()
-
-        # joystick.size_hint_x = 0.25
-        # joystick.size_hint_y = 0.25
-        # joystick.pos_hint = {'top': 0.5}
-
-        joystick.pad_size = 0.4
-        joystick.inner_size = 0
-
-        joystick.bind(pad=self.update_coordinates)
 
         self.left_buttons = GridLayout(cols=2, rows=1)
         self.shift_button = Button(text="Shift", font_size=buttons_font_size)
@@ -186,8 +173,6 @@ class APISenderApp(App):
         self.right_buttons.add_widget(self.middle_click)
         self.right_buttons.add_widget(self.left_click)
         self.right_buttons.add_widget(self.right_click)
-
-        self.touchpad = TouchpadWidget()
 
         self.right_side = GridLayout(cols=1, rows=2)
 
