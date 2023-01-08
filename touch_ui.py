@@ -51,7 +51,7 @@ ellipse_size = (diameter, diameter)
 
 buttons_font_size = 50
 
-visuals_for_touchpad = True
+visuals_for_touchpad = False
 
 
 class TouchpadWidget(Widget):
@@ -71,22 +71,8 @@ class TouchpadWidget(Widget):
             Color(*color)
             Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
-    def _is_in_zone(self, touch_event):
-        # print(self.x, event.x, self.width, self.y, event.y, self.height)
-
-        return self.x < touch_event.x < self.max_x and self.y < touch_event.y < self.max_y
-
-    def is_in_zone(self, touch_event):
-        res = self._is_in_zone(touch_event)
-        if self.collide_point(touch_event.x, touch_event.y) != res:
-            print(f"Not equal: {touch_event.x}, {touch_event.y}")
-            exit(-1)
-
-        return res
-
     def on_touch_down(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
-            # if self.is_in_zone(touch_event):
             if touch_event.is_double_tap:
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
@@ -102,7 +88,6 @@ class TouchpadWidget(Widget):
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
-            # if self.is_in_zone(touch_event):
             if self.prev_x is None:
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
@@ -125,19 +110,12 @@ class TouchpadWidget(Widget):
 
     def on_touch_up(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
-            # if self.is_in_zone(touch_event):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
             return True
         else:
             return super(TouchpadWidget, self).on_touch_up(touch_event)
-
-    def on_resize(self, obj, values):
-        self.max_x = self.x + self.width
-        self.max_y = self.y + self.height
-        # print(values)
-        # print(self.max_x, self.max_y)
 
 
 class APISenderApp(App):
@@ -149,7 +127,6 @@ class APISenderApp(App):
 
     def build(self):
         self.touchpad = TouchpadWidget()
-        # self.touchpad.bind(size=self.touchpad.on_resize)
 
         joystick = Joystick()
 
