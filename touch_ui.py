@@ -49,9 +49,9 @@ diameter = 30.
 radius = diameter / 2
 ellipse_size = (diameter, diameter)
 
-visuals_for_touchpad = False
-
 buttons_font_size = 50
+
+visuals_for_touchpad = False
 
 
 class TouchpadWidget(Widget):
@@ -71,8 +71,13 @@ class TouchpadWidget(Widget):
             Color(*color)
             Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
+    def is_in_zone(self, touch_event):
+        # print(self.x, event.x, self.width, self.y, event.y, self.height)
+
+        return self.x < touch_event.x < self.max_x and self.y < touch_event.y < self.max_y
+
     def on_touch_down(self, touch_event):
-        if is_in_zone(self, touch_event):
+        if self.is_in_zone(touch_event):
             if touch_event.is_double_tap:
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
@@ -85,7 +90,7 @@ class TouchpadWidget(Widget):
             self.prev_x = None
 
     def on_touch_move(self, touch_event):
-        if is_in_zone(self, touch_event):
+        if self.is_in_zone(touch_event):
             if self.prev_x is None:
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
@@ -104,7 +109,7 @@ class TouchpadWidget(Widget):
             self.draw_touch(touch_event)
 
     def on_touch_up(self, touch_event):
-        if is_in_zone(self, touch_event):
+        if self.is_in_zone(touch_event):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
@@ -114,12 +119,6 @@ class TouchpadWidget(Widget):
         self.max_y = self.y + self.height
         # print(values)
         # print(self.max_x, self.max_y)
-
-
-def is_in_zone(touchpad, event):
-    # print(touchpad.x, event.x, touchpad.width, touchpad.y, event.y, touchpad.height)
-
-    return touchpad.x < event.x < touchpad.max_x and touchpad.y < event.y < touchpad.max_y
 
 
 class APISenderApp(App):
