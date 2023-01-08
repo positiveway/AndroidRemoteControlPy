@@ -163,26 +163,14 @@ class Controller:
     def reset_pressed(self):
         self.pressed = {self.LeftMouse: False, self.RightMouse: False, self.MiddleMouse: False}
 
-    def press(self, button):
-        if self.pressed[button]:
-            return False
-        else:
-            self.pressed[button] = True
-            return True
-
-    def release(self, button):
-        if self.pressed[button]:
-            self.pressed[button] = False
-            return True
-        else:
-            return False
-
     def press_and_send(self, button):
-        if controller.press(button):
+        if not self.pressed[button]:
+            self.pressed[button] = True
             send_pressed(button)
 
     def release_and_send(self, button):
-        if controller.release(button):
+        if self.pressed[button]:
+            self.pressed[button] = False
             send_released(button)
 
     NEUTRAL_ZONE = '⬤'

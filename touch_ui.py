@@ -71,27 +71,33 @@ class TouchpadWidget(Widget):
             Color(*color)
             Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
-    def on_touch_down(self, touch):
-        if is_in_zone(self, touch):
-            if touch.is_double_tap:
+    def on_touch_down(self, touch_event):
+        if is_in_zone(self, touch_event):
+            if touch_event.is_double_tap:
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
 
-            self.prev_x = touch.x
-            self.prev_y = touch.y
+            self.prev_x = touch_event.x
+            self.prev_y = touch_event.y
 
-            self.draw_touch(touch)
+            self.draw_touch(touch_event)
+        else:
+            self.prev_x = None
 
-    def on_touch_move(self, touch):
-        if is_in_zone(self, touch):
-            self.prev_x, move_x = update_coord_get_number_to_move(touch.x, self.prev_x)
-            self.prev_y, move_y = update_coord_get_number_to_move(touch.y, self.prev_y)
-            send_mouse_move(move_x, move_y)
+    def on_touch_move(self, touch_event):
+        if is_in_zone(self, touch_event):
+            if self.prev_x is None:
+                self.prev_x = touch_event.x
+                self.prev_y = touch_event.y
+            else:
+                self.prev_x, move_x = update_coord_get_number_to_move(touch_event.x, self.prev_x)
+                self.prev_y, move_y = update_coord_get_number_to_move(touch_event.y, self.prev_y)
+                send_mouse_move(move_x, move_y)
 
-            self.draw_touch(touch)
+            self.draw_touch(touch_event)
 
-    def on_touch_up(self, touch):
-        if is_in_zone(self, touch):
+    def on_touch_up(self, touch_event):
+        if is_in_zone(self, touch_event):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
