@@ -90,8 +90,15 @@ class TouchpadWidget(Widget):
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
             else:
-                self.prev_x, move_x = update_coord_get_number_to_move(touch_event.x, self.prev_x)
-                self.prev_y, move_y = update_coord_get_number_to_move(touch_event.y, self.prev_y)
+                # self.prev_x, move_x = update_coord_get_number_to_move(touch_event.x, self.prev_x)
+                # self.prev_y, move_y = update_coord_get_number_to_move(touch_event.y, self.prev_y)
+
+                move_x = touch_event.x - self.prev_x
+                move_y = touch_event.y - self.prev_y
+
+                self.prev_x = touch_event.x
+                self.prev_y = touch_event.y
+
                 send_mouse_move(move_x, move_y)
 
             self.draw_touch(touch_event)
