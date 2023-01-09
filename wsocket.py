@@ -13,12 +13,12 @@ def send_command_to_ws(command: str):
 
 
 def send_typing_letter(letter):
-    send_command_to_ws(f'l{letter}')
+    send_command_to_ws(f'ty{letter}')
 
 
 def send_pressed(button):
-    send_command_to_ws(f'p{button}')
+    send_command_to_ws(f'pr{button}')
 
 
 def send_released(button):
-    send_command_to_ws(f'r{button}')
+    send_command_to_ws(f're{button}')
