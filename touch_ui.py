@@ -1,12 +1,9 @@
-from collections import deque
-from statistics import mean
-
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
 from backend import controller
 from garden_joystick import Joystick
-from wsocket import send_mouse_move, send_pressed, send_released, send_typing_letter
+from wsocket import send_typing_letter, sock, server_ip, server_port
 
 ENABLE_VIBRATE = False
 
@@ -86,24 +83,26 @@ class TouchpadWidget(Widget):
             self.full_reset()
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
-    def convert_to_send(self, x):
+    def convert_to_send(self, x, offset):
         x = round(x)
 
         if abs(x) < 255:
             if x < 0:
-                return [1, -x]
+                self.msg[offset] = 1
+                self.msg[offset + 1] = -x
             else:
-                return [0, x]
+                self.msg[offset] = 0
+                self.msg[offset + 1] = x
         else:
             raise ValueError(f"value is too much: {x}")
 
     def send_if_not_empty(self, move_x, move_y):
         # print(move_x, move_y)
         if move_x != 0 or move_y != 0:
-            move_x = self.convert_to_send(move_x)
-            move_y = self.convert_to_send(move_y)
+            self.convert_to_send(move_x, 0)
+            self.convert_to_send(move_y, 2)
 
-            send_mouse_move(move_x, move_y)
+            sock.sendto(self.msg, (server_ip, server_port))
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -130,6 +129,10 @@ class TouchpadWidget(Widget):
 
     def full_reset(self):
         self.prev_x = None
+
+    def init(self):
+        self.msg = bytearray(4)
+        self.full_reset()
 
     def on_touch_up(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -158,7 +161,7 @@ class APISenderApp(App):
         buttons_font_size = 50
 
         self.touchpad = TouchpadWidget()
-        self.touchpad.full_reset()
+        self.touchpad.init()
 
         joystick = Joystick()
 

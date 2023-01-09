@@ -22,9 +22,3 @@ def send_pressed(button):
 
 def send_released(button):
     send_command_to_ws(f'r{button}')
-
-
-def send_mouse_move(x, y):
-    x.extend(y)
-    msg = bytes(x)
-    sock.sendto(msg, (server_ip, server_port))
