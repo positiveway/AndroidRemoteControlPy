@@ -91,19 +91,18 @@ class TouchpadWidget(Widget):
 
         if abs(x) < 255:
             if x < 0:
-                return f'-{chr(-x)}'
+                return [1, -x]
             else:
-                return f'+{chr(x)}'
+                return [0, x]
         else:
-            print("value is too much")
-            exit(-1)
+            raise ValueError(f"value is too much: {x}")
 
     def send_if_not_empty(self, move_x, move_y):
         # print(move_x, move_y)
-        move_x = self.convert_to_send(move_x)
-        move_y = self.convert_to_send(move_y)
-
         if move_x != 0 or move_y != 0:
+            move_x = self.convert_to_send(move_x)
+            move_y = self.convert_to_send(move_y)
+
             send_mouse_move(move_x, move_y)
 
     def on_touch_move(self, touch_event):
