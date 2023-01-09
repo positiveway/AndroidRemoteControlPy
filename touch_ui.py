@@ -46,7 +46,7 @@ def update_coord_get_number_to_move(cur, prev):
 
 
 class TouchpadWidget(Widget):
-    send_every_n = 3
+    send_every_n = 2
 
     visuals_for_touchpad = False
 
