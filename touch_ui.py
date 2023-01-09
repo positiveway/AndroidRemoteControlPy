@@ -86,13 +86,15 @@ class TouchpadWidget(Widget):
     def convert_to_send(self, x, offset):
         x = round(x)
 
-        if abs(x) < 128:
-            if x < 0:
-                x += 256
+        if abs(x) > 127:
+            x = 127 if x > 0 else -127
 
-            self.msg[offset] = x
-        else:
-            raise ValueError(f"value is too much: {x}")
+            print(f"value is too much: {x}")
+
+        if x < 0:
+            x += 256
+
+        self.msg[offset] = x
 
     def send_if_not_empty(self, move_x, move_y):
         # print(move_x, move_y)
