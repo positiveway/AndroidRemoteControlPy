@@ -86,21 +86,19 @@ class TouchpadWidget(Widget):
     def convert_to_send(self, x, offset):
         x = round(x)
 
-        if abs(x) < 255:
+        if abs(x) < 128:
             if x < 0:
-                self.msg[0] += offset
-                self.msg[offset] = -x
-            else:
-                self.msg[offset] = x
+                x += 256
+
+            self.msg[offset] = x
         else:
             raise ValueError(f"value is too much: {x}")
 
     def send_if_not_empty(self, move_x, move_y):
         # print(move_x, move_y)
         if move_x != 0 or move_y != 0:
-            self.msg[0] = 0
-            self.convert_to_send(move_x, 1)
-            self.convert_to_send(move_y, 2)
+            self.convert_to_send(move_x, 0)
+            self.convert_to_send(move_y, 1)
 
             sock.sendto(self.msg, (server_ip, server_port))
 
@@ -131,7 +129,7 @@ class TouchpadWidget(Widget):
         self.prev_x = None
 
     def init(self):
-        self.msg = bytearray(4)
+        self.msg = bytearray(2)
         self.full_reset()
 
     def on_touch_up(self, touch_event):
