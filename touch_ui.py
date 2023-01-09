@@ -87,14 +87,16 @@ class TouchpadWidget(Widget):
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
     def convert_to_send(self, x):
-        if abs(x) > 4:
+        x = round(x)
+
+        if abs(x) < 255:
+            if x < 0:
+                return f'-{chr(-x)}'
+            else:
+                return chr(x)
+        else:
             print("value is too much")
             exit(-1)
-        else:
-            if x < 0:
-                x += 9
-
-        return x
 
     def send_if_not_empty(self, move_x, move_y):
         print(move_x, move_y)
@@ -107,8 +109,6 @@ class TouchpadWidget(Widget):
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             if self.prev_x is None:
-                self.reset_history()
-
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
             else:
