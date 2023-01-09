@@ -46,8 +46,6 @@ def update_coord_get_number_to_move(cur, prev):
 
 
 class TouchpadWidget(Widget):
-    send_every_n = 2
-
     visuals_for_touchpad = False
 
     max_color = 255
@@ -88,14 +86,23 @@ class TouchpadWidget(Widget):
             self.full_reset()
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
-    def send_if_not_empty(self):
-        if self.history_x != 0 or self.history_y != 0:
-            send_mouse_move(self.history_x, self.history_y)
+    def convert_to_send(self, x):
+        if abs(x) > 4:
+            print("value is too much")
+            exit(-1)
+        else:
+            if x < 0:
+                x += 9
 
-    def add_to_history(self, move_x, move_y):
-        self.history_x += move_x
-        self.history_y += move_y
-        self.history_count += 1
+        return x
+
+    def send_if_not_empty(self, move_x, move_y):
+        print(move_x, move_y)
+        move_x = self.convert_to_send(move_x)
+        move_y = self.convert_to_send(move_y)
+
+        if move_x != 0 or move_y != 0:
+            send_mouse_move(move_x, move_y)
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -114,27 +121,16 @@ class TouchpadWidget(Widget):
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
 
-                self.add_to_history(move_x, move_y)
-
-                if self.history_count == self.send_every_n:
-                    self.send_if_not_empty()
-                    self.reset_history()
+                self.send_if_not_empty(move_x, move_y)
 
             self.draw_touch(touch_event)
             return True
         else:
-            self.send_if_not_empty()
             self.full_reset()
             return super(TouchpadWidget, self).on_touch_move(touch_event)
 
-    def reset_history(self):
-        self.history_x = 0
-        self.history_y = 0
-        self.history_count = 0
-
     def full_reset(self):
         self.prev_x = None
-        self.reset_history()
 
     def on_touch_up(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
