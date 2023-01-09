@@ -1,3 +1,6 @@
+from collections import deque
+from statistics import mean
+
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
@@ -53,6 +56,9 @@ buttons_font_size = 50
 
 visuals_for_touchpad = False
 
+history_size = 3
+diff_for_new_touch = 4
+
 
 class TouchpadWidget(Widget):
     def clear_canvas(self):
@@ -72,10 +78,20 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
 
     def on_touch_down(self, touch_event):
+        # self.history_x = deque()
+        # self.history_y = deque()
+
         if self.collide_point(touch_event.x, touch_event.y):
             if touch_event.is_double_tap:
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
+
+            if self.prev_x is not None:
+                diff_x = touch_event.x - self.prev_x
+                diff_y = touch_event.y - self.prev_y
+
+                if diff_x < diff_for_new_touch and diff_y < diff_for_new_touch:
+                    send_mouse_move(diff_x, diff_y)
 
             self.prev_x = touch_event.x
             self.prev_y = touch_event.y
@@ -85,6 +101,16 @@ class TouchpadWidget(Widget):
         else:
             self.prev_x = None
             return super(TouchpadWidget, self).on_touch_down(touch_event)
+
+    def calc_move(self, cur_x, prev_x, diff_history: deque):
+        diff = cur_x, prev_x
+        diff_history.append(diff)
+
+        if len(diff_history) == history_size:
+            move_by = mean(diff_history)
+            return move_by
+        else:
+            return 0
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -116,6 +142,9 @@ class TouchpadWidget(Widget):
             return True
         else:
             return super(TouchpadWidget, self).on_touch_up(touch_event)
+
+    def on_size(self, obj, values):
+        self.prev_x = None
 
 
 class APISenderApp(App):
