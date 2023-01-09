@@ -45,53 +45,39 @@ def update_coord_get_number_to_move(cur, prev):
         return prev, 0
 
 
-max_color = 255
-color = (80 / max_color, 200 / max_color, 1 / max_color)
-
-diameter = 30.
-radius = diameter / 2
-ellipse_size = (diameter, diameter)
-
-buttons_font_size = 50
-
-visuals_for_touchpad = False
-
-history_size = 3
-diff_for_new_touch = 10
-
-
 class TouchpadWidget(Widget):
+    send_every_n = 3
+
+    visuals_for_touchpad = False
+
+    max_color = 255
+    color = (80 / max_color, 200 / max_color, 1 / max_color)
+
+    diameter = 30.
+    radius = diameter / 2
+    ellipse_size = (diameter, diameter)
+
     def clear_canvas(self):
-        if not visuals_for_touchpad:
+        if not self.visuals_for_touchpad:
             return
 
         self.canvas.clear()
 
     def draw_touch(self, touch):
-        if not visuals_for_touchpad:
+        if not self.visuals_for_touchpad:
             return
 
         self.canvas.clear()
 
         with self.canvas:
-            Color(*color)
-            Ellipse(pos=(touch.x - radius, touch.y - radius), size=ellipse_size)
+            Color(*self.color)
+            Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def on_touch_down(self, touch_event):
-        # self.history_x = deque()
-        # self.history_y = deque()
-
         if self.collide_point(touch_event.x, touch_event.y):
             if touch_event.is_double_tap:
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
-
-            if self.prev_x is not None:
-                diff_x = touch_event.x - self.prev_x
-                diff_y = touch_event.y - self.prev_y
-
-                if abs(diff_x) < diff_for_new_touch and abs(diff_y) < diff_for_new_touch:
-                    send_mouse_move(diff_x, diff_y)
 
             self.prev_x = touch_event.x
             self.prev_y = touch_event.y
@@ -99,22 +85,23 @@ class TouchpadWidget(Widget):
             self.draw_touch(touch_event)
             return True
         else:
-            self.prev_x = None
+            self.full_reset()
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
-    def calc_move(self, cur_x, prev_x, diff_history: deque):
-        diff = cur_x, prev_x
-        diff_history.append(diff)
+    def send_if_not_empty(self):
+        if self.history_x != 0 or self.history_y != 0:
+            send_mouse_move(self.history_x, self.history_y)
 
-        if len(diff_history) == history_size:
-            move_by = mean(diff_history)
-            return move_by
-        else:
-            return 0
+    def add_to_history(self, move_x, move_y):
+        self.history_x += move_x
+        self.history_y += move_y
+        self.history_count += 1
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             if self.prev_x is None:
+                self.reset_history()
+
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
             else:
@@ -127,24 +114,42 @@ class TouchpadWidget(Widget):
                 self.prev_x = touch_event.x
                 self.prev_y = touch_event.y
 
-                send_mouse_move(move_x, move_y)
+                self.add_to_history(move_x, move_y)
+
+                if self.history_count == self.send_every_n:
+                    self.send_if_not_empty()
+                    self.reset_history()
 
             self.draw_touch(touch_event)
             return True
         else:
+            self.send_if_not_empty()
+            self.full_reset()
             return super(TouchpadWidget, self).on_touch_move(touch_event)
+
+    def reset_history(self):
+        self.history_x = 0
+        self.history_y = 0
+        self.history_count = 0
+
+    def full_reset(self):
+        self.prev_x = None
+        self.reset_history()
 
     def on_touch_up(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
+
+            self.full_reset()
+
             return True
         else:
             return super(TouchpadWidget, self).on_touch_up(touch_event)
 
     def on_size(self, obj, values):
-        self.prev_x = None
+        self.full_reset()
 
 
 class APISenderApp(App):
@@ -155,7 +160,10 @@ class APISenderApp(App):
         controller.release_and_send(controller.LeftMouse)
 
     def build(self):
+        buttons_font_size = 50
+
         self.touchpad = TouchpadWidget()
+        self.touchpad.full_reset()
 
         joystick = Joystick()
 
