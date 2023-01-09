@@ -57,7 +57,7 @@ buttons_font_size = 50
 visuals_for_touchpad = False
 
 history_size = 3
-diff_for_new_touch = 4
+diff_for_new_touch = 10
 
 
 class TouchpadWidget(Widget):
@@ -90,7 +90,7 @@ class TouchpadWidget(Widget):
                 diff_x = touch_event.x - self.prev_x
                 diff_y = touch_event.y - self.prev_y
 
-                if diff_x < diff_for_new_touch and diff_y < diff_for_new_touch:
+                if abs(diff_x) < diff_for_new_touch and abs(diff_y) < diff_for_new_touch:
                     send_mouse_move(diff_x, diff_y)
 
             self.prev_x = touch_event.x
