@@ -8,7 +8,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
 
 def send_command_to_ws(command: str):
-    print(command)
+    # print(command)
     sock.sendto(command.encode('utf-8'), (server_ip, server_port))
 
 

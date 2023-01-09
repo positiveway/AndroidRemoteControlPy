@@ -99,7 +99,7 @@ class TouchpadWidget(Widget):
             exit(-1)
 
     def send_if_not_empty(self, move_x, move_y):
-        print(move_x, move_y)
+        # print(move_x, move_y)
         move_x = self.convert_to_send(move_x)
         move_y = self.convert_to_send(move_y)
 
