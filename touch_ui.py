@@ -93,7 +93,7 @@ class TouchpadWidget(Widget):
             if x < 0:
                 return f'-{chr(-x)}'
             else:
-                return chr(x)
+                return f'+{chr(x)}'
         else:
             print("value is too much")
             exit(-1)
