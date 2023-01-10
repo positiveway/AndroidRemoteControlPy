@@ -45,15 +45,6 @@ def update_coord_get_number_to_move(cur, prev):
 
 
 class TouchpadWidget(Widget):
-    visuals_for_touchpad = False
-
-    max_color = 255
-    color = (80 / max_color, 200 / max_color, 1 / max_color)
-
-    diameter = 30.
-    radius = diameter / 2
-    ellipse_size = (diameter, diameter)
-
     def clear_canvas(self):
         if not self.visuals_for_touchpad:
             return
@@ -76,8 +67,8 @@ class TouchpadWidget(Widget):
                 # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
 
-            self.prev_x = touch_event.x
-            self.prev_y = touch_event.y
+            self.prev_x = round(touch_event.x)
+            self.prev_y = round(touch_event.y)
 
             self.draw_touch(touch_event)
             return True
@@ -85,9 +76,7 @@ class TouchpadWidget(Widget):
             self.full_reset()
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
-    def convert_to_send(self, x, offset):
-        x = round(x)
-
+    def convert_to_send(self, x):
         if x > 127:
             x = 127
             # print(f"value is too much: {x}")
@@ -99,15 +88,17 @@ class TouchpadWidget(Widget):
             x += 256
 
         if self.is_mouse_mode:
-            self.mouse_bytes[offset] = x
+            self.mouse_bytes[self.offset] = x
         else:
-            self.scroll_bytes[offset + 1] = x
+            self.scroll_bytes[self.offset + 1] = x
 
-    def send_if_not_empty(self, move_x, move_y):
+    def send_if_not_empty(self):
         # print(move_x, move_y)
-        if move_x != 0 or move_y != 0:
-            self.convert_to_send(move_x, 0)
-            self.convert_to_send(move_y, 1)
+        if self.move_x != 0 or self.move_y != 0:
+            self.offset = 0
+            self.convert_to_send(self.move_x)
+            self.offset = 1
+            self.convert_to_send(self.move_y)
 
             if self.is_mouse_mode:
                 sock.sendto(self.mouse_bytes, (server_ip, server_port))
@@ -116,20 +107,23 @@ class TouchpadWidget(Widget):
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
-            if self.prev_x is None:
-                self.prev_x = touch_event.x
-                self.prev_y = touch_event.y
+            self.cur_x = round(touch_event.x)
+            self.cur_y = round(touch_event.y)
+
+            if self.prev_x == self.value_not_set:
+                self.prev_x = self.cur_x
+                self.prev_y = self.cur_y
             else:
                 # self.prev_x, move_x = update_coord_get_number_to_move(touch_event.x, self.prev_x)
                 # self.prev_y, move_y = update_coord_get_number_to_move(touch_event.y, self.prev_y)
 
-                move_x = touch_event.x - self.prev_x
-                move_y = touch_event.y - self.prev_y
+                self.move_x = self.cur_x - self.prev_x
+                self.move_y = self.cur_y - self.prev_y
 
-                self.prev_x = touch_event.x
-                self.prev_y = touch_event.y
+                self.prev_x = self.cur_x
+                self.prev_y = self.cur_y
 
-                self.send_if_not_empty(move_x, move_y)
+                self.send_if_not_empty()
 
             self.draw_touch(touch_event)
             return True
@@ -138,16 +132,33 @@ class TouchpadWidget(Widget):
             return super(TouchpadWidget, self).on_touch_move(touch_event)
 
     def full_reset(self):
-        self.prev_x = None
+        self.prev_x = self.value_not_set
 
     def init(self):
+        self.visuals_for_touchpad = False
+
         self.mouse_bytes = bytearray(2)
         self.scroll_bytes = bytearray(3)
         self.scroll_bytes[0] = 5
 
         self.is_mouse_mode = True
 
+        self.value_not_set = 1000
+
+        self.offset = 0
+        self.prev_x = 0
+        self.prev_y = 0
+        self.move_x = 0
+        self.move_y = 0
+
         self.full_reset()
+
+        max_color = 255
+        self.color = (80 / max_color, 200 / max_color, 1 / max_color)
+
+        diameter = 30.
+        self.radius = diameter / 2
+        self.ellipse_size = (diameter, diameter)
 
     def on_touch_up(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -258,8 +269,8 @@ class APISenderApp(App):
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
 
-        gc.collect()
         gc.disable()
+        gc.collect()
 
     def release_all(self, button):
         controller.release_all()
