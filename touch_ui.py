@@ -86,15 +86,20 @@ class TouchpadWidget(Widget):
     def convert_to_send(self, x, offset):
         x = round(x)
 
-        if abs(x) > 127:
-            x = 127 if x > 0 else -127
-
-            print(f"value is too much: {x}")
+        if x > 127:
+            x = 127
+            # print(f"value is too much: {x}")
+        elif x < -127:
+            x = -127
+            # print(f"value is too much: {x}")
 
         if x < 0:
             x += 256
 
-        self.msg[offset] = x
+        if self.is_mouse_mode:
+            self.mouse_bytes[offset] = x
+        else:
+            self.scroll_bytes[offset + 1] = x
 
     def send_if_not_empty(self, move_x, move_y):
         # print(move_x, move_y)
@@ -102,7 +107,10 @@ class TouchpadWidget(Widget):
             self.convert_to_send(move_x, 0)
             self.convert_to_send(move_y, 1)
 
-            sock.sendto(self.msg, (server_ip, server_port))
+            if self.is_mouse_mode:
+                sock.sendto(self.mouse_bytes, (server_ip, server_port))
+            else:
+                sock.sendto(self.scroll_bytes, (server_ip, server_port))
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -131,7 +139,12 @@ class TouchpadWidget(Widget):
         self.prev_x = None
 
     def init(self):
-        self.msg = bytearray(2)
+        self.mouse_bytes = bytearray(2)
+        self.scroll_bytes = bytearray(3)
+        self.scroll_bytes[0] = 5
+
+        self.is_mouse_mode = True
+
         self.full_reset()
 
     def on_touch_up(self, touch_event):
@@ -151,11 +164,8 @@ class TouchpadWidget(Widget):
 
 
 class APISenderApp(App):
-    def left_pressed(self, button):
-        controller.press_and_send(controller.LeftMouse)
-
-    def left_released(self, button):
-        controller.release_and_send(controller.LeftMouse)
+    def toggle_scroll(self, button):
+        self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def build(self):
         buttons_font_size = 50
@@ -175,9 +185,6 @@ class APISenderApp(App):
         joystick.bind(pad=self.update_coordinates)
 
         self.root = GridLayout(cols=2, rows=1)
-
-        # clearbtn = Button(text='Clear')
-        # clearbtn.bind(on_release=self.clear_canvas)
 
         # self.root = BoxLayout()
         # self.root.padding = 110
@@ -202,28 +209,57 @@ class APISenderApp(App):
         self.prev_letter = ""
         self.update_label()
 
-        self.button1 = Button()
-        self.middle_click = Button()
+        self.scroll_btn = Button(
+            text="Scroll", font_size=buttons_font_size,
+            on_press=self.toggle_scroll,
+        )
         self.left_click = Button(
             text="Left", font_size=buttons_font_size,
             on_press=self.left_pressed,
             on_release=self.left_released
         )
-        self.right_click = Button()
+        self.right_click = Button(
+            text="Right", font_size=buttons_font_size,
+            on_press=self.right_pressed,
+            on_release=self.right_released
+        )
+        self.middle_click = Button(
+            text="Middle", font_size=buttons_font_size,
+            on_press=self.middle_pressed,
+            on_release=self.middle_released
+        )
 
         self.right_buttons = GridLayout(cols=2, rows=2)
-        self.right_buttons.add_widget(self.button1)
-        self.right_buttons.add_widget(self.middle_click)
-        self.right_buttons.add_widget(self.left_click)
         self.right_buttons.add_widget(self.right_click)
+        self.right_buttons.add_widget(self.middle_click)
+
+        self.right_buttons.add_widget(self.left_click)
+        self.right_buttons.add_widget(self.scroll_btn)
 
         self.right_side = GridLayout(cols=1, rows=2)
-
         self.right_side.add_widget(self.right_buttons)
         self.right_side.add_widget(self.touchpad)
 
         self.root.add_widget(self.left_side)
         self.root.add_widget(self.right_side)
+
+    def left_pressed(self, button):
+        controller.press_and_send(controller.LeftMouse)
+
+    def left_released(self, button):
+        controller.release_and_send(controller.LeftMouse)
+
+    def right_pressed(self, button):
+        controller.press_and_send(controller.RightMouse)
+
+    def right_released(self, button):
+        controller.release_and_send(controller.RightMouse)
+
+    def middle_pressed(self, button):
+        controller.press_and_send(controller.MiddleMouse)
+
+    def middle_released(self, button):
+        controller.release_and_send(controller.MiddleMouse)
 
     def update_label(self):
         cur_stage = controller.cur_stage
