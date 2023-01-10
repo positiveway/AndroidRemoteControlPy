@@ -64,16 +64,10 @@ class TouchpadWidget(Widget):
     def on_touch_down(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             if touch_event.is_double_tap:
-                # print("Double tap")
                 controller.press_and_send(controller.LeftMouse)
-
-            self.prev_x = round(touch_event.x)
-            self.prev_y = round(touch_event.y)
-
-            self.draw_touch(touch_event)
+                # print("Double tap")
             return True
         else:
-            self.full_reset()
             return super(TouchpadWidget, self).on_touch_down(touch_event)
 
     def convert_to_send(self, x):
@@ -161,12 +155,12 @@ class TouchpadWidget(Widget):
         self.ellipse_size = (diameter, diameter)
 
     def on_touch_up(self, touch_event):
+        self.full_reset()
+
         if self.collide_point(touch_event.x, touch_event.y):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
-
-            self.full_reset()
 
             gc.collect()
 
