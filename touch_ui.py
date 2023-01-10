@@ -230,11 +230,11 @@ class APISenderApp(App):
         )
 
         self.right_buttons = GridLayout(cols=2, rows=2)
-        self.right_buttons.add_widget(self.right_click)
         self.right_buttons.add_widget(self.middle_click)
+        self.right_buttons.add_widget(self.right_click)
 
-        self.right_buttons.add_widget(self.left_click)
         self.right_buttons.add_widget(self.scroll_btn)
+        self.right_buttons.add_widget(self.left_click)
 
         self.right_side = GridLayout(cols=1, rows=2)
         self.right_side.add_widget(self.right_buttons)
