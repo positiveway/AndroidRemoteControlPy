@@ -174,7 +174,6 @@ class APISenderApp(App):
         self.touchpad.init()
 
         joystick = Joystick()
-
         # joystick.size_hint_x = 0.25
         # joystick.size_hint_y = 0.25
         # joystick.pos_hint = {'top': 0.5}
@@ -185,26 +184,31 @@ class APISenderApp(App):
         joystick.bind(pad=self.update_coordinates)
 
         self.root = GridLayout(cols=2, rows=1)
-
         # self.root = BoxLayout()
         # self.root.padding = 110
 
-        self.label = Label()
-        self.label.font_size = 50
-
+        self.label = Label(font_size=buttons_font_size)
         # self.label.size_hint_x = 0.25
         # self.label.size_hint_y = 0.9
 
-        self.left_buttons = GridLayout(cols=2, rows=1)
+        joystick_row_1 = GridLayout(cols=2, rows=1)
+        joystick_row_2 = GridLayout(cols=2, rows=1)
         self.shift_button = Button(text="Shift", font_size=buttons_font_size)
         self.caps_button = Button(text="Caps", font_size=buttons_font_size)
-        self.left_buttons.add_widget(self.caps_button)
-        self.left_buttons.add_widget(self.shift_button)
 
-        self.left_side = GridLayout(cols=1, rows=3)
-        self.left_side.add_widget(self.label)
-        self.left_side.add_widget(joystick)
-        self.left_side.add_widget(self.left_buttons)
+        joystick_row_1.add_widget(self.caps_button)
+        joystick_row_1.add_widget(joystick)
+        joystick_row_2.add_widget(Label())
+        joystick_row_2.add_widget(self.shift_button)
+
+        label_layout = GridLayout(cols=1, rows=2)
+        label_layout.add_widget(self.label)
+        label_layout.add_widget(Label())
+
+        left_side = GridLayout(cols=1, rows=3)
+        left_side.add_widget(joystick_row_2)
+        left_side.add_widget(joystick_row_1)
+        left_side.add_widget(label_layout)
 
         self.prev_letter = ""
         self.update_label()
@@ -229,19 +233,18 @@ class APISenderApp(App):
             on_release=self.middle_released
         )
 
-        self.right_buttons = GridLayout(cols=2, rows=2)
-        self.right_buttons.add_widget(self.middle_click)
-        self.right_buttons.add_widget(self.right_click)
+        touchpad_layout = GridLayout(cols=2, rows=2)
+        touchpad_layout.add_widget(self.middle_click)
+        touchpad_layout.add_widget(self.right_click)
+        touchpad_layout.add_widget(self.scroll_btn)
+        touchpad_layout.add_widget(self.left_click)
 
-        self.right_buttons.add_widget(self.scroll_btn)
-        self.right_buttons.add_widget(self.left_click)
+        right_side = GridLayout(cols=1, rows=2)
+        right_side.add_widget(touchpad_layout)
+        right_side.add_widget(self.touchpad)
 
-        self.right_side = GridLayout(cols=1, rows=2)
-        self.right_side.add_widget(self.right_buttons)
-        self.right_side.add_widget(self.touchpad)
-
-        self.root.add_widget(self.left_side)
-        self.root.add_widget(self.right_side)
+        self.root.add_widget(left_side)
+        self.root.add_widget(right_side)
 
     def left_pressed(self, button):
         controller.press_and_send(controller.LeftMouse)
