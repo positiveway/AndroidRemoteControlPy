@@ -1,3 +1,5 @@
+import gc
+
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
@@ -155,6 +157,8 @@ class TouchpadWidget(Widget):
 
             self.full_reset()
 
+            gc.collect()
+
             return True
         else:
             return super(TouchpadWidget, self).on_touch_up(touch_event)
@@ -253,6 +257,9 @@ class APISenderApp(App):
 
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
+
+        gc.collect()
+        gc.disable()
 
     def release_all(self, button):
         controller.release_all()
