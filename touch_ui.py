@@ -3,7 +3,7 @@ from kivy.uix.label import Label
 
 from backend import controller
 from garden_joystick import Joystick
-from wsocket import send_typing_letter, sock, server_ip, server_port
+from wsocket import send_typing_letter, sock, server_ip, server_port, send_pressed, send_released
 
 ENABLE_VIBRATE = False
 
@@ -168,6 +168,8 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def build(self):
+        self.visuals_for_joystick = False
+
         buttons_font_size = 50
 
         self.touchpad = TouchpadWidget()
@@ -195,14 +197,20 @@ class APISenderApp(App):
         joystick_row_2 = GridLayout(cols=2, rows=1)
         self.shift_button = Button(text="Shift", font_size=buttons_font_size)
         self.caps_button = Button(text="Caps", font_size=buttons_font_size)
+        self.release_all_btn = Button(
+            text="Release all", font_size=buttons_font_size,
+            on_release=self.release_all
+        )
 
         joystick_row_1.add_widget(self.caps_button)
         joystick_row_1.add_widget(joystick)
         joystick_row_2.add_widget(Label())
         joystick_row_2.add_widget(self.shift_button)
 
-        label_layout = GridLayout(cols=1, rows=2)
+        label_layout = GridLayout(cols=2, rows=2)
+        label_layout.add_widget(Label())
         label_layout.add_widget(self.label)
+        label_layout.add_widget(self.release_all_btn)
         label_layout.add_widget(Label())
 
         left_side = GridLayout(cols=1, rows=3)
@@ -215,7 +223,7 @@ class APISenderApp(App):
 
         self.scroll_btn = Button(
             text="Scroll", font_size=buttons_font_size,
-            on_press=self.toggle_scroll,
+            on_release=self.toggle_scroll,
         )
         self.left_click = Button(
             text="Left", font_size=buttons_font_size,
@@ -246,25 +254,31 @@ class APISenderApp(App):
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
 
+    def release_all(self, button):
+        controller.release_all()
+
     def left_pressed(self, button):
-        controller.press_and_send(controller.LeftMouse)
+        send_pressed(controller.LeftMouse)
 
     def left_released(self, button):
-        controller.release_and_send(controller.LeftMouse)
+        send_released(controller.LeftMouse)
 
     def right_pressed(self, button):
-        controller.press_and_send(controller.RightMouse)
+        send_pressed(controller.RightMouse)
 
     def right_released(self, button):
-        controller.release_and_send(controller.RightMouse)
+        send_released(controller.RightMouse)
 
     def middle_pressed(self, button):
-        controller.press_and_send(controller.MiddleMouse)
+        send_pressed(controller.MiddleMouse)
 
     def middle_released(self, button):
-        controller.release_and_send(controller.MiddleMouse)
+        send_released(controller.MiddleMouse)
 
     def update_label(self):
+        if not self.visuals_for_joystick:
+            return
+
         cur_stage = controller.cur_stage
         if cur_stage < 1:  # cur_stage == 0 or cur_stage == 0.5:
             zone = controller.stick_pos_1

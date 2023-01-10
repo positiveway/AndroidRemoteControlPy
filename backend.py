@@ -163,6 +163,10 @@ class Controller:
     def reset_pressed(self):
         self.pressed = {self.LeftMouse: False, self.RightMouse: False, self.MiddleMouse: False}
 
+    def release_all(self):
+        for button in self.pressed.keys():
+            send_released(button)
+
     def press_and_send(self, button):
         if not self.pressed[button]:
             self.pressed[button] = True
