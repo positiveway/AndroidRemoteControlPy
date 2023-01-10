@@ -156,13 +156,12 @@ class TouchpadWidget(Widget):
 
     def on_touch_up(self, touch_event):
         self.full_reset()
+        gc.collect()
 
         if self.collide_point(touch_event.x, touch_event.y):
             controller.release_and_send(controller.LeftMouse)
 
             self.clear_canvas()
-
-            gc.collect()
 
             return True
         else:
