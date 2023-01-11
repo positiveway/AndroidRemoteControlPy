@@ -210,10 +210,10 @@ class APISenderApp(App):
             on_release=self.release_all
         )
 
-        joystick_row_1.add_widget(self.caps_button)
         joystick_row_1.add_widget(joystick)
-        joystick_row_2.add_widget(Label())
+        joystick_row_1.add_widget(self.caps_button)
         joystick_row_2.add_widget(self.shift_button)
+        joystick_row_2.add_widget(Label())
 
         label_layout = GridLayout(cols=2, rows=2)
         label_layout.add_widget(Label())
@@ -222,8 +222,8 @@ class APISenderApp(App):
         label_layout.add_widget(Label())
 
         left_side = GridLayout(cols=1, rows=3)
-        left_side.add_widget(joystick_row_2)
         left_side.add_widget(joystick_row_1)
+        left_side.add_widget(joystick_row_2)
         left_side.add_widget(label_layout)
 
         self.prev_letter = ""
@@ -250,14 +250,14 @@ class APISenderApp(App):
         )
 
         touchpad_layout = GridLayout(cols=2, rows=2)
-        touchpad_layout.add_widget(self.middle_click)
-        touchpad_layout.add_widget(self.right_click)
         touchpad_layout.add_widget(self.scroll_btn)
         touchpad_layout.add_widget(self.left_click)
+        touchpad_layout.add_widget(self.middle_click)
+        touchpad_layout.add_widget(self.right_click)
 
         right_side = GridLayout(cols=1, rows=2)
-        right_side.add_widget(touchpad_layout)
         right_side.add_widget(self.touchpad)
+        right_side.add_widget(touchpad_layout)
 
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
