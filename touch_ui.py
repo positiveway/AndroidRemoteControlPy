@@ -324,12 +324,11 @@ class APISenderApp(App):
 
         letter = self.controller.update_zone(joystick.magnitude, joystick.angle)
         if letter is not None:
+            self.controller.send_type(letter)
+            self.prev_letter = letter
+
             #     if is_vibro_enabled():
             #         vibrator.vibrate(0.5)
-
-            self.prev_letter = letter
-            if letter != self.controller.UNMAPPED_POSITION:
-                self.controller.send_type(letter)
 
         self.update_label()
 
