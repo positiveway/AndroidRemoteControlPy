@@ -118,9 +118,6 @@ class Controller:
             self.print_layout_error(stick_positions, error)
             return None
 
-        if letter == '':
-            letter = self.UNMAPPED_POSITION
-
         return letter
 
     def update_zone(self, magnitude, angle):
@@ -196,7 +193,6 @@ class Controller:
     def __init__(self):
         self.NEUTRAL_ZONE = '⬤'
         self.UNMAPPED_ZONE = '❌'
-        self.UNMAPPED_POSITION = "Unmapped"
 
         self.msg = bytearray(1)
 

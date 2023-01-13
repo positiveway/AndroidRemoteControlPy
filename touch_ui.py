@@ -8,7 +8,7 @@ from kivy.uix.button import Button
 from kivy.graphics import Color, Ellipse
 
 from backend import Controller
-from code_map import reverse_code_map
+from code_map import reverse_code_map, code_map
 from garden_joystick import Joystick
 
 ENABLE_VIBRATE = False
@@ -225,9 +225,6 @@ class APISenderApp(App):
         left_side.add_widget(joystick_row_2)
         left_side.add_widget(label_layout)
 
-        self.prev_letter = ""
-        self.update_label()
-
         self.scroll_btn = Button(
             text="Scroll", font_size=buttons_font_size,
             on_release=self.toggle_scroll,
@@ -260,6 +257,9 @@ class APISenderApp(App):
 
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
+
+        self.prev_letter = code_map['Space']
+        self.update_label()
 
         gc.disable()
         gc.collect()
