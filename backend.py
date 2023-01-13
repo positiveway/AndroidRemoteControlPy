@@ -191,6 +191,7 @@ class Controller:
             self.pressed[button] = False
             self.msg[0] = button
             self.sock.send(self.msg)
+            # gc.collect()
 
     def __init__(self):
         self.NEUTRAL_ZONE = '⬤'

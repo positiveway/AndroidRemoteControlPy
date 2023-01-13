@@ -265,9 +265,8 @@ class APISenderApp(App):
         gc.collect()
 
     def release_all(self, button):
-        gc.collect()
-
         self.controller.release_all()
+        gc.collect()
 
     def left_pressed(self, button):
         self.controller.send_pressed(self.controller.LeftMouse)
