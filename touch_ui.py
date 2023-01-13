@@ -157,8 +157,6 @@ class TouchpadWidget(Widget):
 
         self.controller.send_released(self.controller.LeftMouse)
 
-        gc.collect()
-
         if self.collide_point(touch_event.x, touch_event.y):
             self.clear_canvas()
             return True
@@ -267,6 +265,8 @@ class APISenderApp(App):
         gc.collect()
 
     def release_all(self, button):
+        gc.collect()
+
         self.controller.release_all()
 
     def left_pressed(self, button):
