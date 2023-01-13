@@ -1,5 +1,3 @@
-import socket
-
 connected_over_phone = False
 
 if connected_over_phone:
