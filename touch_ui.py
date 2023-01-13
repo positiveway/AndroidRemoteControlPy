@@ -4,8 +4,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
 from backend import controller
+from code_map import reverse_code_map
 from garden_joystick import Joystick
-from wsocket import send_typing_letter, sock, server_ip, server_port, send_pressed, send_released
 
 ENABLE_VIBRATE = False
 
@@ -64,7 +64,8 @@ class TouchpadWidget(Widget):
     def on_touch_down(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             if touch_event.is_double_tap:
-                controller.press_and_send(controller.LeftMouse)
+                controller.btn_msg_bytes[0] = controller.LeftMouse
+                controller.send_pressed()
                 # print("Double tap")
             return True
         else:
@@ -81,23 +82,23 @@ class TouchpadWidget(Widget):
         if x < 0:
             x += 256
 
-        if self.is_mouse_mode:
-            self.mouse_bytes[self.offset] = x
-        else:
-            self.scroll_bytes[self.offset + 1] = x
+        self.mouse_bytes[self.offset] = x
 
     def send_if_not_empty(self):
         # print(move_x, move_y)
-        if self.move_x != 0 or self.move_y != 0:
-            self.offset = 0
-            self.convert_to_send(self.move_x)
-            self.offset = 1
-            self.convert_to_send(self.move_y)
-
-            if self.is_mouse_mode:
-                sock.sendto(self.mouse_bytes, (server_ip, server_port))
-            else:
-                sock.sendto(self.scroll_bytes, (server_ip, server_port))
+        if self.is_mouse_mode:
+            if self.move_x != 0 or self.move_y != 0:
+                self.offset = 0
+                self.convert_to_send(self.move_x)
+                self.offset = 1
+                self.convert_to_send(self.move_y)
+                controller.sock.send(self.mouse_bytes)
+        else:
+            if self.move_y != 0:
+                self.mouse_bytes[0] = 128
+                self.offset = 1
+                self.convert_to_send(self.move_y)
+                controller.sock.send(self.mouse_bytes)
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -132,8 +133,6 @@ class TouchpadWidget(Widget):
         self.visuals_for_touchpad = False
 
         self.mouse_bytes = bytearray(2)
-        self.scroll_bytes = bytearray(3)
-        self.scroll_bytes[0] = 5
 
         self.is_mouse_mode = True
 
@@ -156,13 +155,14 @@ class TouchpadWidget(Widget):
 
     def on_touch_up(self, touch_event):
         self.full_reset()
+
+        controller.btn_msg_bytes[0] = controller.LeftMouse
+        controller.send_released()
+
         gc.collect()
 
         if self.collide_point(touch_event.x, touch_event.y):
-            controller.release_and_send(controller.LeftMouse)
-
             self.clear_canvas()
-
             return True
         else:
             return super(TouchpadWidget, self).on_touch_up(touch_event)
@@ -179,6 +179,8 @@ class APISenderApp(App):
         self.visuals_for_joystick = False
 
         buttons_font_size = 50
+
+        self.reverse_code_map = reverse_code_map
 
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
@@ -269,22 +271,28 @@ class APISenderApp(App):
         controller.release_all()
 
     def left_pressed(self, button):
-        send_pressed(controller.LeftMouse)
+        controller.btn_msg_bytes[0] = controller.LeftMouse
+        controller.send_pressed()
 
     def left_released(self, button):
-        send_released(controller.LeftMouse)
+        controller.btn_msg_bytes[0] = controller.LeftMouse
+        controller.send_released()
 
     def right_pressed(self, button):
-        send_pressed(controller.RightMouse)
+        controller.btn_msg_bytes[0] = controller.RightMouse
+        controller.send_pressed()
 
     def right_released(self, button):
-        send_released(controller.RightMouse)
+        controller.btn_msg_bytes[0] = controller.RightMouse
+        controller.send_released()
 
     def middle_pressed(self, button):
-        send_pressed(controller.MiddleMouse)
+        controller.btn_msg_bytes[0] = controller.MiddleMouse
+        controller.send_pressed()
 
     def middle_released(self, button):
-        send_released(controller.MiddleMouse)
+        controller.btn_msg_bytes[0] = controller.MiddleMouse
+        controller.send_released()
 
     def update_label(self):
         if not self.visuals_for_joystick:
@@ -298,7 +306,7 @@ class APISenderApp(App):
 
         letter = ''
         if cur_stage == 1.5 or cur_stage == 0:
-            letter = f'{self.prev_letter}'
+            letter = f'{self.reverse_code_map[self.prev_letter]}'
 
         hints = ''
         if cur_stage == 0.5 or cur_stage == 1:
@@ -329,7 +337,8 @@ class APISenderApp(App):
 
             self.prev_letter = letter
             if letter != controller.UNMAPPED_POSITION:
-                send_typing_letter(letter)
+                controller.btn_msg_bytes[0] = letter
+                controller.send_type()
 
         self.update_label()
 

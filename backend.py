@@ -1,6 +1,8 @@
 import json
+import socket
 
-from wsocket import send_pressed, send_released
+from code_map import code_map
+from wsocket import server_ip, server_port
 
 
 def load_layout():
@@ -22,7 +24,11 @@ def load_layout():
             if stick_positions in layout:
                 raise ValueError(f"Repeated: {letters}")
 
-            layout[stick_positions] = {'en': letters[0], 'ru': letters[1]}
+            layout[stick_positions] = {}
+            if letters[0]:
+                layout[stick_positions]['en'] = letters[0]
+            if letters[1]:
+                layout[stick_positions]['ru'] = letters[1]
 
     return layout
 
@@ -165,31 +171,49 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            send_released(button)
-
-    def press_and_send(self, button):
-        if not self.pressed[button]:
-            self.pressed[button] = True
-            send_pressed(button)
-
-    def release_and_send(self, button):
-        if self.pressed[button]:
+            self.btn_msg_bytes[0] = button
+            self.sock.send(self.btn_msg_bytes[0])
             self.pressed[button] = False
-            send_released(button)
 
-    NEUTRAL_ZONE = '⬤'
-    UNMAPPED_ZONE = '❌'
-    UNMAPPED_POSITION = "Unmapped"
+    def send_type(self):
+        self.send_pressed()
+        self.send_released()
 
-    LeftMouse = -1
-    RightMouse = -2
-    MiddleMouse = -3
+    def send_pressed(self):
+        res = self.pressed.get(self.btn_msg_bytes[0], False)
+        if res == False:
+            self.pressed[self.btn_msg_bytes[0]] = True
+            self.sock.send(self.btn_msg_bytes[0] + 128)
+
+    def send_released(self):
+        res = self.pressed.get(self.btn_msg_bytes[0], True)
+        if res == True:
+            self.pressed[self.btn_msg_bytes[0]] = False
+            self.sock.send(self.btn_msg_bytes[0])
 
     def __init__(self):
+        self.NEUTRAL_ZONE = '⬤'
+        self.UNMAPPED_ZONE = '❌'
+        self.UNMAPPED_POSITION = "Unmapped"
+
+        self.LeftMouse = code_map["LeftMouse"]
+        self.RightMouse = code_map["RightMouse"]
+        self.MiddleMouse = code_map["MiddleMouse"]
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        self.sock.bind((server_ip, server_port))
+        self.sock.connect((server_ip, server_port))
+
+        self.btn_msg_bytes = bytearray(1)
+
         self.layout = load_layout()
         self.configs = load_configs()
 
         self.direction_hints = generate_hints(self.layout)
+
+        for letters in self.layout.values():
+            for lang, letter in letters.items():
+                letters[lang] = code_map[letter]
 
         self.lang = 'en'
 
