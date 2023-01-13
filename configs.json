@@ -18,7 +18,7 @@
     }
   },
   "typing": {
-    "thresholdPct": 75,
+    "thresholdPct": 85,
     "angleMargin": 20
   }
 }
