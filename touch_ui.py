@@ -200,18 +200,23 @@ class APISenderApp(App):
         # self.label.size_hint_x = 0.25
         # self.label.size_hint_y = 0.9
 
-        joystick_row_1 = GridLayout(cols=2, rows=1)
-        joystick_row_2 = GridLayout(cols=2, rows=1)
-        self.shift_button = Button(text="Shift", font_size=buttons_font_size)
-        self.caps_button = Button(text="Caps", font_size=buttons_font_size)
-        self.release_all_btn = Button(
-            text="Release all", font_size=buttons_font_size,
-            on_release=self.release_all
-        )
+        joystick_layout = GridLayout(cols=3, rows=3)
+        self.shift_btn = Button(text="Shift", font_size=buttons_font_size)
+        self.caps_btn = Button(text="Caps", font_size=buttons_font_size)
+        self.clear_btn = Button(text="Clear", font_size=buttons_font_size, on_release=self.clear)
+        self.copy_btn = Button(text="Copy", font_size=buttons_font_size)
+        self.cut_btn = Button(text="Cut", font_size=buttons_font_size)
+        self.paste_btn = Button(text="Paste", font_size=buttons_font_size)
 
-        joystick_row_1.add_widget(joystick)
-        joystick_row_1.add_widget(self.caps_button)
-        joystick_row_2.add_widget(self.shift_button)
+        joystick_layout.add_widget(self.copy_btn)
+        joystick_layout.add_widget(self.cut_btn)
+        joystick_layout.add_widget(self.paste_btn)
+        joystick_layout.add_widget(Label())
+        joystick_layout.add_widget(joystick)
+        joystick_layout.add_widget(self.clear_btn)
+        joystick_layout.add_widget(Label())
+        joystick_layout.add_widget(self.caps_btn)
+        joystick_layout.add_widget(self.shift_btn)
 
         hints_layout = GridLayout(cols=3, rows=3)
         self.hint0 = Label(font_size=buttons_font_size)
@@ -231,19 +236,22 @@ class APISenderApp(App):
         hints_layout.add_widget(self.hint5)
         hints_layout.add_widget(self.hint6)
         hints_layout.add_widget(self.hint7)
-        joystick_row_2.add_widget(hints_layout)
 
-        label_row_2 = GridLayout(cols=2, rows=1)
-        label_row_2.add_widget(self.release_all_btn)
-        label_row_2.add_widget(Label())
+        self.release_all_btn = Button(
+            text="Release all", font_size=buttons_font_size,
+            on_release=self.release_all
+        )
 
-        label_layout = GridLayout(cols=1, rows=2)
-        label_layout.add_widget(self.label)
-        label_layout.add_widget(label_row_2)
+        label_col_1 = GridLayout(cols=1, rows=2)
+        label_col_1.add_widget(self.label)
+        label_col_1.add_widget(self.release_all_btn)
+
+        label_layout = GridLayout(cols=2, rows=1)
+        label_layout.add_widget(label_col_1)
+        label_layout.add_widget(hints_layout)
 
         left_side = GridLayout(cols=1, rows=3)
-        left_side.add_widget(joystick_row_1)
-        left_side.add_widget(joystick_row_2)
+        left_side.add_widget(joystick_layout)
         left_side.add_widget(label_layout)
 
         self.scroll_btn = Button(
@@ -279,7 +287,7 @@ class APISenderApp(App):
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
 
-        self.prev_letter = code_map['Space']
+        self.prev_letter = code_map['/']
         self.empty_hints = ["" for _ in range(8)]
         self.update_label()
 
@@ -289,6 +297,11 @@ class APISenderApp(App):
     def release_all(self, button):
         self.controller.release_all()
         gc.collect()
+
+    def clear(self, button):
+        self.controller.reset_typing()
+        self.prev_letter = code_map['/']
+        self.update_label()
 
     def left_pressed(self, button):
         self.controller.send_pressed(self.controller.LeftMouse)
