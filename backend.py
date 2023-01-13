@@ -201,7 +201,6 @@ class Controller:
         self.MiddleMouse = code_map["MiddleMouse"]
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
-        self.sock.bind((server_ip, server_port))
         self.sock.connect((server_ip, server_port))
 
         self.btn_msg_bytes = bytearray(1)
