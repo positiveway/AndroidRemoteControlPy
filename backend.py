@@ -182,18 +182,22 @@ class Controller:
         res = self.pressed.get(button, False)
         if res == False:
             self.pressed[button] = True
-            self.sock.send(bytes(button + 128))
+            self.msg[0] = button + 128
+            self.sock.send(self.msg)
 
     def send_released(self, button):
         res = self.pressed.get(button, True)
         if res == True:
             self.pressed[button] = False
-            self.sock.send(bytes(button))
+            self.msg[0] = button
+            self.sock.send(self.msg)
 
     def __init__(self):
         self.NEUTRAL_ZONE = '⬤'
         self.UNMAPPED_ZONE = '❌'
         self.UNMAPPED_POSITION = "Unmapped"
+
+        self.msg = bytearray(1)
 
         self.LeftMouse = code_map["LeftMouse"]
         self.RightMouse = code_map["RightMouse"]
