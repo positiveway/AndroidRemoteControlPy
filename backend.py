@@ -40,21 +40,21 @@ def generate_hints(layout):
 
     for lang in langs:
         lang_direction_hints[lang] = {}
-        for direction in directions:
-            lang_direction_hints[lang][direction] = []
+        for direction1 in directions:
+            lang_direction_hints[lang][direction1] = []
 
-    for direction in directions:
-        for stick_positions, letters in layout.items():
-            if stick_positions[0] == direction:
+    for direction1 in directions:
+        for direction2 in directions:
+            pos = (direction1, direction2)
+            if pos in layout:
+                letters = layout[pos]
                 for lang, letter in letters.items():
-                    lang_direction_hints[lang][direction].append(letter)
+                    lang_direction_hints[lang][direction1].append(letter)
 
     for lang in langs:
-        for direction in directions:
-            hints = lang_direction_hints[lang][direction]
-            hints = [hint for hint in hints if hint]
-            hints = ', '.join(hints)
-            lang_direction_hints[lang][direction] = hints
+        for direction1 in directions:
+            hints = ', '.join(lang_direction_hints[lang][direction1])
+            lang_direction_hints[lang][direction1] = hints
 
     return lang_direction_hints
 
@@ -171,25 +171,24 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            self.btn_msg_bytes[0] = button
-            self.sock.send(self.btn_msg_bytes[0])
+            self.sock.send(bytes(button))
             self.pressed[button] = False
 
-    def send_type(self):
-        self.send_pressed()
-        self.send_released()
+    def send_type(self, button):
+        self.send_pressed(button)
+        self.send_released(button)
 
-    def send_pressed(self):
-        res = self.pressed.get(self.btn_msg_bytes[0], False)
+    def send_pressed(self, button):
+        res = self.pressed.get(button, False)
         if res == False:
-            self.pressed[self.btn_msg_bytes[0]] = True
-            self.sock.send(self.btn_msg_bytes[0] + 128)
+            self.pressed[button] = True
+            self.sock.send(bytes(button + 128))
 
-    def send_released(self):
-        res = self.pressed.get(self.btn_msg_bytes[0], True)
+    def send_released(self, button):
+        res = self.pressed.get(button, True)
         if res == True:
-            self.pressed[self.btn_msg_bytes[0]] = False
-            self.sock.send(self.btn_msg_bytes[0])
+            self.pressed[button] = False
+            self.sock.send(bytes(button))
 
     def __init__(self):
         self.NEUTRAL_ZONE = '⬤'
@@ -203,10 +202,8 @@ class Controller:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
         self.sock.connect((server_ip, server_port))
 
-        self.btn_msg_bytes = bytearray(1)
-
         self.layout = load_layout()
-        self.configs = load_configs()
+        configs = load_configs()
 
         self.direction_hints = generate_hints(self.layout)
 
@@ -216,23 +213,15 @@ class Controller:
 
         self.lang = 'en'
 
-        typing_cfg = self.configs['typing']
+        typing_cfg = configs['typing']
         self.magnitude_threshold = typing_cfg['thresholdPct'] / 100
         angle_margin = typing_cfg['angleMargin']
 
-        mouse_speed = self.configs['mouse']['speed']['normal']
-        self.move_every_n_pixels = mouse_speed['move_every_n_pixels']
-        self.move_by_n_pixels = mouse_speed['move_by_n_pixels']
-
         self.boundary_mapping = self.gen_boundary_mapping(angle_margin)
-
         self.reset_typing()
 
+        scroll_speed = configs['scroll']['speed']['normal']
+        self.move_every_n_pixels = scroll_speed['move_every_n_pixels']
+        self.move_by_n_pixels = scroll_speed['move_by_n_pixels']
+
         self.reset_pressed()
-
-
-controller = Controller()
-
-if __name__ == '__main__':
-    while True:
-        input()

@@ -2,8 +2,12 @@ import gc
 
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.graphics import Color, Ellipse
 
-from backend import controller
+from backend import Controller
 from code_map import reverse_code_map
 from garden_joystick import Joystick
 
@@ -23,28 +27,22 @@ if is_vibro_enabled():
 
     request_permissions([Permission.VIBRATE])
 
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.graphics import Color, Ellipse, Line
-
-
-def update_coord_get_number_to_move(cur, prev):
-    move_every_n_pixels = controller.move_every_n_pixels
-
-    diff = cur - prev
-    if abs(diff) >= move_every_n_pixels:  # greater or EQUAL
-        multiplier, remainder = divmod(diff, move_every_n_pixels)
-
-        prev = cur - remainder
-        move_by = multiplier * controller.move_by_n_pixels
-
-        return prev, move_by
-    else:
-        return prev, 0
-
 
 class TouchpadWidget(Widget):
+    def update_coord_get_number_to_move(self, cur, prev):
+        move_every_n_pixels = self.controller.move_every_n_pixels
+
+        diff = cur - prev
+        if abs(diff) >= move_every_n_pixels:  # greater or EQUAL
+            multiplier, remainder = divmod(diff, move_every_n_pixels)
+
+            prev = cur - remainder
+            move_by = multiplier * self.controller.move_by_n_pixels
+
+            return prev, move_by
+        else:
+            return prev, 0
+
     def clear_canvas(self):
         if not self.visuals_for_touchpad:
             return
@@ -64,8 +62,7 @@ class TouchpadWidget(Widget):
     def on_touch_down(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
             if touch_event.is_double_tap:
-                controller.btn_msg_bytes[0] = controller.LeftMouse
-                controller.send_pressed()
+                self.controller.send_pressed(self.controller.LeftMouse)
                 # print("Double tap")
             return True
         else:
@@ -92,13 +89,13 @@ class TouchpadWidget(Widget):
                 self.convert_to_send(self.move_x)
                 self.offset = 1
                 self.convert_to_send(self.move_y)
-                controller.sock.send(self.mouse_bytes)
+                self.controller.sock.send(self.mouse_bytes)
         else:
             if self.move_y != 0:
                 self.mouse_bytes[0] = 128
                 self.offset = 1
                 self.convert_to_send(self.move_y)
-                controller.sock.send(self.mouse_bytes)
+                self.controller.sock.send(self.mouse_bytes)
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
@@ -136,6 +133,8 @@ class TouchpadWidget(Widget):
 
         self.is_mouse_mode = True
 
+        self.controller = Controller()
+
         self.value_not_set = 1000
 
         self.offset = 0
@@ -156,8 +155,7 @@ class TouchpadWidget(Widget):
     def on_touch_up(self, touch_event):
         self.full_reset()
 
-        controller.btn_msg_bytes[0] = controller.LeftMouse
-        controller.send_released()
+        self.controller.send_released(self.controller.LeftMouse)
 
         gc.collect()
 
@@ -184,6 +182,7 @@ class APISenderApp(App):
 
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
+        self.controller = self.touchpad.controller
 
         joystick = Joystick()
         # joystick.size_hint_x = 0.25
@@ -268,41 +267,35 @@ class APISenderApp(App):
         gc.collect()
 
     def release_all(self, button):
-        controller.release_all()
+        self.controller.release_all()
 
     def left_pressed(self, button):
-        controller.btn_msg_bytes[0] = controller.LeftMouse
-        controller.send_pressed()
+        self.controller.send_pressed(self.controller.LeftMouse)
 
     def left_released(self, button):
-        controller.btn_msg_bytes[0] = controller.LeftMouse
-        controller.send_released()
+        self.controller.send_released(self.controller.LeftMouse)
 
     def right_pressed(self, button):
-        controller.btn_msg_bytes[0] = controller.RightMouse
-        controller.send_pressed()
+        self.controller.send_pressed(self.controller.RightMouse)
 
     def right_released(self, button):
-        controller.btn_msg_bytes[0] = controller.RightMouse
-        controller.send_released()
+        self.controller.send_released(self.controller.RightMouse)
 
     def middle_pressed(self, button):
-        controller.btn_msg_bytes[0] = controller.MiddleMouse
-        controller.send_pressed()
+        self.controller.send_pressed(self.controller.MiddleMouse)
 
     def middle_released(self, button):
-        controller.btn_msg_bytes[0] = controller.MiddleMouse
-        controller.send_released()
+        self.controller.send_released(self.controller.MiddleMouse)
 
     def update_label(self):
         if not self.visuals_for_joystick:
             return
 
-        cur_stage = controller.cur_stage
+        cur_stage = self.controller.cur_stage
         if cur_stage < 1:  # cur_stage == 0 or cur_stage == 0.5:
-            zone = controller.stick_pos_1
+            zone = self.controller.stick_pos_1
         else:  # elif cur_stage == 1 or cur_stage == 1.5:
-            zone = controller.stick_pos_2
+            zone = self.controller.stick_pos_2
 
         letter = ''
         if cur_stage == 1.5 or cur_stage == 0:
@@ -310,7 +303,7 @@ class APISenderApp(App):
 
         hints = ''
         if cur_stage == 0.5 or cur_stage == 1:
-            hints = f'{controller.get_direction_hints(controller.stick_pos_1)}'
+            hints = f'{self.controller.get_direction_hints(self.controller.stick_pos_1)}'
 
         zone = {
             "🢂": 'Right',
@@ -330,15 +323,14 @@ class APISenderApp(App):
     def update_coordinates(self, joystick, pad):
         # print(joystick.magnitude, joystick.angle)
 
-        letter = controller.update_zone(joystick.magnitude, joystick.angle)
+        letter = self.controller.update_zone(joystick.magnitude, joystick.angle)
         if letter is not None:
             #     if is_vibro_enabled():
             #         vibrator.vibrate(0.5)
 
             self.prev_letter = letter
-            if letter != controller.UNMAPPED_POSITION:
-                controller.btn_msg_bytes[0] = letter
-                controller.send_type()
+            if letter != self.controller.UNMAPPED_POSITION:
+                self.controller.send_type(letter)
 
         self.update_label()
 
