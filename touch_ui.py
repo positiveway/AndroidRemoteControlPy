@@ -10,6 +10,7 @@ from kivy.graphics import Color, Ellipse
 from backend import Controller
 from code_map import reverse_code_map, code_map
 from garden_joystick import Joystick
+from layout import get_arrow_convert_map
 
 ENABLE_VIBRATE = False
 
@@ -215,8 +216,8 @@ class APISenderApp(App):
         joystick_row_2.add_widget(Label())
 
         label_layout = GridLayout(cols=2, rows=2)
-        label_layout.add_widget(Label())
         label_layout.add_widget(self.label)
+        label_layout.add_widget(Label())
         label_layout.add_widget(self.release_all_btn)
         label_layout.add_widget(Label())
 
