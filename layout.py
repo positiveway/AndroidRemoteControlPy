@@ -29,7 +29,6 @@ def load_layout():
 def generate_hints(layout):
     langs = ['en', 'ru']
     directions = ["🢂", "🢅", "🢁", "🢄", "🢀", "🢇", "🢃", "🢆"]
-    arrow_map = get_arrow_convert_map()
     lang_direction_hints = {}
 
     for lang in langs:
@@ -42,27 +41,11 @@ def generate_hints(layout):
             pos = (direction1, direction2)
             if pos in layout:
                 letters = layout[pos]
-                for lang, letter in letters.items():
-                    lang_direction_hints[lang][direction1].append(f"({arrow_map[direction2]}: '{letter}')")
+            else:
+                letters = {}
 
-    for lang in langs:
-        for direction1 in directions:
-            hints = ', '.join(lang_direction_hints[lang][direction1])
-            lang_direction_hints[lang][direction1] = hints
+            for lang in langs:
+                letter = letters.get(lang, "")
+                lang_direction_hints[lang][direction1].append(letter)
 
     return lang_direction_hints
-
-
-def get_arrow_convert_map():
-    return {
-        "🢂": 'R',
-        "🢅": 'UR',
-        "🢁": 'U',
-        "🢄": 'UL',
-        "🢀": 'L',
-        "🢇": 'DL',
-        "🢃": 'D',
-        "🢆": 'DR',
-        "⬤": 'Neutral',
-        "❌": 'Unmapped',
-    }

@@ -10,7 +10,6 @@ from kivy.graphics import Color, Ellipse
 from backend import Controller
 from code_map import reverse_code_map, code_map
 from garden_joystick import Joystick
-from layout import get_arrow_convert_map
 
 ENABLE_VIBRATE = False
 
@@ -173,7 +172,7 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def build(self):
-        self.visuals_for_joystick = False
+        self.visuals_for_joystick = True
 
         buttons_font_size = 50
 
@@ -213,13 +212,34 @@ class APISenderApp(App):
         joystick_row_1.add_widget(joystick)
         joystick_row_1.add_widget(self.caps_button)
         joystick_row_2.add_widget(self.shift_button)
-        joystick_row_2.add_widget(Label())
 
-        label_layout = GridLayout(cols=2, rows=2)
+        hints_layout = GridLayout(cols=3, rows=3)
+        self.hint0 = Label(font_size=buttons_font_size)
+        self.hint1 = Label(font_size=buttons_font_size)
+        self.hint2 = Label(font_size=buttons_font_size)
+        self.hint3 = Label(font_size=buttons_font_size)
+        self.hint4 = Label(font_size=buttons_font_size)
+        self.hint5 = Label(font_size=buttons_font_size)
+        self.hint6 = Label(font_size=buttons_font_size)
+        self.hint7 = Label(font_size=buttons_font_size)
+        hints_layout.add_widget(self.hint3)
+        hints_layout.add_widget(self.hint2)
+        hints_layout.add_widget(self.hint1)
+        hints_layout.add_widget(self.hint4)
+        hints_layout.add_widget(Label())
+        hints_layout.add_widget(self.hint0)
+        hints_layout.add_widget(self.hint5)
+        hints_layout.add_widget(self.hint6)
+        hints_layout.add_widget(self.hint7)
+        joystick_row_2.add_widget(hints_layout)
+
+        label_row_2 = GridLayout(cols=2, rows=1)
+        label_row_2.add_widget(self.release_all_btn)
+        label_row_2.add_widget(Label())
+
+        label_layout = GridLayout(cols=1, rows=2)
         label_layout.add_widget(self.label)
-        label_layout.add_widget(Label())
-        label_layout.add_widget(self.release_all_btn)
-        label_layout.add_widget(Label())
+        label_layout.add_widget(label_row_2)
 
         left_side = GridLayout(cols=1, rows=3)
         left_side.add_widget(joystick_row_1)
@@ -260,6 +280,7 @@ class APISenderApp(App):
         self.root.add_widget(right_side)
 
         self.prev_letter = code_map['Space']
+        self.empty_hints = ["" for _ in range(8)]
         self.update_label()
 
         gc.disable()
@@ -299,11 +320,21 @@ class APISenderApp(App):
 
         letter = ''
         if cur_stage == 1.5 or cur_stage == 0:
-            letter = f'{self.reverse_code_map[self.prev_letter]}'
+            letter = self.reverse_code_map[self.prev_letter]
 
-        hints = ''
         if cur_stage == 0.5 or cur_stage == 1:
-            hints = f'{self.controller.get_direction_hints(self.controller.stick_pos_1)}'
+            hints = self.controller.get_direction_hints(self.controller.stick_pos_1)
+        else:
+            hints = self.empty_hints
+
+        self.hint0.text = hints[0]
+        self.hint1.text = hints[1]
+        self.hint2.text = hints[2]
+        self.hint3.text = hints[3]
+        self.hint4.text = hints[4]
+        self.hint5.text = hints[5]
+        self.hint6.text = hints[6]
+        self.hint7.text = hints[7]
 
         zone = {
             "🢂": 'Right',
@@ -318,7 +349,7 @@ class APISenderApp(App):
             "❌": 'Unmapped',
         }[zone]
 
-        self.label.text = f'{letter}\n{hints}\n{cur_stage}: {zone}'
+        self.label.text = f'{letter}\n{cur_stage}: {zone}'
 
     def update_coordinates(self, joystick, pad):
         # print(joystick.magnitude, joystick.angle)
