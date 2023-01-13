@@ -203,7 +203,7 @@ class APISenderApp(App):
         joystick_layout = GridLayout(cols=3, rows=3)
         self.shift_btn = Button(text="Shift", font_size=buttons_font_size)
         self.caps_btn = Button(text="Caps", font_size=buttons_font_size)
-        self.clear_btn = Button(text="Clear", font_size=buttons_font_size, on_release=self.clear)
+        self.clear_btn = Button(text="BS", font_size=buttons_font_size, on_release=self.clear)
         self.copy_btn = Button(text="Copy", font_size=buttons_font_size)
         self.cut_btn = Button(text="Cut", font_size=buttons_font_size)
         self.paste_btn = Button(text="Paste", font_size=buttons_font_size)
@@ -299,9 +299,12 @@ class APISenderApp(App):
         gc.collect()
 
     def clear(self, button):
-        self.controller.reset_typing()
-        self.prev_letter = code_map['/']
-        self.update_label()
+        if self.controller.cur_stage == 1.0:
+            self.controller.reset_typing()
+            self.prev_letter = code_map['/']
+            self.update_label()
+        else:
+            self.controller.send_type(code_map["Bs"])
 
     def left_pressed(self, button):
         self.controller.send_pressed(self.controller.LeftMouse)
