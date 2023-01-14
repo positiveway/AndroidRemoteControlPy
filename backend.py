@@ -133,13 +133,14 @@ class Controller:
             # gc.collect()
 
     def send(self, msg):
-        try:
-            self.sock.sendall(msg)
-        except socket.error as err:
-            print(f'Send failed: {err}')
+        self.sock.sendall(msg)
+        # try:
+        #     self.sock.sendall(msg)
+        # except socket.error as err:
+        #     print(f'Send failed: {err}')
 
     def connect(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         print("Waiting for server to connect")
         while True:
