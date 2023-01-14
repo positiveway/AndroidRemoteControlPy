@@ -110,7 +110,7 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            self.send(bytes(button))
+            self.sock.send(bytes(button))
             self.pressed[button] = False
 
     def send_type(self, button):
@@ -122,22 +122,15 @@ class Controller:
         if res == False:
             self.pressed[button] = True
             self.msg[0] = button + 128
-            self.send(self.msg)
+            self.sock.send(self.msg)
 
     def send_released(self, button):
         res = self.pressed.get(button, True)
         if res == True:
             self.pressed[button] = False
             self.msg[0] = button
-            self.send(self.msg)
+            self.sock.send(self.msg)
             # gc.collect()
-
-    def send(self, msg):
-        self.sock.sendall(msg)
-        # try:
-        #     self.sock.sendall(msg)
-        # except socket.error as err:
-        #     print(f'Send failed: {err}')
 
     def connect(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
