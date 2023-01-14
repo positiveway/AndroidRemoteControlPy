@@ -1,3 +1,6 @@
+import json
+
+
 def load_layout():
     layout = {}
     with open("layout.csv", encoding="utf8") as layout_csv:
@@ -49,3 +52,8 @@ def generate_hints(layout):
                 lang_direction_hints[lang][direction1].append(letter)
 
     return lang_direction_hints
+
+
+def load_configs():
+    with open("configs.json", encoding="utf8") as file:
+        return json.load(file)

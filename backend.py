@@ -1,14 +1,8 @@
-import json
 import socket
 
 from code_map import code_map
-from layout import load_layout, generate_hints
+from layout import load_layout, generate_hints, load_configs
 from wsocket import server_ip, server_port
-
-
-def load_configs():
-    with open("configs.json", encoding="utf8") as file:
-        return json.load(file)
 
 
 def resole_angle(angle):
@@ -115,7 +109,7 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            self.sock.sendall(bytes(button))
+            self.send(bytes(button))
             self.pressed[button] = False
 
     def send_type(self, button):
@@ -127,15 +121,21 @@ class Controller:
         if res == False:
             self.pressed[button] = True
             self.msg[0] = button + 128
-            self.sock.sendall(self.msg)
+            self.send(self.msg)
 
     def send_released(self, button):
         res = self.pressed.get(button, True)
         if res == True:
             self.pressed[button] = False
             self.msg[0] = button
-            self.sock.sendall(self.msg)
+            self.send(self.msg)
             # gc.collect()
+
+    def send(self, msg):
+        try:
+            self.sock.sendall(msg)
+        except socket.error as err:
+            print(f'Send failed: {err}')
 
     def __init__(self):
         self.NEUTRAL_ZONE = '⬤'
