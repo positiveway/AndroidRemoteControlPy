@@ -40,6 +40,10 @@ class TouchpadWidget(Widget):
             if touch_event.is_double_tap:
                 self.controller.send_pressed(self.controller.LeftMouse)
                 # print("Double tap")
+
+            self.prev_x = round(touch_event.x)
+            self.prev_y = round(touch_event.y)
+
             return True
         else:
             return super(TouchpadWidget, self).on_touch_down(touch_event)
