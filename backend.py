@@ -134,16 +134,7 @@ class Controller:
 
     def connect(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        print("Waiting for server to connect")
-        while True:
-            try:
-                self.sock.connect((server_ip, server_port))
-            except ConnectionRefusedError:
-                time.sleep(2)
-            else:
-                print("Connected")
-                break
+        self.sock.connect((server_ip, server_port))
 
     def __init__(self):
         self.connect()
