@@ -31,15 +31,15 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def build(self):
+        self.touchpad = TouchpadWidget()
+        self.touchpad.init()
+        self.controller = self.touchpad.controller
+
         self.visuals_for_joystick = True
 
         buttons_font_size = 50
 
         self.reverse_code_map = reverse_code_map
-
-        self.touchpad = TouchpadWidget()
-        self.touchpad.init()
-        self.controller = self.touchpad.controller
 
         joystick = Joystick()
         # joystick.size_hint_x = 0.25

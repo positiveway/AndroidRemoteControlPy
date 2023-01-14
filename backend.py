@@ -1,4 +1,5 @@
 import socket
+import time
 
 from code_map import code_map
 from layout import load_layout, generate_hints, load_configs
@@ -137,7 +138,22 @@ class Controller:
         except socket.error as err:
             print(f'Send failed: {err}')
 
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        print("Waiting for server to connect")
+        while True:
+            try:
+                self.sock.connect((server_ip, server_port))
+            except ConnectionRefusedError:
+                time.sleep(2)
+            else:
+                print("Connected")
+                break
+
     def __init__(self):
+        self.connect()
+
         self.NEUTRAL_ZONE = '⬤'
         self.UNMAPPED_ZONE = '❌'
 
@@ -146,9 +162,6 @@ class Controller:
         self.LeftMouse = code_map["LeftMouse"]
         self.RightMouse = code_map["RightMouse"]
         self.MiddleMouse = code_map["MiddleMouse"]
-
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((server_ip, server_port))
 
         self.layout = load_layout()
         configs = load_configs()

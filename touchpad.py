@@ -103,13 +103,13 @@ class TouchpadWidget(Widget):
         self.prev_x = self.value_not_set
 
     def init(self):
+        self.controller = Controller()
+
         self.visuals_for_touchpad = False
 
         self.mouse_bytes = bytearray(2)
 
         self.is_mouse_mode = True
-
-        self.controller = Controller()
 
         self.value_not_set = 1000
 
