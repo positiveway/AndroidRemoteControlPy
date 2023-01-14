@@ -115,7 +115,7 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            self.sock.send(bytes(button))
+            self.sock.sendall(bytes(button))
             self.pressed[button] = False
 
     def send_type(self, button):
@@ -127,14 +127,14 @@ class Controller:
         if res == False:
             self.pressed[button] = True
             self.msg[0] = button + 128
-            self.sock.send(self.msg)
+            self.sock.sendall(self.msg)
 
     def send_released(self, button):
         res = self.pressed.get(button, True)
         if res == True:
             self.pressed[button] = False
             self.msg[0] = button
-            self.sock.send(self.msg)
+            self.sock.sendall(self.msg)
             # gc.collect()
 
     def __init__(self):
@@ -147,7 +147,7 @@ class Controller:
         self.RightMouse = code_map["RightMouse"]
         self.MiddleMouse = code_map["MiddleMouse"]
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((server_ip, server_port))
 
         self.layout = load_layout()

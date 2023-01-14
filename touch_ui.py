@@ -89,13 +89,13 @@ class TouchpadWidget(Widget):
                 self.convert_to_send(self.move_x)
                 self.offset = 1
                 self.convert_to_send(self.move_y)
-                self.controller.sock.send(self.mouse_bytes)
+                self.controller.sock.sendall(self.mouse_bytes)
         else:
             if self.move_y != 0:
                 self.mouse_bytes[0] = 128
                 self.offset = 1
                 self.convert_to_send(self.move_y)
-                self.controller.sock.send(self.mouse_bytes)
+                self.controller.sock.sendall(self.mouse_bytes)
 
     def on_touch_move(self, touch_event):
         if self.collide_point(touch_event.x, touch_event.y):
