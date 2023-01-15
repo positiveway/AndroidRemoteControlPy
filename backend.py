@@ -136,7 +136,7 @@ class Controller:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.connect((server_ip, server_port))
 
-        self.run_scheduler()
+        # self.run_scheduler()
 
     def send_empty_msg(self):
         try:

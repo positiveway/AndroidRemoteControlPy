@@ -35,11 +35,11 @@ class TouchpadWidget(Widget):
 
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
-            if touch_event.is_double_tap:
-                self.toggle_scroll()
-
             self.prev_x = round(touch_event.x)
             self.prev_y = round(touch_event.y)
+
+            if touch_event.is_double_tap:
+                self.toggle_scroll()
 
             if self.is_mouse_mode:
                 self.init_x = self.prev_x
