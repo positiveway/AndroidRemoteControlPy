@@ -11,7 +11,7 @@
   "scroll": {
     "speed": {
       "normal": {
-        "move_every_n_pixels": 5,
+        "move_every_n_pixels": 7,
         "move_by_n_pixels": 1
       },
       "fast": 2
