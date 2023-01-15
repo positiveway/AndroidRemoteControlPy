@@ -104,32 +104,53 @@ class Controller:
         self.cur_stage = 0
         self.awaiting_neutral_pos = False
 
-    def reset_pressed(self):
-        self.pressed = {self.LeftMouse: False, self.RightMouse: False, self.MiddleMouse: False}
+    def init_pressed(self):
+        self.pressed = {}
+        for button in code_map.values():
+            self.pressed[button] = 0
+
+    def release_mouse(self):
+        for button in self.mouse_buttons:
+            self.msg[0] = button
+            self.sock.send(self.msg)
+            self.pressed[button] = 0
+
+    def release_all_pressed(self):
+        for button in self.pressed.keys():
+            if self.pressed[button] > 0:
+                self.msg[0] = button
+                self.sock.send(self.msg)
+                self.pressed[button] = 0
+
+    def release_mouse_and_pressed(self):
+        self.release_mouse()
+        self.release_all_pressed()
 
     def release_all(self):
+        self.release_mouse()
+
         for button in self.pressed.keys():
             self.msg[0] = button
             self.sock.send(self.msg)
-            self.pressed[button] = False
+            self.pressed[button] = 0
 
     def send_type(self, button):
         self.send_pressed(button)
         self.send_released(button)
 
     def send_pressed(self, button):
-        res = self.pressed.get(button, False)
-        if res == False:
-            self.pressed[button] = True
-            self.msg[0] = button + 128
-            self.sock.send(self.msg)
+        press_count = self.pressed[button]
+        self.msg[0] = button + 128
+        self.sock.send(self.msg)
+        self.pressed[button] = press_count + 1
 
     def send_released(self, button):
-        res = self.pressed.get(button, True)
-        if res == True:
-            self.pressed[button] = False
+        press_count = self.pressed[button]
+        if press_count > 0:
             self.msg[0] = button
             self.sock.send(self.msg)
+            self.pressed[button] = press_count - 1
+
             # gc.collect()
 
     def connect(self):
@@ -164,6 +185,7 @@ class Controller:
         self.LeftMouse = code_map["LeftMouse"]
         self.RightMouse = code_map["RightMouse"]
         self.MiddleMouse = code_map["MiddleMouse"]
+        self.mouse_buttons = (self.LeftMouse, self.RightMouse, self.MiddleMouse)
 
         self.layout = load_layout()
         configs = load_configs()
@@ -189,4 +211,4 @@ class Controller:
         self.hold_dist = 10
         self.hold_time = 0.25
 
-        self.reset_pressed()
+        self.init_pressed()

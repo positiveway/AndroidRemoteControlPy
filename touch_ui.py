@@ -5,6 +5,7 @@ from kivy.uix.label import Label
 from kivy.app import App
 from kivy.uix.button import Button
 
+from backend import Controller
 from code_map import reverse_code_map, code_map
 from garden_joystick import Joystick
 from touchpad import TouchpadWidget
@@ -246,9 +247,13 @@ class APISenderApp(App):
 
         self.update_label()
 
+    def on_stop(self):
+        self.controller.release_mouse_and_pressed()
+
 
 def main():
     APISenderApp().run()
+    Controller().release_mouse()
 
 
 if __name__ == '__main__':
