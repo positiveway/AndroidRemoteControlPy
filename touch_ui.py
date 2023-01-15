@@ -59,7 +59,6 @@ class APISenderApp(App):
         # self.label.size_hint_x = 0.25
         # self.label.size_hint_y = 0.9
 
-        joystick_layout = GridLayout(cols=3, rows=3)
         self.shift_btn = Button(text="Shift", font_size=buttons_font_size)
         self.caps_btn = Button(text="Caps", font_size=buttons_font_size)
         self.clear_btn = Button(text="BS", font_size=buttons_font_size, on_release=self.clear)
@@ -67,17 +66,18 @@ class APISenderApp(App):
         self.cut_btn = Button(text="Cut", font_size=buttons_font_size)
         self.paste_btn = Button(text="Paste", font_size=buttons_font_size)
 
-        joystick_layout.add_widget(self.copy_btn)
-        joystick_layout.add_widget(self.cut_btn)
-        joystick_layout.add_widget(self.paste_btn)
+        joystick_buttons = GridLayout(cols=3, rows=2)
+        joystick_buttons.add_widget(self.caps_btn)
+        joystick_buttons.add_widget(self.clear_btn)
+        joystick_buttons.add_widget(self.shift_btn)
 
-        joystick_layout.add_widget(Label())
+        joystick_buttons.add_widget(self.copy_btn)
+        joystick_buttons.add_widget(self.cut_btn)
+        joystick_buttons.add_widget(self.paste_btn)
+
+        joystick_layout = GridLayout(cols=1, rows=2)
         joystick_layout.add_widget(joystick)
-        joystick_layout.add_widget(self.clear_btn)
-
-        joystick_layout.add_widget(Label())
-        joystick_layout.add_widget(self.caps_btn)
-        joystick_layout.add_widget(self.shift_btn)
+        joystick_layout.add_widget(joystick_buttons)
 
         hints_layout = GridLayout(cols=3, rows=3)
         self.hint0 = Label(font_size=buttons_font_size)
