@@ -187,6 +187,6 @@ class Controller:
         self.scroll_every_n_pixels = scroll_speed['move_every_n_pixels']
 
         self.hold_dist = 10
-        self.hold_time = 0.3
+        self.hold_time = 0.25
 
         self.reset_pressed()
