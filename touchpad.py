@@ -43,6 +43,7 @@ class TouchpadWidget(Widget):
 
             self.init_x = self.prev_x
             self.init_y = self.prev_y
+            self.make_new_timer()
             self.timer.start()
 
             return True
@@ -132,10 +133,10 @@ class TouchpadWidget(Widget):
             return super(TouchpadWidget, self).on_touch_up(touch_event)
 
     def reset(self):
+        self.timer.cancel()
         self.prev_x = self.value_not_set
         self.cur_x = self.value_not_set
         self.init_x = self.value_not_set
-        self.timer.cancel()
 
     def is_in_zone(self, touch_event):
         return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
@@ -151,10 +152,13 @@ class TouchpadWidget(Widget):
     def toggle_scroll(self):
         self.is_mouse_mode = not self.is_mouse_mode
 
+    def make_new_timer(self):
+        self.timer = Timer(self.controller.hold_time, self.timer_func)
+
     def init(self):
         self.controller = Controller()
 
-        self.timer = Timer(self.controller.hold_time, self.timer_func)
+        self.make_new_timer()
 
         self.visuals_for_touchpad = False
 
