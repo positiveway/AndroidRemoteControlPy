@@ -115,7 +115,7 @@ class APISenderApp(App):
         label_layout.add_widget(label_col_1)
         label_layout.add_widget(label_col_2)
 
-        left_side = GridLayout(cols=1, rows=3)
+        left_side = GridLayout(cols=1, rows=2)
         left_side.add_widget(joystick_layout)
         left_side.add_widget(label_layout)
 
