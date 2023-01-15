@@ -25,7 +25,7 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        if self.init_x != self.value_not_set:
+        if self.is_mouse_mode and self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set:
                 self.controller.send_pressed(self.controller.LeftMouse)
             else:
@@ -41,10 +41,11 @@ class TouchpadWidget(Widget):
             self.prev_x = round(touch_event.x)
             self.prev_y = round(touch_event.y)
 
-            self.init_x = self.prev_x
-            self.init_y = self.prev_y
-            self.make_new_timer()
-            self.timer.start()
+            if self.is_mouse_mode:
+                self.init_x = self.prev_x
+                self.init_y = self.prev_y
+                self.make_new_timer()
+                self.timer.start()
 
             return True
         else:
