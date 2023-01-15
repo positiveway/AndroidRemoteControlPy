@@ -2,3 +2,4 @@ kivy
 plyer
 python-for-android
 websockets
+apscheduler

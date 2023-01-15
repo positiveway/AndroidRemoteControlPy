@@ -1,5 +1,4 @@
 import socket
-import time
 
 from code_map import code_map
 from layout import load_layout, generate_hints, load_configs
@@ -110,7 +109,8 @@ class Controller:
 
     def release_all(self):
         for button in self.pressed.keys():
-            self.sock.send(bytes(button))
+            self.msg[0] = button
+            self.sock.send(self.msg)
             self.pressed[button] = False
 
     def send_type(self, button):
@@ -135,6 +135,23 @@ class Controller:
     def connect(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.connect((server_ip, server_port))
+
+        self.run_scheduler()
+
+    def send_empty_msg(self):
+        try:
+            self.sock.send(self.empty_msg)
+        except ConnectionRefusedError:
+            pass
+
+    def run_scheduler(self):
+        self.empty_msg = bytes(1)
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(self.send_empty_msg, 'interval', seconds=1)
+        scheduler.start()
 
     def __init__(self):
         self.connect()
