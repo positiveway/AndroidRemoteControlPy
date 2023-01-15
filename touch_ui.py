@@ -67,12 +67,14 @@ class APISenderApp(App):
         self.cut_btn = Button(text="Cut", font_size=buttons_font_size)
         self.paste_btn = Button(text="Paste", font_size=buttons_font_size)
 
-        joystick_layout.add_widget(self.copy_btn)
-        joystick_layout.add_widget(self.cut_btn)
-        joystick_layout.add_widget(self.paste_btn)
         joystick_layout.add_widget(Label())
         joystick_layout.add_widget(joystick)
         joystick_layout.add_widget(self.clear_btn)
+
+        joystick_layout.add_widget(self.copy_btn)
+        joystick_layout.add_widget(self.cut_btn)
+        joystick_layout.add_widget(self.paste_btn)
+
         joystick_layout.add_widget(Label())
         joystick_layout.add_widget(self.caps_btn)
         joystick_layout.add_widget(self.shift_btn)
@@ -105,9 +107,13 @@ class APISenderApp(App):
         label_col_1.add_widget(self.label)
         label_col_1.add_widget(self.release_all_btn)
 
+        label_col_2 = GridLayout(cols=1, rows=2)
+        label_col_2.add_widget(hints_layout)
+        label_col_2.add_widget(Label())
+
         label_layout = GridLayout(cols=2, rows=1)
         label_layout.add_widget(label_col_1)
-        label_layout.add_widget(hints_layout)
+        label_layout.add_widget(label_col_2)
 
         left_side = GridLayout(cols=1, rows=3)
         left_side.add_widget(joystick_layout)

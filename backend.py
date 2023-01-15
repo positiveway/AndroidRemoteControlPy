@@ -167,7 +167,9 @@ class Controller:
         self.reset_typing()
 
         scroll_speed = configs['scroll']['speed']['normal']
-        self.move_every_n_pixels = scroll_speed['move_every_n_pixels']
-        self.move_by_n_pixels = scroll_speed['move_by_n_pixels']
+        self.scroll_every_n_pixels = scroll_speed['move_every_n_pixels']
+
+        self.hold_dist = 20
+        self.hold_time = 0.5
 
         self.reset_pressed()
