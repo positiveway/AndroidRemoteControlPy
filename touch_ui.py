@@ -140,10 +140,11 @@ class APISenderApp(App):
         )
 
         touchpad_layout = GridLayout(cols=2, rows=2)
-        touchpad_layout.add_widget(self.scroll_btn)
-        touchpad_layout.add_widget(self.left_click)
         touchpad_layout.add_widget(self.middle_click)
         touchpad_layout.add_widget(self.right_click)
+
+        touchpad_layout.add_widget(self.scroll_btn)
+        touchpad_layout.add_widget(self.left_click)
 
         right_side = GridLayout(cols=1, rows=2)
         right_side.add_widget(self.touchpad)
