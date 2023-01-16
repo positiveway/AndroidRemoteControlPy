@@ -7,7 +7,10 @@
   },
   "touchpad": {
     "hold_dist": 10,
-    "hold_time": 0.25,
+    "hold_time": {
+      "normal": 0.25,
+      "during_scroll": 0.5
+    },
     "visuals": false
   },
   "scroll": {

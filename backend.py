@@ -159,7 +159,9 @@ class Controller:
 
         touchpad_cfg = configs['touchpad']
         self.hold_dist = touchpad_cfg["hold_dist"]
-        self.hold_time = touchpad_cfg["hold_time"]
+        hold_time_cfg = touchpad_cfg["hold_time"]
+        self.hold_time_normal = hold_time_cfg['normal']
+        self.hold_time_during_scroll = hold_time_cfg['during_scroll']
         self.visuals_for_touchpad = touchpad_cfg['visuals']
 
         font_size_cfg = configs['font']['size']
