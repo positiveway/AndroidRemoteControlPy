@@ -204,18 +204,20 @@ class APISenderApp(App):
 
         if self.controller.typing_btn_1 is None:
             cur_stage = 0
+
+            letter = self.reverse_code_map[self.prev_letter]
             direction = ""
+
+            font_size = self.small_font_size
+            hints = self.controller.get_preview_hints()
         else:
             cur_stage = 1
+
+            letter = ''
             direction = self.reverse_button_nums[self.controller.typing_btn_1]
 
-        letter = ''
-        if cur_stage == 0:
-            letter = self.reverse_code_map[self.prev_letter]
-
-        font_size = self.small_font_size
-        if cur_stage == 1:
             font_size = self.font_size
+            hints = self.controller.get_detailed_hints(self.controller.typing_btn_1)
 
         self.typing_btn_1.font_size = font_size
         self.typing_btn_2.font_size = font_size
@@ -227,30 +229,15 @@ class APISenderApp(App):
         self.typing_btn_8.font_size = font_size
         self.typing_btn_9.font_size = font_size
 
-        hints = self.controller.get_direction_hints()
-
-        if cur_stage == 1:
-            hints = hints[self.controller.typing_btn_1]
-
-            self.typing_btn_1.text = hints[1]
-            self.typing_btn_2.text = hints[2]
-            self.typing_btn_3.text = hints[3]
-            self.typing_btn_4.text = hints[4]
-            self.typing_btn_5.text = hints[5]
-            self.typing_btn_6.text = hints[6]
-            self.typing_btn_7.text = hints[7]
-            self.typing_btn_8.text = hints[8]
-            self.typing_btn_9.text = hints[9]
-        else:
-            self.typing_btn_1.text = hints[1][0]
-            self.typing_btn_2.text = hints[2][0]
-            self.typing_btn_3.text = hints[3][0]
-            self.typing_btn_4.text = hints[4][0]
-            self.typing_btn_5.text = hints[5][0]
-            self.typing_btn_6.text = hints[6][0]
-            self.typing_btn_7.text = hints[7][0]
-            self.typing_btn_8.text = hints[8][0]
-            self.typing_btn_9.text = hints[9][0]
+        self.typing_btn_1.text = hints[1]
+        self.typing_btn_2.text = hints[2]
+        self.typing_btn_3.text = hints[3]
+        self.typing_btn_4.text = hints[4]
+        self.typing_btn_5.text = hints[5]
+        self.typing_btn_6.text = hints[6]
+        self.typing_btn_7.text = hints[7]
+        self.typing_btn_8.text = hints[8]
+        self.typing_btn_9.text = hints[9]
 
         self.label.text = f'{letter}\n{cur_stage}: {direction}'
 

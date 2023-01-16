@@ -42,12 +42,14 @@ def load_layout():
 def generate_hints(layout):
     langs = ['en', 'ru']
     directions = tuple(range(1, 10))
-    lang_direction_hints = {}
+    detailed_hints = {}
+    preview_hints = {}
 
     for lang in langs:
-        lang_direction_hints[lang] = {}
+        detailed_hints[lang] = {}
+        preview_hints[lang] = {}
         for direction1 in directions:
-            lang_direction_hints[lang][direction1] = {}
+            detailed_hints[lang][direction1] = {}
 
     for direction1 in directions:
         for direction2 in directions:
@@ -59,15 +61,15 @@ def generate_hints(layout):
 
             for lang in langs:
                 letter = letters.get(lang, "")
-                lang_direction_hints[lang][direction1][direction2] = letter
+                detailed_hints[lang][direction1][direction2] = letter
 
     for lang in langs:
         for direction1 in directions:
-            dirs2 = lang_direction_hints[lang][direction1].values()
+            dirs2 = detailed_hints[lang][direction1].values()
             dirs2 = [d for d in dirs2 if d]
-            lang_direction_hints[lang][direction1][0] = " ".join(dirs2)
+            preview_hints[lang][direction1] = " ".join(dirs2)
 
-    return lang_direction_hints
+    return detailed_hints, preview_hints
 
 
 def load_configs():

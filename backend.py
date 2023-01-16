@@ -10,8 +10,11 @@ def resole_angle(angle):
 
 
 class Controller:
-    def get_direction_hints(self):
-        return self.direction_hints[self.lang]
+    def get_detailed_hints(self, direction):
+        return self.detailed_hints[self.lang][direction]
+
+    def get_preview_hints(self):
+        return self.preview_hints[self.lang]
 
     def print_layout_error(self, typing_positions, error):
         print(f'no letter for this position: {typing_positions} or lang: {self.lang}, error key: {error}')
@@ -134,7 +137,7 @@ class Controller:
         self.layout = load_layout()
         configs = load_configs()
 
-        self.direction_hints = generate_hints(self.layout)
+        self.detailed_hints, self.preview_hints = generate_hints(self.layout)
 
         for letters in self.layout.values():
             for lang, letter in letters.items():
