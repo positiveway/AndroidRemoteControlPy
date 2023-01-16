@@ -1,5 +1,4 @@
 import gc
-from functools import partial
 
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
