@@ -74,6 +74,13 @@ class Controller:
             self.sock.send(self.msg)
             self.pressed[button] = 0
 
+    def send_sequence(self, seq):
+        for button in seq:
+            self.send_pressed(button)
+
+        for button in reversed(seq):
+            self.send_released(button)
+
     def send_type(self, button):
         self.send_pressed(button)
         self.send_released(button)
@@ -133,6 +140,11 @@ class Controller:
         self.RightMouse = code_map["RightMouse"]
         self.MiddleMouse = code_map["MiddleMouse"]
         self.mouse_buttons = (self.LeftMouse, self.RightMouse, self.MiddleMouse)
+
+        self.Ctrl = code_map["Ctrl"]
+        self.Shift = code_map["Shift"]
+
+        self.is_shift_pressed = False
 
         self.layout = load_layout()
         configs = load_configs()

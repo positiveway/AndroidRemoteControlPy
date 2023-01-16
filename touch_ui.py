@@ -42,12 +42,26 @@ class APISenderApp(App):
 
         return released
 
+    def get_send_type_func(self, button_code):
+        def send_type(button):
+            self.controller.send_type(button_code)
+
+        return send_type
+
+    def get_send_seq_func(self, seq):
+        def send_seq(button):
+            self.controller.send_sequence(seq)
+
+        return send_seq
+
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
         self.controller = self.touchpad.controller
 
         self.visuals_for_typing = self.controller.visuals_for_typing
+        self.Ctrl = self.controller.Ctrl
+        self.Shift = self.controller.Shift
 
         self.font_size = self.controller.font_size
         self.small_font_size = self.controller.small_font_size
@@ -64,14 +78,16 @@ class APISenderApp(App):
 
         self.shift_btn = Button(text="Shift", font_size=self.font_size)
         self.caps_btn = Button(text="Caps", font_size=self.font_size)
-        self.clear_btn = Button(text="Bs", font_size=self.font_size, on_release=self.clear)
+        self.clear_btn = Button(text="Bs", font_size=self.font_size, on_press=self.clear)
         self.enter_btn = Button(text="Enter", font_size=self.font_size,
-                                on_press=self.get_pressed_func(code_map["Enter"]),
-                                on_release=self.get_released_func(code_map["Enter"])
+                                on_press=self.get_send_type_func(code_map["Enter"]),
                                 )
-        self.copy_btn = Button(text="Copy", font_size=self.font_size)
-        self.cut_btn = Button(text="Cut", font_size=self.font_size)
-        self.paste_btn = Button(text="Paste", font_size=self.font_size)
+        self.copy_btn = Button(text="Copy", font_size=self.font_size,
+                               on_press=self.get_send_seq_func([self.Ctrl, code_map["C"]]))
+        self.cut_btn = Button(text="Cut", font_size=self.font_size,
+                              on_press=self.get_send_seq_func([self.Ctrl, code_map["X"]]))
+        self.paste_btn = Button(text="Paste", font_size=self.font_size,
+                                on_press=self.get_send_seq_func([self.Ctrl, code_map["V"]]))
 
         typing_extra_buttons = GridLayout(cols=3, rows=2)
         typing_extra_buttons.add_widget(self.caps_btn)
@@ -132,7 +148,7 @@ class APISenderApp(App):
 
         self.scroll_btn = Button(
             text="Scroll", font_size=self.font_size,
-            on_release=self.toggle_scroll,
+            on_press=self.toggle_scroll,
         )
         self.left_click = Button(
             text="Left", font_size=self.font_size,
