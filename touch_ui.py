@@ -103,7 +103,10 @@ class APISenderApp(App):
         typing_buttons.add_widget(self.typing_btn_9)
 
         typing_layout = GridLayout(cols=1, rows=2)
-        typing_layout.add_widget(typing_buttons)
+        typing_row_1 = GridLayout(cols=2, rows=1)
+        typing_row_1.add_widget(typing_buttons)
+        typing_row_1.add_widget(Label())
+        typing_layout.add_widget(typing_row_1)
         typing_layout.add_widget(typing_extra_buttons)
 
         self.release_all_btn = Button(
