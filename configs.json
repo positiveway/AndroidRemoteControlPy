@@ -1,4 +1,10 @@
 {
+  "font": {
+    "size": {
+      "normal": 50,
+      "small": 30
+    }
+  },
   "touchpad": {
     "hold_dist": 10,
     "hold_time": 0.25,
@@ -13,6 +19,9 @@
     }
   },
   "typing": {
+    "visuals": true
+  },
+  "joystick": {
     "visuals": true,
     "thresholdPct": 70,
     "angleMargin": 20

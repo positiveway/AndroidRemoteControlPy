@@ -10,99 +10,36 @@ def resole_angle(angle):
 
 
 class Controller:
-    def get_direction_hints(self, direction):
-        return self.direction_hints[self.lang][direction]
+    def get_direction_hints(self):
+        return self.direction_hints[self.lang]
 
-    def gen_boundary_mapping(self, angle_margin):
-        base_mapping = {
-            0: "🢂",
-            45: "🢅",
-            90: "🢁",
-            135: "🢄",
-            180: "🢀",
-            225: "🢇",
-            270: "🢃",
-            315: "🢆",
-        }
-        angles_mapping = {}
-
-        for base_angle, direction in base_mapping.items():
-            for angle in range(base_angle - angle_margin, base_angle + angle_margin):
-                angle = resole_angle(angle)
-                angles_mapping[angle] = direction
-
-        return angles_mapping
-
-    def detect_zone(self, magnitude, angle):
-        angle = int(angle)
-
-        if magnitude > self.magnitude_threshold:
-            return self.boundary_mapping.get(angle, self.UNMAPPED_ZONE)
-        else:
-            return self.NEUTRAL_ZONE
-
-    def print_layout_error(self, stick_positions, error):
-        print(f'no letter for this position: {stick_positions} or lang: {self.lang}, error key: {error}')
+    def print_layout_error(self, typing_positions, error):
+        print(f'no letter for this position: {typing_positions} or lang: {self.lang}, error key: {error}')
 
     def detect_letter(self):
-        stick_positions = (self.stick_pos_1, self.stick_pos_2)
+        typing_positions = (self.typing_btn_1, self.typing_btn_2)
 
         try:
-            letters = self.layout[stick_positions]
+            letter = self.layout[typing_positions][self.lang]
         except KeyError as error:
-            self.print_layout_error(stick_positions, error)
-            return None
-
-        try:
-            letter = letters[self.lang]
-        except KeyError as error:
-            self.print_layout_error(stick_positions, error)
+            self.print_layout_error(typing_positions, error)
             return None
 
         return letter
 
-    def update_zone(self, magnitude, angle):
-        if self.cur_stage < 1:  # self.cur_stage == 0 or self.cur_stage == 0.5:
-            prev_zone = self.stick_pos_1
-        else:  # elif self.cur_stage == 1 or self.cur_stage == 1.5:
-            prev_zone = self.stick_pos_2
-
-        new_zone = self.detect_zone(magnitude, angle)
-
-        # print(f'1 not set: {self.stick_1_not_set}, prev: {prev_zone}, new: {new_zone}, pos 1: {self.stick_pos_1}, pos2: {self.stick_pos_2}')
-
-        if new_zone == self.UNMAPPED_ZONE or new_zone == prev_zone:
+    def update_zone(self, btn_num):
+        if self.typing_btn_1 is None:
+            self.typing_btn_1 = btn_num
             return None
-
-        if new_zone == self.NEUTRAL_ZONE:
-            self.awaiting_neutral_pos = False
-            self.cur_stage += 0.5
-
-            if self.cur_stage == 2:
-                self.reset_typing()
         else:
-            if self.awaiting_neutral_pos:
-                return None
-            else:
-                self.awaiting_neutral_pos = True
-                self.cur_stage += 0.5
-
-                if self.cur_stage == 0.5:
-                    self.stick_pos_1 = new_zone
-
-                elif self.cur_stage == 1.5:
-                    self.stick_pos_2 = new_zone
-                    letter = self.detect_letter()
-                    return letter
-
-        return None
+            self.typing_btn_2 = btn_num
+            letter = self.detect_letter()
+            self.reset_typing()
+            return letter
 
     def reset_typing(self):
-        self.stick_pos_1 = self.NEUTRAL_ZONE
-        self.stick_pos_2 = self.NEUTRAL_ZONE
-
-        self.cur_stage = 0
-        self.awaiting_neutral_pos = False
+        self.typing_btn_1 = None
+        self.typing_btn_2 = None
 
     def init_pressed(self):
         self.pressed = {}
@@ -187,9 +124,6 @@ class Controller:
     def __init__(self):
         self.connect()
 
-        self.NEUTRAL_ZONE = '⬤'
-        self.UNMAPPED_ZONE = '❌'
-
         self.msg = bytearray(1)
 
         self.LeftMouse = code_map["LeftMouse"]
@@ -210,10 +144,6 @@ class Controller:
 
         typing_cfg = configs['typing']
         self.visuals_for_typing = typing_cfg['visuals']
-        self.magnitude_threshold = typing_cfg['thresholdPct'] / 100
-        angle_margin = typing_cfg['angleMargin']
-
-        self.boundary_mapping = self.gen_boundary_mapping(angle_margin)
         self.reset_typing()
 
         scroll_speed_cfg = configs['scroll']
@@ -228,5 +158,9 @@ class Controller:
         self.hold_dist = touchpad_cfg["hold_dist"]
         self.hold_time = touchpad_cfg["hold_time"]
         self.visuals_for_touchpad = touchpad_cfg['visuals']
+
+        font_size_cfg = configs['font']['size']
+        self.font_size = font_size_cfg['normal']
+        self.small_font_size = font_size_cfg['small']
 
         self.init_pressed()
