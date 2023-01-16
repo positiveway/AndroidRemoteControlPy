@@ -161,7 +161,7 @@ class TouchpadWidget(Widget):
 
         self.make_new_timer()
 
-        self.visuals_for_touchpad = False
+        self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
         self.mouse_bytes = bytearray(2)
 

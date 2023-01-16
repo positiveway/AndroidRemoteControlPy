@@ -1,23 +1,19 @@
 {
-  "mouse": {
-    "speed": {
-      "normal": {
-        "move_every_n_pixels": 1,
-        "move_by_n_pixels": 1
-      },
-      "fast": 2
-    }
+  "touchpad": {
+    "hold_dist": 10,
+    "hold_time": 0.25,
+    "visuals": false
   },
   "scroll": {
-    "speed": {
-      "normal": {
-        "move_every_n_pixels": 7,
-        "move_by_n_pixels": 1
-      },
-      "fast": 2
+    "normal": {
+      "move_every_n_pixels": 13
+    },
+    "fast": {
+      "move_every_n_pixels": 20
     }
   },
   "typing": {
+    "visuals": true,
     "thresholdPct": 70,
     "angleMargin": 20
   }

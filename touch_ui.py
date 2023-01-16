@@ -36,7 +36,7 @@ class APISenderApp(App):
         self.touchpad.init()
         self.controller = self.touchpad.controller
 
-        self.visuals_for_joystick = True
+        self.visuals_for_typing = self.controller.visuals_for_typing
 
         buttons_font_size = 50
 
@@ -192,7 +192,7 @@ class APISenderApp(App):
         self.controller.send_released(self.controller.MiddleMouse)
 
     def update_label(self):
-        if not self.visuals_for_joystick:
+        if not self.visuals_for_typing:
             return
 
         cur_stage = self.controller.cur_stage

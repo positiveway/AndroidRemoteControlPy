@@ -174,6 +174,16 @@ class Controller:
         scheduler.add_job(self.send_empty_msg, 'interval', seconds=1)
         scheduler.start()
 
+    def set_scroll_speed(self):
+        self.scroll_every_n_pixels = self.scroll_speed_cfg[self.scroll_speed_profile]
+
+    def toggle_speed(self, speed):
+        return (speed + 1) % 2
+
+    def toggle_scroll_speed(self):
+        self.scroll_speed_profile = self.toggle_speed(self.scroll_speed_profile)
+        self.set_scroll_speed()
+
     def __init__(self):
         self.connect()
 
@@ -199,16 +209,24 @@ class Controller:
         self.lang = 'en'
 
         typing_cfg = configs['typing']
+        self.visuals_for_typing = typing_cfg['visuals']
         self.magnitude_threshold = typing_cfg['thresholdPct'] / 100
         angle_margin = typing_cfg['angleMargin']
 
         self.boundary_mapping = self.gen_boundary_mapping(angle_margin)
         self.reset_typing()
 
-        scroll_speed = configs['scroll']['speed']['normal']
-        self.scroll_every_n_pixels = scroll_speed['move_every_n_pixels']
+        scroll_speed_cfg = configs['scroll']
+        self.scroll_speed_cfg = {
+            0: scroll_speed_cfg['normal']['move_every_n_pixels'],
+            1: scroll_speed_cfg['fast']['move_every_n_pixels'],
+        }
+        self.scroll_speed_profile = 0
+        self.set_scroll_speed()
 
-        self.hold_dist = 10
-        self.hold_time = 0.25
+        touchpad_cfg = configs['touchpad']
+        self.hold_dist = touchpad_cfg["hold_dist"]
+        self.hold_time = touchpad_cfg["hold_time"]
+        self.visuals_for_touchpad = touchpad_cfg['visuals']
 
         self.init_pressed()
