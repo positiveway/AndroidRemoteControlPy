@@ -25,13 +25,14 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        if self.is_mouse_mode and self.init_x != self.value_not_set:
-            if self.cur_x == self.value_not_set:
-                self.controller.send_pressed(self.controller.LeftMouse)
-            else:
-                dist = hypot(self.cur_x - self.init_x, self.cur_y - self.init_y)
-                if dist <= self.controller.hold_dist:
+        if self.init_x != self.value_not_set:
+            if self.cur_x == self.value_not_set or \
+                    hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
+
+                if self.is_mouse_mode:
                     self.controller.send_pressed(self.controller.LeftMouse)
+                else:
+                    self.is_mouse_mode = True
 
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
@@ -40,8 +41,7 @@ class TouchpadWidget(Widget):
 
             if touch_event.is_double_tap:
                 self.toggle_scroll()
-
-            if self.is_mouse_mode:
+            else:
                 self.init_x = self.prev_x
                 self.init_y = self.prev_y
                 self.make_new_timer()
