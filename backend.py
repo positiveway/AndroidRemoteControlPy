@@ -124,15 +124,29 @@ class Controller:
         scheduler.add_job(self.send_empty_msg, 'interval', seconds=1)
         scheduler.start()
 
-    def set_scroll_speed(self):
-        self.scroll_every_n_pixels = self.scroll_speed_cfg[self.scroll_speed_profile]
+    def cycle_profile(self, profile):
+        return (profile + 1) % 2
 
-    def toggle_speed(self, speed):
-        return (speed + 1) % 2
+    def set_scroll_profile(self):
+        if self.scroll_speed_profile == 0:
+            profile = "normal"
+        else:
+            profile = "fast"
+
+        self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
 
     def toggle_scroll_speed(self):
-        self.scroll_speed_profile = self.toggle_speed(self.scroll_speed_profile)
-        self.set_scroll_speed()
+        self.scroll_speed_profile = self.cycle_profile(self.scroll_speed_profile)
+        self.set_scroll_profile()
+
+    def set_hold_profile(self, profile):
+        if profile == 0:
+            profile = "normal"
+        else:
+            profile = "during_scroll"
+
+        self.hold_dist = self.hold_cfg[profile]["dist"]
+        self.hold_time = self.hold_cfg[profile]["time"]
 
     def __init__(self):
         self.connect()
@@ -165,19 +179,13 @@ class Controller:
 
         self.reset_typing()
 
-        scroll_speed_cfg = configs['scroll']
-        self.scroll_speed_cfg = {
-            0: scroll_speed_cfg['normal']['move_every_n_pixels'],
-            1: scroll_speed_cfg['fast']['move_every_n_pixels'],
-        }
+        self.scroll_cfg = configs['scroll']
         self.scroll_speed_profile = 0
-        self.set_scroll_speed()
+        self.set_scroll_profile()
 
         touchpad_cfg = configs['touchpad']
-        self.hold_dist = touchpad_cfg["hold_dist"]
-        hold_time_cfg = touchpad_cfg["hold_time"]
-        self.hold_time_normal = hold_time_cfg['normal']
-        self.hold_time_during_scroll = hold_time_cfg['during_scroll']
+        self.hold_cfg = touchpad_cfg['hold']
+        self.set_hold_profile(0)
         self.visuals_for_touchpad = touchpad_cfg['visuals']
 
         font_size_cfg = configs['font']['size']

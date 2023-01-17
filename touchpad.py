@@ -154,13 +154,8 @@ class TouchpadWidget(Widget):
         self.is_mouse_mode = not self.is_mouse_mode
 
     def start_timer(self):
-        if self.is_mouse_mode:
-            hold_time = self.controller.hold_time_normal
-        else:
-            hold_time = self.controller.hold_time_during_scroll
-
         self.timer.cancel()
-        self.timer = Timer(hold_time, self.timer_func)
+        self.timer = Timer(self.controller.hold_time, self.timer_func)
         self.timer.start()
 
     def init(self):

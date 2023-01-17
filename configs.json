@@ -6,10 +6,15 @@
     }
   },
   "touchpad": {
-    "hold_dist": 10,
-    "hold_time": {
-      "normal": 0.25,
-      "during_scroll": 0.7
+    "hold": {
+      "normal": {
+        "dist": 20,
+        "time": 0.25
+      },
+      "during_scroll": {
+        "dist": 20,
+        "time": 0.7
+      }
     },
     "visuals": false
   },
