@@ -96,17 +96,17 @@ class TouchpadWidget(Widget):
                 self.convert_to_send(self.move_y)
                 self.controller.sock.send(self.mouse_bytes)
         else:
-            self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
-            self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
+            # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
+            # self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
 
-            # self.move_x = self.cur_x - self.prev_x
-            # self.move_y = self.cur_y - self.prev_y
-            #
-            # self.move_x = self.move_x // self.controller.scroll_every_n_pixels
-            # self.move_y = self.move_y // self.controller.scroll_every_n_pixels
-            #
-            # self.prev_x = self.cur_x
-            # self.prev_y = self.cur_y
+            self.move_x = self.cur_x - self.prev_x
+            self.move_y = self.cur_y - self.prev_y
+
+            self.move_x = int(self.move_x / self.controller.scroll_every_n_pixels)
+            self.move_y = int(self.move_y / self.controller.scroll_every_n_pixels)
+
+            self.prev_x = self.cur_x
+            self.prev_y = self.cur_y
 
             if self.move_y != 0:
                 self.mouse_bytes[0] = 128
