@@ -7,6 +7,12 @@ from kivy.graphics import Color, Ellipse
 from backend import Controller
 
 
+def divide_with_reminder(a, b: int):
+    multiplier = int(a / b)
+    reminder = a - (multiplier * b)
+    return multiplier, reminder
+
+
 class TouchpadWidget(Widget):
     def clear_canvas(self):
         if not self.visuals_for_touchpad:
@@ -55,13 +61,9 @@ class TouchpadWidget(Widget):
         scroll_every_n_pixels = self.controller.scroll_every_n_pixels
         diff = cur - prev
         if abs(diff) >= scroll_every_n_pixels:  # greater or EQUAL
-            remainder = abs(diff) % scroll_every_n_pixels  # diff has to be >= 0
-            if cur < 0:
-                remainder *= -1
-
+            multiplier, remainder = divide_with_reminder(diff, scroll_every_n_pixels)
             prev = cur - remainder
-            dir = 1 if diff > 0 else - 1
-            return prev, dir
+            return prev, multiplier
         else:
             return prev, 0
 
@@ -94,17 +96,17 @@ class TouchpadWidget(Widget):
                 self.convert_to_send(self.move_y)
                 self.controller.sock.send(self.mouse_bytes)
         else:
-            # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
-            # self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
+            self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
+            self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
 
-            self.move_x = self.cur_x - self.prev_x
-            self.move_y = self.cur_y - self.prev_y
-
-            self.move_x = self.move_x // self.controller.scroll_every_n_pixels
-            self.move_y = self.move_y // self.controller.scroll_every_n_pixels
-
-            self.prev_x = self.cur_x
-            self.prev_y = self.cur_y
+            # self.move_x = self.cur_x - self.prev_x
+            # self.move_y = self.cur_y - self.prev_y
+            #
+            # self.move_x = self.move_x // self.controller.scroll_every_n_pixels
+            # self.move_y = self.move_y // self.controller.scroll_every_n_pixels
+            #
+            # self.prev_x = self.cur_x
+            # self.prev_y = self.cur_y
 
             if self.move_y != 0:
                 self.mouse_bytes[0] = 128
