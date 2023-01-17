@@ -89,19 +89,16 @@ class Controller:
         if button == self.Esc:
             self.release_mouse_and_pressed()
 
-        press_count = self.pressed[button]
         self.msg[0] = button + 128
         self.sock.send(self.msg)
-        self.pressed[button] = press_count + 1
+        self.pressed[button] = 1
 
     def send_released(self, button):
-        press_count = self.pressed[button]
-        if press_count > 0:
-            self.msg[0] = button
-            self.sock.send(self.msg)
-            self.pressed[button] = press_count - 1
+        self.msg[0] = button
+        self.sock.send(self.msg)
+        self.pressed[button] = 0
 
-            # gc.collect()
+        # gc.collect()
 
     def connect(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
