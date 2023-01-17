@@ -115,9 +115,6 @@ class TouchpadWidget(Widget):
                 self.prev_x = self.cur_x
                 self.prev_y = self.cur_y
             else:
-                # self.prev_x, move_x = update_coord_get_number_to_move(touch_event.x, self.prev_x)
-                # self.prev_y, move_y = update_coord_get_number_to_move(touch_event.y, self.prev_y)
-
                 self.send_if_not_empty()
 
             self.draw_touch(touch_event)
