@@ -9,13 +9,13 @@
     "hold_dist": 10,
     "hold_time": {
       "normal": 0.25,
-      "during_scroll": 0.6
+      "during_scroll": 0.5
     },
     "visuals": false
   },
   "scroll": {
     "normal": {
-      "move_every_n_pixels": 13
+      "move_every_n_pixels": 11
     },
     "fast": {
       "move_every_n_pixels": 20
