@@ -31,7 +31,7 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        if self.init_x != self.value_not_set:
+        if self.is_mouse_mode and self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set or \
                     hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
 
@@ -48,10 +48,10 @@ class TouchpadWidget(Widget):
             if touch_event.is_double_tap:
                 self.toggle_scroll()
             else:
-                self.init_x = self.prev_x
-                self.init_y = self.prev_y
-                self.make_new_timer()
-                self.timer.start()
+                if self.is_mouse_mode:
+                    self.init_x = self.prev_x
+                    self.init_y = self.prev_y
+                    self.start_timer()
 
             self.reset_typed_text()
             return True
@@ -156,10 +156,15 @@ class TouchpadWidget(Widget):
     def toggle_scroll(self):
         self.is_mouse_mode = not self.is_mouse_mode
 
-    def make_new_timer(self):
-        hold_time = self.controller.hold_time_normal if self.is_mouse_mode \
-            else self.controller.hold_time_during_scroll
+    def start_timer(self):
+        if self.is_mouse_mode:
+            hold_time = self.controller.hold_time_normal
+        else:
+            hold_time = self.controller.hold_time_during_scroll
+
+        self.timer.cancel()
         self.timer = Timer(hold_time, self.timer_func)
+        self.timer.start()
 
     def init(self):
         self.value_not_set = 1000
@@ -169,7 +174,9 @@ class TouchpadWidget(Widget):
         self.mouse_bytes = bytearray(2)
         self.is_mouse_mode = True
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
-        self.make_new_timer()
+
+        self.timer = Timer(0, self.timer_func)
+        self.start_timer()
 
         self.offset = 0
         self.prev_x = 0
