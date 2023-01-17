@@ -86,6 +86,9 @@ class Controller:
         self.send_released(button)
 
     def send_pressed(self, button):
+        if button == self.Esc:
+            self.release_mouse_and_pressed()
+
         press_count = self.pressed[button]
         self.msg[0] = button + 128
         self.sock.send(self.msg)
@@ -143,7 +146,9 @@ class Controller:
 
         self.Ctrl = code_map["Ctrl"]
         self.Shift = code_map["Shift"]
+        self.Caps = code_map["Caps"]
         self.Backspace = code_map["Bs"]
+        self.Esc = code_map["Esc"]
 
         self.is_shift_pressed = False
 

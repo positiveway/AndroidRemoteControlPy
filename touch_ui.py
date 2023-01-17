@@ -25,29 +25,29 @@ if is_vibro_enabled():
 
 
 class APISenderApp(App):
-    def toggle_scroll(self, button):
+    def toggle_scroll(self, obj, values):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
-    def get_pressed_func(self, button_code):
-        def pressed(button):
+    def get_on_down_func(self, button_code):
+        def on_down(obj, values):
             self.controller.send_pressed(button_code)
 
-        return pressed
+        return on_down
 
-    def get_released_func(self, button_code):
-        def released(button):
+    def get_on_up_func(self, button_code):
+        def on_up(obj, values):
             self.controller.send_released(button_code)
 
-        return released
+        return on_up
 
     def get_send_type_func(self, button_code):
-        def send_type(button):
+        def send_type(obj, values):
             self.controller.send_type(button_code)
 
         return send_type
 
     def get_send_seq_func(self, seq):
-        def send_seq(button):
+        def send_seq(obj, values):
             self.controller.send_sequence(seq)
 
         return send_seq
@@ -61,6 +61,7 @@ class APISenderApp(App):
 
         self.Ctrl = self.controller.Ctrl
         self.Shift = self.controller.Shift
+        self.Caps = self.controller.Caps
         self.Backspace = self.controller.Backspace
 
         self.font_size = self.controller.font_size
@@ -82,7 +83,7 @@ class APISenderApp(App):
         gc.disable()
         gc.collect()
 
-    def release_all(self, button):
+    def release_all(self, obj, values):
         self.controller.release_all()
         gc.collect()
 
@@ -101,7 +102,7 @@ class APISenderApp(App):
 
         self.label.text = self.typed_text
 
-    def clear(self, button):
+    def clear(self, obj, values):
         if self.controller.typing_btn_1 is not None:
             self.controller.reset_typing()
             self.update_label()
@@ -110,7 +111,7 @@ class APISenderApp(App):
             self.update_typed_text(self.Backspace)
 
     def get_typing_btn_func(self, button_num):
-        def typing_btn_pressed(button):
+        def typing_btn_pressed(obj, values):
             letter = self.controller.update_typing_state(button_num)
             if letter is not None:
                 self.controller.send_type(letter)
