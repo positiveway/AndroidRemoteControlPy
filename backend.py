@@ -1,7 +1,7 @@
 import socket
 
 from code_map import code_map
-from layout import load_layout, generate_hints, load_configs
+from typing_layout import load_layout, generate_hints, load_configs
 from wsocket import server_ip, server_port
 
 

@@ -1,13 +1,11 @@
 import gc
 
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
 from kivy.app import App
-from kivy.uix.button import Button
 
 from backend import Controller
 from code_map import reverse_code_map, code_map
 from touchpad import TouchpadWidget
+from ui_layout import build_layout
 
 ENABLE_VIBRATE = False
 
@@ -70,117 +68,7 @@ class APISenderApp(App):
 
         self.reverse_code_map = reverse_code_map
 
-        self.root = GridLayout(cols=2, rows=1)
-        # self.root = BoxLayout()
-        # self.root.padding = 110
-
-        self.label = Label(font_size=self.font_size)
-        # self.label.size_hint_x = 0.25
-        # self.label.size_hint_y = 0.9
-
-        self.shift_btn = Button(text="Shift", font_size=self.font_size)
-        self.caps_btn = Button(text="Caps", font_size=self.font_size)
-        self.clear_btn = Button(text="Bs", font_size=self.font_size, on_press=self.clear)
-        self.enter_btn = Button(text="Enter", font_size=self.font_size,
-                                on_press=self.get_send_type_func(code_map["Enter"]),
-                                )
-        self.copy_btn = Button(text="Copy", font_size=self.font_size,
-                               on_press=self.get_send_seq_func([self.Ctrl, code_map["C"]]))
-        self.cut_btn = Button(text="Cut", font_size=self.font_size,
-                              on_press=self.get_send_seq_func([self.Ctrl, code_map["X"]]))
-        self.paste_btn = Button(text="Paste", font_size=self.font_size,
-                                on_press=self.get_send_seq_func([self.Ctrl, code_map["V"]]))
-
-        typing_extra_buttons = GridLayout(cols=3, rows=2)
-        typing_extra_buttons.add_widget(self.caps_btn)
-        typing_extra_buttons.add_widget(self.enter_btn)
-        typing_extra_buttons.add_widget(self.shift_btn)
-
-        typing_extra_buttons.add_widget(self.copy_btn)
-        typing_extra_buttons.add_widget(self.cut_btn)
-        typing_extra_buttons.add_widget(self.paste_btn)
-
-        typing_buttons = GridLayout(cols=3, rows=3)
-        self.typing_btn_1 = Button(on_press=self.get_typing_btn_func(button_num=1))
-        self.typing_btn_2 = Button(on_press=self.get_typing_btn_func(button_num=2))
-        self.typing_btn_3 = Button(on_press=self.get_typing_btn_func(button_num=3))
-        self.typing_btn_4 = Button(on_press=self.get_typing_btn_func(button_num=4))
-        self.typing_btn_5 = Button(on_press=self.get_typing_btn_func(button_num=5))
-        self.typing_btn_6 = Button(on_press=self.get_typing_btn_func(button_num=6))
-        self.typing_btn_7 = Button(on_press=self.get_typing_btn_func(button_num=7))
-        self.typing_btn_8 = Button(on_press=self.get_typing_btn_func(button_num=8))
-        self.typing_btn_9 = Button(on_press=self.get_typing_btn_func(button_num=9))
-        typing_buttons.add_widget(self.typing_btn_1)
-        typing_buttons.add_widget(self.typing_btn_2)
-        typing_buttons.add_widget(self.typing_btn_3)
-        typing_buttons.add_widget(self.typing_btn_4)
-        typing_buttons.add_widget(self.clear_btn)
-        typing_buttons.add_widget(self.typing_btn_6)
-        typing_buttons.add_widget(self.typing_btn_7)
-        typing_buttons.add_widget(self.typing_btn_8)
-        typing_buttons.add_widget(self.typing_btn_9)
-
-        typing_layout = GridLayout(cols=1, rows=2)
-        typing_row_1 = GridLayout(cols=2, rows=1)
-        typing_row_1.add_widget(typing_buttons)
-        typing_row_1.add_widget(Label())
-        typing_layout.add_widget(typing_row_1)
-        typing_layout.add_widget(typing_extra_buttons)
-
-        self.release_all_btn = Button(
-            text="Release all", font_size=self.font_size,
-            on_press=self.release_all
-        )
-
-        label_col_1 = GridLayout(cols=1, rows=2)
-        label_col_1.add_widget(self.label)
-        label_col_1.add_widget(self.release_all_btn)
-
-        label_col_2 = GridLayout(cols=1, rows=2)
-        label_col_2.add_widget(Label())
-        label_col_2.add_widget(Label())
-
-        label_layout = GridLayout(cols=2, rows=1)
-        label_layout.add_widget(label_col_1)
-        label_layout.add_widget(label_col_2)
-
-        left_side = GridLayout(cols=1, rows=2)
-        left_side.add_widget(typing_layout)
-        left_side.add_widget(label_layout)
-
-        self.scroll_btn = Button(
-            text="Scroll", font_size=self.font_size,
-            on_press=self.toggle_scroll,
-        )
-        self.left_click = Button(
-            text="Left", font_size=self.font_size,
-            on_press=self.get_pressed_func(self.controller.LeftMouse),
-            on_release=self.get_released_func(self.controller.LeftMouse)
-        )
-        self.right_click = Button(
-            text="Right", font_size=self.font_size,
-            on_press=self.get_pressed_func(self.controller.RightMouse),
-            on_release=self.get_released_func(self.controller.RightMouse)
-        )
-        self.middle_click = Button(
-            text="Middle", font_size=self.font_size,
-            on_press=self.get_pressed_func(self.controller.MiddleMouse),
-            on_release=self.get_released_func(self.controller.MiddleMouse)
-        )
-
-        touchpad_layout = GridLayout(cols=2, rows=2)
-        touchpad_layout.add_widget(self.middle_click)
-        touchpad_layout.add_widget(self.right_click)
-
-        touchpad_layout.add_widget(self.scroll_btn)
-        touchpad_layout.add_widget(self.left_click)
-
-        right_side = GridLayout(cols=1, rows=2)
-        right_side.add_widget(self.touchpad)
-        right_side.add_widget(touchpad_layout)
-
-        self.root.add_widget(left_side)
-        self.root.add_widget(right_side)
+        build_layout(self)
 
         self.transform_for_display = {
             'Space': ' ',
