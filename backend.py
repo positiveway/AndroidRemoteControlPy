@@ -30,7 +30,7 @@ class Controller:
 
         return letter
 
-    def update_zone(self, btn_num):
+    def update_typing_state(self, btn_num):
         if self.typing_btn_1 is None:
             self.typing_btn_1 = btn_num
             return None
@@ -143,6 +143,7 @@ class Controller:
 
         self.Ctrl = code_map["Ctrl"]
         self.Shift = code_map["Shift"]
+        self.Backspace = code_map["Bs"]
 
         self.is_shift_pressed = False
 
@@ -157,8 +158,6 @@ class Controller:
 
         self.lang = 'en'
 
-        typing_cfg = configs['typing']
-        self.visuals_for_typing = typing_cfg['visuals']
         self.reset_typing()
 
         scroll_speed_cfg = configs['scroll']

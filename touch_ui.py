@@ -57,11 +57,13 @@ class APISenderApp(App):
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
+        self.touchpad.reset_typed_text = self.reset_typed_text
+
         self.controller = self.touchpad.controller
 
-        self.visuals_for_typing = self.controller.visuals_for_typing
         self.Ctrl = self.controller.Ctrl
         self.Shift = self.controller.Shift
+        self.Backspace = self.controller.Backspace
 
         self.font_size = self.controller.font_size
         self.small_font_size = self.controller.small_font_size
@@ -180,12 +182,13 @@ class APISenderApp(App):
         self.root.add_widget(left_side)
         self.root.add_widget(right_side)
 
-        self.reverse_button_nums = {
-            1: 'UpLeft', 2: 'Up', 3: 'UpRight',
-            4: 'Left', 5: 'Central', 6: 'Right',
-            7: 'DownLeft', 8: 'Down', 9: 'DownRight',
+        self.transform_for_display = {
+            'Space': ' ',
+            'Tab': '\t',
+            'Enter': '\n',
+            'Del': '',
         }
-        self.prev_letter = code_map['/']
+        self.reset_typed_text()
         self.update_label()
 
         gc.disable()
@@ -195,20 +198,35 @@ class APISenderApp(App):
         self.controller.release_all()
         gc.collect()
 
+    def reset_typed_text(self):
+        self.typed_text = ""
+        self.label.text = self.typed_text
+
+    def update_typed_text(self, letter):
+        if letter == self.Backspace:
+            if self.typed_text:
+                self.typed_text = self.typed_text[:-1]
+        else:
+            letter = self.reverse_code_map[letter]
+            letter = self.transform_for_display.get(letter, letter)
+            self.typed_text += letter
+
+        self.label.text = self.typed_text
+
     def clear(self, button):
         if self.controller.typing_btn_1 is not None:
             self.controller.reset_typing()
-            self.prev_letter = code_map['/']
             self.update_label()
         else:
-            self.controller.send_type(code_map["Bs"])
+            self.controller.send_type(self.Backspace)
+            self.update_typed_text(self.Backspace)
 
     def get_typing_btn_func(self, button_num):
         def typing_btn_pressed(button):
-            letter = self.controller.update_zone(button_num)
+            letter = self.controller.update_typing_state(button_num)
             if letter is not None:
                 self.controller.send_type(letter)
-                self.prev_letter = letter
+                self.update_typed_text(letter)
 
                 #     if is_vibro_enabled():
                 #         vibrator.vibrate(0.5)
@@ -218,23 +236,10 @@ class APISenderApp(App):
         return typing_btn_pressed
 
     def update_label(self):
-        if not self.visuals_for_typing:
-            return
-
         if self.controller.typing_btn_1 is None:
-            cur_stage = 0
-
-            letter = self.reverse_code_map[self.prev_letter]
-            direction = ""
-
             font_size = self.small_font_size
             hints = self.controller.get_preview_hints()
         else:
-            cur_stage = 1
-
-            letter = ''
-            direction = self.reverse_button_nums[self.controller.typing_btn_1]
-
             font_size = self.font_size
             hints = self.controller.get_detailed_hints(self.controller.typing_btn_1)
 
@@ -257,8 +262,6 @@ class APISenderApp(App):
         self.typing_btn_7.text = hints[7]
         self.typing_btn_8.text = hints[8]
         self.typing_btn_9.text = hints[9]
-
-        self.label.text = f'{letter}\n{cur_stage}: {direction}'
 
     def on_stop(self):
         self.controller.release_mouse_and_pressed()
