@@ -9,13 +9,13 @@ class CustomButton(Button):
     def __init__(self, text, app, on_release=None, on_press=None):
         if on_release is not None and on_press is not None:
             super().__init__(text=text, font_size=app.font_size,
-                             on_press=on_release, on_release=on_press)
-        elif on_release is not None:
-            super().__init__(text=text, font_size=app.font_size,
-                             on_press=on_release)
+                             on_press=on_press, on_release=on_release)
         elif on_press is not None:
             super().__init__(text=text, font_size=app.font_size,
                              on_press=on_press)
+        elif on_release is not None:
+            super().__init__(text=text, font_size=app.font_size,
+                             on_release=on_release)
         else:
             raise ValueError("At least one action should be provided")
 
