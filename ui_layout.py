@@ -6,16 +6,16 @@ from code_map import reverse_code_map, code_map
 
 
 class CustomButton(Button):
-    def __init__(self, text, app, on_down=None, on_up=None):
-        if on_down is not None and on_up is not None:
+    def __init__(self, text, app, on_release=None, on_press=None):
+        if on_release is not None and on_press is not None:
             super().__init__(text=text, font_size=app.font_size,
-                             on_touch_down=on_down, on_touch_up=on_up)
-        elif on_down is not None:
+                             on_press=on_release, on_release=on_press)
+        elif on_release is not None:
             super().__init__(text=text, font_size=app.font_size,
-                             on_touch_down=on_down)
-        elif on_up is not None:
+                             on_press=on_release)
+        elif on_press is not None:
             super().__init__(text=text, font_size=app.font_size,
-                             on_touch_down=on_up)
+                             on_press=on_press)
         else:
             raise ValueError("At least one action should be provided")
 
@@ -23,97 +23,97 @@ class CustomButton(Button):
 def make_buttons(app):
     app.shift_btn = CustomButton(
         "Shift", app,
-        on_down=app.get_on_down_func(app.controller.Shift),
-        on_up=app.get_on_up_func(app.controller.Shift)
+        on_release=app.get_on_release_func(app.controller.Shift),
+        on_press=app.get_on_press_func(app.controller.Shift)
     )
     app.caps_btn = CustomButton(
         "Caps", app,
-        on_down=app.get_on_down_func(app.controller.Caps),
-        on_up=app.get_on_up_func(app.controller.Caps)
+        on_release=app.get_on_release_func(app.controller.Caps),
+        on_press=app.get_on_press_func(app.controller.Caps)
     )
     app.clear_btn = CustomButton(
         "Bs", app,
-        on_down=app.clear
+        on_release=app.clear
     )
     app.enter_btn = CustomButton(
         "Enter", app,
-        on_down=app.get_send_type_func(code_map["Enter"])
+        on_release=app.get_send_type_func(code_map["Enter"])
     )
     app.space_btn = CustomButton(
         "Space", app,
-        on_down=app.get_send_type_func(code_map["Space"])
+        on_release=app.get_send_type_func(code_map["Space"])
     )
     app.copy_btn = CustomButton(
         "Copy", app,
-        on_down=app.get_send_seq_func([app.Ctrl, code_map["C"]])
+        on_release=app.get_send_seq_func([app.Ctrl, code_map["C"]])
     )
     app.cut_btn = CustomButton(
         "Cut", app,
-        on_down=app.get_send_seq_func([app.Ctrl, code_map["X"]])
+        on_release=app.get_send_seq_func([app.Ctrl, code_map["X"]])
     )
     app.paste_btn = CustomButton(
         "Paste", app,
-        on_down=app.get_send_seq_func([app.Ctrl, code_map["V"]])
+        on_release=app.get_send_seq_func([app.Ctrl, code_map["V"]])
     )
     app.select_all_btn = CustomButton(
         "Select", app,
-        on_down=app.get_send_seq_func([app.Ctrl, code_map["A"]])
+        on_release=app.get_send_seq_func([app.Ctrl, code_map["A"]])
     )
     app.undo_btn = CustomButton(
         "Undo", app,
-        on_down=app.get_send_seq_func([app.Ctrl, code_map["Z"]])
+        on_release=app.get_send_seq_func([app.Ctrl, code_map["Z"]])
     )
     app.redo_btn = CustomButton(
         "Redo", app,
-        on_down=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
+        on_release=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
     )
 
     app.up_btn = CustomButton(
         "Up", app,
-        on_down=app.get_on_down_func(code_map["Up"]),
-        on_up=app.get_on_up_func(code_map["Up"])
+        on_release=app.get_on_release_func(code_map["Up"]),
+        on_press=app.get_on_press_func(code_map["Up"])
     )
     app.down_btn = CustomButton(
         "Down", app,
-        on_down=app.get_on_down_func(code_map["Down"]),
-        on_up=app.get_on_up_func(code_map["Down"])
+        on_release=app.get_on_release_func(code_map["Down"]),
+        on_press=app.get_on_press_func(code_map["Down"])
     )
     app.left_btn = CustomButton(
         "Left", app,
-        on_down=app.get_on_down_func(code_map["Left"]),
-        on_up=app.get_on_up_func(code_map["Left"])
+        on_release=app.get_on_release_func(code_map["Left"]),
+        on_press=app.get_on_press_func(code_map["Left"])
     )
     app.right_btn = CustomButton(
         "Right", app,
-        on_down=app.get_on_down_func(code_map["Right"]),
-        on_up=app.get_on_up_func(code_map["Right"])
+        on_release=app.get_on_release_func(code_map["Right"]),
+        on_press=app.get_on_press_func(code_map["Right"])
     )
     app.esc_btn = CustomButton(
         "Esc", app,
-        on_down=app.get_send_type_func(app.controller.Esc)
+        on_release=app.get_send_type_func(app.controller.Esc)
     )
     app.release_all_btn = CustomButton(
         "Release", app,
-        on_down=app.release_all
+        on_release=app.release_all
     )
     app.scroll_btn = CustomButton(
         "Scroll", app,
-        on_down=app.toggle_scroll,
+        on_release=app.toggle_scroll,
     )
     app.left_click = CustomButton(
         "Left", app,
-        on_down=app.get_on_down_func(app.controller.LeftMouse),
-        on_up=app.get_on_up_func(app.controller.LeftMouse)
+        on_release=app.get_on_release_func(app.controller.LeftMouse),
+        on_press=app.get_on_press_func(app.controller.LeftMouse)
     )
     app.right_click = CustomButton(
         "Right", app,
-        on_down=app.get_on_down_func(app.controller.RightMouse),
-        on_up=app.get_on_up_func(app.controller.RightMouse)
+        on_release=app.get_on_release_func(app.controller.RightMouse),
+        on_press=app.get_on_press_func(app.controller.RightMouse)
     )
     app.middle_click = CustomButton(
         "Middle", app,
-        on_down=app.get_on_down_func(app.controller.MiddleMouse),
-        on_up=app.get_on_up_func(app.controller.MiddleMouse)
+        on_release=app.get_on_release_func(app.controller.MiddleMouse),
+        on_press=app.get_on_press_func(app.controller.MiddleMouse)
     )
 
 
@@ -204,15 +204,15 @@ def fill_layout(app):
 
 def make_typing_buttons(app):
     app.typing_buttons = GridLayout(cols=3, rows=3)
-    app.typing_btn_1 = Button(on_touch_down=app.get_typing_btn_func(button_num=1))
-    app.typing_btn_2 = Button(on_touch_down=app.get_typing_btn_func(button_num=2))
-    app.typing_btn_3 = Button(on_touch_down=app.get_typing_btn_func(button_num=3))
-    app.typing_btn_4 = Button(on_touch_down=app.get_typing_btn_func(button_num=4))
-    app.typing_btn_5 = Button(on_touch_down=app.get_typing_btn_func(button_num=5))
-    app.typing_btn_6 = Button(on_touch_down=app.get_typing_btn_func(button_num=6))
-    app.typing_btn_7 = Button(on_touch_down=app.get_typing_btn_func(button_num=7))
-    app.typing_btn_8 = Button(on_touch_down=app.get_typing_btn_func(button_num=8))
-    app.typing_btn_9 = Button(on_touch_down=app.get_typing_btn_func(button_num=9))
+    app.typing_btn_1 = Button(on_press=app.get_typing_btn_func(button_num=1))
+    app.typing_btn_2 = Button(on_press=app.get_typing_btn_func(button_num=2))
+    app.typing_btn_3 = Button(on_press=app.get_typing_btn_func(button_num=3))
+    app.typing_btn_4 = Button(on_press=app.get_typing_btn_func(button_num=4))
+    app.typing_btn_5 = Button(on_press=app.get_typing_btn_func(button_num=5))
+    app.typing_btn_6 = Button(on_press=app.get_typing_btn_func(button_num=6))
+    app.typing_btn_7 = Button(on_press=app.get_typing_btn_func(button_num=7))
+    app.typing_btn_8 = Button(on_press=app.get_typing_btn_func(button_num=8))
+    app.typing_btn_9 = Button(on_press=app.get_typing_btn_func(button_num=9))
     app.typing_buttons.add_widget(app.typing_btn_1)
     app.typing_buttons.add_widget(app.typing_btn_2)
     app.typing_buttons.add_widget(app.typing_btn_3)

@@ -25,29 +25,29 @@ if is_vibro_enabled():
 
 
 class APISenderApp(App):
-    def toggle_scroll(self, obj, values):
+    def toggle_scroll(self, button):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
-    def get_on_down_func(self, button_code):
-        def on_down(obj, values):
+    def get_on_press_func(self, button_code):
+        def on_press(button):
             self.controller.send_pressed(button_code)
 
-        return on_down
+        return on_press
 
-    def get_on_up_func(self, button_code):
-        def on_up(obj, values):
+    def get_on_release_func(self, button_code):
+        def on_release(button):
             self.controller.send_released(button_code)
 
-        return on_up
+        return on_release
 
     def get_send_type_func(self, button_code):
-        def send_type(obj, values):
+        def send_type(button):
             self.controller.send_type(button_code)
 
         return send_type
 
     def get_send_seq_func(self, seq):
-        def send_seq(obj, values):
+        def send_seq(button):
             self.controller.send_sequence(seq)
 
         return send_seq
@@ -83,7 +83,7 @@ class APISenderApp(App):
         gc.disable()
         gc.collect()
 
-    def release_all(self, obj, values):
+    def release_all(self, button):
         self.controller.release_all()
         gc.collect()
 
@@ -102,7 +102,7 @@ class APISenderApp(App):
 
         self.label.text = self.typed_text
 
-    def clear(self, obj, values):
+    def clear(self, button):
         if self.controller.typing_btn_1 is not None:
             self.controller.reset_typing()
             self.update_label()
@@ -111,7 +111,7 @@ class APISenderApp(App):
             self.update_typed_text(self.Backspace)
 
     def get_typing_btn_func(self, button_num):
-        def typing_btn_pressed(obj, values):
+        def typing_btn_pressed(button):
             letter = self.controller.update_typing_state(button_num)
             if letter is not None:
                 self.controller.send_type(letter)
