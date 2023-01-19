@@ -1,5 +1,17 @@
 {
   "is_game_mode": false,
+  "connection": {
+    "via_wifi": true,
+    "wifi": {
+      "device_num": 104,
+      "network_num": 1
+    },
+    "phone": {
+      "device_num": 200,
+      "network_num": 161
+    }
+  },
+  "connect_over_phone": false,
   "font": {
     "size": {
       "normal": 82,

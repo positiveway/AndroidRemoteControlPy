@@ -2,7 +2,6 @@ import socket
 
 from code_map import code_map
 from typing_layout import load_layout, generate_hints, load_configs
-from wsocket import server_ip, server_port
 
 
 def resole_angle(angle):
@@ -100,26 +99,21 @@ class Controller:
 
         # gc.collect()
 
-    def connect(self):
+    def connect(self, configs):
+        connection_cfg = configs["connection"]
+        if connection_cfg['via_wifi']:
+            connection_cfg = connection_cfg['wifi']
+        else:
+            connection_cfg = connection_cfg['phone']
+
+        network_num = connection_cfg["network_num"]
+        device_num = connection_cfg["device_num"]
+
+        server_ip = f'192.168.{network_num}.{device_num}'
+        server_port = 5005
+
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.connect((server_ip, server_port))
-
-        # self.run_scheduler()
-
-    def send_empty_msg(self):
-        try:
-            self.sock.send(self.empty_msg)
-        except ConnectionRefusedError:
-            pass
-
-    def run_scheduler(self):
-        self.empty_msg = bytes(1)
-
-        from apscheduler.schedulers.background import BackgroundScheduler
-
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(self.send_empty_msg, 'interval', seconds=1)
-        scheduler.start()
 
     def cycle_profile(self, profile):
         return (profile + 1) % 2
@@ -146,7 +140,10 @@ class Controller:
         self.hold_time = self.hold_cfg[profile]["time"]
 
     def __init__(self):
-        self.connect()
+        self.layout = load_layout()
+        configs = load_configs()
+
+        self.connect(configs)
 
         self.msg = bytearray(1)
 
@@ -163,9 +160,6 @@ class Controller:
         self.Esc = code_map["Esc"]
 
         self.is_shift_pressed = False
-
-        self.layout = load_layout()
-        configs = load_configs()
 
         self.detailed_hints, self.preview_hints = generate_hints(self.layout)
 
