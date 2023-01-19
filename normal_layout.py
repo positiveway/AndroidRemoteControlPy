@@ -1,53 +1,7 @@
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
 from kivy.uix.button import Button
-
-from code_map import reverse_code_map, code_map
-
-
-class Layout(GridLayout):
-    def __init__(self, rows, cols):
-        self.grid = [[None for i in range(cols)] for j in range(rows)]
-        super().__init__(rows=rows, cols=cols)
-
-    def add(self, row, col, widget):
-        row -= 1
-        col -= 1
-        if self.grid[row][col] is not None:
-            raise ValueError("Duplicate position")
-
-        self.grid[row][col] = widget
-
-    def fill(self):
-        for row in range(self.rows):
-            for col in range(self.cols):
-                widget = self.grid[row][col]
-                if widget is None:
-                    widget = Label()
-
-                self.add_widget(widget)
-
-
-class PressReleaseButton(Button):
-    def __init__(self, text, app, button=None, button_code=None):
-        if button_code is None and button is None:
-            raise ValueError()
-        if button_code is None:
-            button_code = code_map[button]
-
-        super().__init__(
-            text=text, font_size=app.font_size,
-            on_press=app.get_on_press_func(button_code),
-            on_release=app.get_on_release_func(button_code)
-        )
-
-
-class PressFuncButton(Button):
-    def __init__(self, text, app, func):
-        super().__init__(
-            text=text, font_size=app.font_size,
-            on_press=func
-        )
+from kivy.uix.label import Label
+from code_map import code_map
+from common_layout import PressReleaseButton, PressFuncButton, Layout
 
 
 def make_buttons(app):
@@ -156,7 +110,7 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = GridLayout(cols=2, rows=1)
+    app.root = Layout(cols=2, rows=1)
     # app.root = BoxLayout()
     # app.root.padding = 110
 
@@ -164,84 +118,89 @@ def fill_layout(app):
     # app.label.size_hint_x = 0.25
     # app.label.size_hint_y = 0.9
 
-    typing_extra_buttons = GridLayout(cols=3, rows=2)
-    typing_extra_buttons.add_widget(app.caps_btn)
-    typing_extra_buttons.add_widget(app.enter_btn)
-    typing_extra_buttons.add_widget(app.shift_btn)
+    typing_extra_buttons = Layout(cols=3, rows=2)
+    typing_extra_buttons.add(1, 1, app.caps_btn)
+    typing_extra_buttons.add(1, 2, app.enter_btn)
+    typing_extra_buttons.add(1, 3, app.shift_btn)
 
-    typing_extra_buttons.add_widget(app.copy_btn)
-    typing_extra_buttons.add_widget(app.cut_btn)
-    typing_extra_buttons.add_widget(app.paste_btn)
+    typing_extra_buttons.add(2, 1, app.copy_btn)
+    typing_extra_buttons.add(2, 2, app.cut_btn)
+    typing_extra_buttons.add(2, 3, app.paste_btn)
+    typing_extra_buttons.fill()
 
-    right_of_typing_layout = GridLayout(cols=2, rows=2)
-    right_of_typing_layout.add_widget(Label())
-    right_of_typing_layout.add_widget(app.double_click_btn)
-    right_of_typing_layout.add_widget(Label())
-    right_of_typing_layout.add_widget(app.space_btn)
+    right_of_typing_layout = Layout(cols=2, rows=2)
+    right_of_typing_layout.add(1, 2, app.double_click_btn)
+    right_of_typing_layout.add(2, 2, app.space_btn)
+    right_of_typing_layout.fill()
 
-    typing_layout = GridLayout(cols=1, rows=2)
-    typing_row_1 = GridLayout(cols=2, rows=1)
-    typing_row_1.add_widget(app.typing_buttons)
-    typing_row_1.add_widget(right_of_typing_layout)
-    typing_layout.add_widget(typing_row_1)
-    typing_layout.add_widget(typing_extra_buttons)
+    typing_row_1 = Layout(cols=2, rows=1)
+    typing_row_1.add(1, 1, app.typing_buttons)
+    typing_row_1.add(1, 2, right_of_typing_layout)
+    typing_row_1.fill()
 
-    release_all_layout = GridLayout(cols=2, rows=2)
-    release_all_layout.add_widget(Label())
-    release_all_layout.add_widget(Label())
-    release_all_layout.add_widget(app.release_all_btn)
-    release_all_layout.add_widget(Label())
+    typing_layout = Layout(cols=1, rows=2)
+    typing_layout.add(1, 1, typing_row_1)
+    typing_layout.add(2, 1, typing_extra_buttons)
+    typing_layout.fill()
 
-    label_row_2 = GridLayout(cols=2, rows=1)
-    label_row_2.add_widget(release_all_layout)
-    label_row_2.add_widget(app.label)
+    release_all_layout = Layout(cols=2, rows=2)
+    release_all_layout.add(2, 1, app.release_all_btn)
+    release_all_layout.fill()
 
-    extra_buttons_2 = GridLayout(cols=2, rows=1)
-    extra_buttons_2_left = GridLayout(cols=3, rows=2)
-    extra_buttons_2_right = GridLayout(cols=3, rows=2)
+    label_row_2 = Layout(cols=2, rows=1)
+    label_row_2.add(1, 1, release_all_layout)
+    label_row_2.add(1, 2, app.label)
+    label_row_2.fill()
 
-    extra_buttons_2_left.add_widget(Label())
-    extra_buttons_2_left.add_widget(app.up_btn)
-    extra_buttons_2_left.add_widget(Label())
-    extra_buttons_2_left.add_widget(app.left_btn)
-    extra_buttons_2_left.add_widget(app.down_btn)
-    extra_buttons_2_left.add_widget(app.right_btn)
+    extra_buttons_2 = Layout(cols=2, rows=1)
+    extra_buttons_2_left = Layout(cols=3, rows=2)
+    extra_buttons_2_right = Layout(cols=3, rows=2)
 
-    extra_buttons_2_right.add_widget(app.select_all_btn)
-    extra_buttons_2_right.add_widget(app.undo_btn)
-    extra_buttons_2_right.add_widget(app.redo_btn)
-    extra_buttons_2_right.add_widget(Label())
-    extra_buttons_2_right.add_widget(Label())
-    extra_buttons_2_right.add_widget(Label())
+    extra_buttons_2_left.add(1, 2, app.up_btn)
+    extra_buttons_2_left.add(2, 1, app.left_btn)
+    extra_buttons_2_left.add(2, 2, app.down_btn)
+    extra_buttons_2_left.add(2, 3, app.right_btn)
+    extra_buttons_2_left.fill()
 
-    extra_buttons_2.add_widget(extra_buttons_2_left)
-    extra_buttons_2.add_widget(extra_buttons_2_right)
+    extra_buttons_2_right.add(1, 1, app.select_all_btn)
+    extra_buttons_2_right.add(1, 2, app.undo_btn)
+    extra_buttons_2_right.add(1, 3, app.redo_btn)
+    extra_buttons_2_right.fill()
 
-    label_layout = GridLayout(cols=1, rows=2)
-    label_layout.add_widget(extra_buttons_2)
-    label_layout.add_widget(label_row_2)
+    extra_buttons_2.add(1, 1, extra_buttons_2_left)
+    extra_buttons_2.add(1, 2, extra_buttons_2_right)
+    extra_buttons_2.fill()
 
-    left_side = GridLayout(cols=1, rows=2)
-    left_side.add_widget(typing_layout)
-    left_side.add_widget(label_layout)
+    label_layout = Layout(cols=1, rows=2)
+    label_layout.add(1, 1, extra_buttons_2)
+    label_layout.add(2, 1, label_row_2)
+    label_layout.fill()
 
-    touchpad_layout = GridLayout(cols=2, rows=2)
-    touchpad_layout.add_widget(app.middle_click)
-    touchpad_layout.add_widget(app.right_click)
+    left_side = Layout(cols=1, rows=2)
+    left_side.add(1, 1, typing_layout)
+    left_side.add(2, 1, label_layout)
+    left_side.fill()
 
-    touchpad_layout.add_widget(app.search_btn)
-    touchpad_layout.add_widget(app.replace_btn)
+    touchpad_layout = Layout(cols=2, rows=2)
+    touchpad_layout.add(1, 1, app.middle_click)
+    touchpad_layout.add(1, 2, app.right_click)
 
-    right_side = GridLayout(cols=1, rows=2)
-    right_side.add_widget(app.touchpad)
-    right_side.add_widget(touchpad_layout)
+    touchpad_layout.add(2, 1, app.search_btn)
+    touchpad_layout.add(2, 2, app.replace_btn)
+    touchpad_layout.fill()
 
-    app.root.add_widget(left_side)
-    app.root.add_widget(right_side)
+    right_side = Layout(cols=1, rows=2)
+    right_side.add(1, 1, app.touchpad)
+    right_side.add(2, 1, touchpad_layout)
+    right_side.fill()
+
+    app.root.add(1, 1, left_side)
+    app.root.add(1, 2, right_side)
+    app.root.fill()
 
 
 def make_typing_buttons(app):
-    app.typing_buttons = GridLayout(cols=3, rows=3)
+    app.typing_buttons = Layout(cols=3, rows=3)
     app.typing_btn_1 = Button(on_press=app.get_typing_btn_func(button_num=1))
     app.typing_btn_2 = Button(on_press=app.get_typing_btn_func(button_num=2))
     app.typing_btn_3 = Button(on_press=app.get_typing_btn_func(button_num=3))
@@ -251,15 +210,16 @@ def make_typing_buttons(app):
     app.typing_btn_7 = Button(on_press=app.get_typing_btn_func(button_num=7))
     app.typing_btn_8 = Button(on_press=app.get_typing_btn_func(button_num=8))
     app.typing_btn_9 = Button(on_press=app.get_typing_btn_func(button_num=9))
-    app.typing_buttons.add_widget(app.typing_btn_1)
-    app.typing_buttons.add_widget(app.typing_btn_2)
-    app.typing_buttons.add_widget(app.typing_btn_3)
-    app.typing_buttons.add_widget(app.typing_btn_4)
-    app.typing_buttons.add_widget(app.clear_btn)
-    app.typing_buttons.add_widget(app.typing_btn_6)
-    app.typing_buttons.add_widget(app.typing_btn_7)
-    app.typing_buttons.add_widget(app.typing_btn_8)
-    app.typing_buttons.add_widget(app.typing_btn_9)
+    app.typing_buttons.add(1, 1, app.typing_btn_1)
+    app.typing_buttons.add(1, 2, app.typing_btn_2)
+    app.typing_buttons.add(1, 3, app.typing_btn_3)
+    app.typing_buttons.add(2, 1, app.typing_btn_4)
+    app.typing_buttons.add(2, 2, app.clear_btn)
+    app.typing_buttons.add(2, 3, app.typing_btn_6)
+    app.typing_buttons.add(3, 1, app.typing_btn_7)
+    app.typing_buttons.add(3, 2, app.typing_btn_8)
+    app.typing_buttons.add(3, 3, app.typing_btn_9)
+    app.typing_buttons.fill()
 
 
 def build_layout(app):
