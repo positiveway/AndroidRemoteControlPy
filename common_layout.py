@@ -5,6 +5,21 @@ from kivy.uix.button import Button
 from code_map import code_map
 
 
+def make_common_buttons(app):
+    app.enter_btn = PressFuncButton(
+        "Enter", app,
+        func=app.get_send_type_func(code_map["Enter"])
+    )
+    app.esc_btn = PressFuncButton(
+        "Esc", app,
+        func=app.get_send_type_func(app.controller.Esc)
+    )
+    app.release_all_btn = PressFuncButton(
+        "Release", app,
+        func=app.release_all
+    )
+
+
 class Layout(GridLayout):
     def __init__(self, rows, cols):
         self.grid = [[None for i in range(cols)] for j in range(rows)]

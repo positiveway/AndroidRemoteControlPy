@@ -1,7 +1,7 @@
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from code_map import code_map
-from common_layout import PressReleaseButton, PressFuncButton, Layout
+from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
 
 
 def make_buttons(app):
@@ -46,14 +46,9 @@ def make_buttons(app):
         "X2", app,
         func=app.double_click
     )
-
     app.clear_btn = PressFuncButton(
         "Bs", app,
         func=app.clear
-    )
-    app.enter_btn = PressFuncButton(
-        "Enter", app,
-        func=app.get_send_type_func(code_map["Enter"])
     )
     app.space_btn = PressFuncButton(
         "Space", app,
@@ -94,14 +89,6 @@ def make_buttons(app):
     app.redo_btn = PressFuncButton(
         "Redo", app,
         func=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
-    )
-    app.esc_btn = PressFuncButton(
-        "Esc", app,
-        func=app.get_send_type_func(app.controller.Esc)
-    )
-    app.release_all_btn = PressFuncButton(
-        "Release", app,
-        func=app.release_all
     )
     app.scroll_btn = PressFuncButton(
         "Scroll", app,
@@ -223,6 +210,7 @@ def make_typing_buttons(app):
 
 
 def build_layout(app):
+    make_common_buttons(app)
     make_buttons(app)
     make_typing_buttons(app)
     fill_layout(app)
