@@ -32,8 +32,9 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def double_click(self, button):
-        self.controller.send_type(self.controller.LeftMouse)
-        self.controller.send_type(self.controller.LeftMouse)
+        self.controller.send_pressed(self.controller.LeftMouse)
+        self.controller.send_pressed(self.controller.LeftMouse)
+        self.controller.send_released(self.controller.LeftMouse)
 
     def get_on_press_func(self, button_code):
         def on_press(button):
