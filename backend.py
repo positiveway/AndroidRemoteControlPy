@@ -70,11 +70,15 @@ class Controller:
             self.pressed[button] = 0
 
     def send_type(self, seq):
-        for button in seq:
-            self.send_pressed(button)
+        if not isinstance(seq, (list, tuple)):
+            self.send_pressed(seq)
+            self.send_released(seq)
+        else:
+            for button in seq:
+                self.send_pressed(button)
 
-        for button in reversed(seq):
-            self.send_released(button)
+            for button in reversed(seq):
+                self.send_released(button)
 
     def send_pressed(self, button):
         if button == self.Esc:

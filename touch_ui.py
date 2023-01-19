@@ -54,13 +54,8 @@ class APISenderApp(App):
         return on_release
 
     def get_send_type_func(self, button_code_seq):
-        if not isinstance(button_code_seq, (list, tuple)):
-            to_send = tuple([button_code_seq])
-        else:
-            to_send = button_code_seq
-
         def send_type(button):
-            self.controller.send_type(to_send)
+            self.controller.send_type(button_code_seq)
 
         return send_type
 

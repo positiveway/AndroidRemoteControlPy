@@ -83,16 +83,23 @@ LeftMouse = code_map['LeftMouse']
 RightMouse = code_map['RightMouse']
 MiddleMouse = code_map['MiddleMouse']
 
-command_map = {
-    'Select': (Ctrl, code_map['A']),
-    'Undo': (Ctrl, code_map['Z']),
-    'Redo': (Ctrl, Shift, code_map['Z']),
-    'Copy': (Ctrl, code_map['C']),
-    'Cut': (Ctrl, code_map['X']),
-    'Paste': (Ctrl, code_map['V']),
-    'Format': (Ctrl, Alt, code_map['L']),
-    'Search': (Ctrl, code_map['F']),
-    'Replace': (Ctrl, code_map['R']),
-}
+
+def append_commands():
+    command_map = {
+        'Select': (Ctrl, code_map['A']),
+        'Undo': (Ctrl, code_map['Z']),
+        'Redo': (Ctrl, Shift, code_map['Z']),
+        'Copy': (Ctrl, code_map['C']),
+        'Cut': (Ctrl, code_map['X']),
+        'Paste': (Ctrl, code_map['V']),
+        'Format': (Ctrl, Alt, code_map['L']),
+        'Search': (Ctrl, code_map['F']),
+        'Replace': (Ctrl, code_map['R']),
+    }
+    for key, val in command_map.items():
+        code_map[key] = val
+
+
+append_commands()
 
 reverse_code_map = {val: key for key, val in code_map.items()}

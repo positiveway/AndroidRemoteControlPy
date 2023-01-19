@@ -51,39 +51,39 @@ def make_buttons(app):
     )
     app.copy_btn = PressFuncButton(
         "Copy", app,
-        func=app.get_send_type_func(command_map['Copy'])
+        func=app.get_send_type_func(code_map['Copy'])
     )
     app.cut_btn = PressFuncButton(
         "Cut", app,
-        func=app.get_send_type_func(command_map['Cut'])
+        func=app.get_send_type_func(code_map['Cut'])
     )
     app.paste_btn = PressFuncButton(
         "Paste", app,
-        func=app.get_send_type_func(command_map['Paste'])
+        func=app.get_send_type_func(code_map['Paste'])
     )
     app.select_all_btn = PressFuncButton(
         "Select", app,
-        func=app.get_send_type_func(command_map['Select'])
+        func=app.get_send_type_func(code_map['Select'])
     )
     app.format_btn = PressFuncButton(
         "Format", app,
-        func=app.get_send_type_func(command_map['Format'])
+        func=app.get_send_type_func(code_map['Format'])
     )
     app.search_btn = PressFuncButton(
         "Search", app,
-        func=app.get_send_type_func(command_map['Search'])
+        func=app.get_send_type_func(code_map['Search'])
     )
     app.replace_btn = PressFuncButton(
         "Replace", app,
-        func=app.get_send_type_func(command_map['Replace'])
+        func=app.get_send_type_func(code_map['Replace'])
     )
     app.undo_btn = PressFuncButton(
         "Undo", app,
-        func=app.get_send_type_func(command_map['Undo'])
+        func=app.get_send_type_func(code_map['Undo'])
     )
     app.redo_btn = PressFuncButton(
         "Redo", app,
-        func=app.get_send_type_func(command_map['Redo'])
+        func=app.get_send_type_func(code_map['Redo'])
     )
     app.scroll_btn = PressFuncButton(
         "Scroll", app,
