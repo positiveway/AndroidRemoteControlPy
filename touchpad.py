@@ -31,14 +31,10 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        if self.is_mouse_mode and self.init_x != self.value_not_set:
+        if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set or \
                     hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
-
-                if self.is_mouse_mode:
-                    self.controller.send_pressed(self.controller.LeftMouse)
-                else:
-                    self.is_mouse_mode = True
+                self.controller.send_pressed(self.controller.LeftMouse)
 
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
@@ -48,7 +44,7 @@ class TouchpadWidget(Widget):
             if touch_event.is_double_tap:
                 self.double_tap_func()
             else:
-                if self.is_mouse_mode:
+                if self.controller.is_mouse_mode:
                     self.init_x = self.prev_x
                     self.init_y = self.prev_y
                     self.start_timer()
@@ -83,7 +79,7 @@ class TouchpadWidget(Widget):
 
     def send_if_not_empty(self):
         # print(move_x, move_y)
-        if self.is_mouse_mode:
+        if self.controller.is_mouse_mode:
             self.move_x = self.cur_x - self.prev_x
             self.move_y = self.cur_y - self.prev_y
 
@@ -155,7 +151,7 @@ class TouchpadWidget(Widget):
         self.controller.send_type(self.controller.RightMouse)
 
     def toggle_scroll(self):
-        self.is_mouse_mode = not self.is_mouse_mode
+        self.controller.is_mouse_mode = not self.controller.is_mouse_mode
 
     def start_timer(self):
         self.timer.cancel()
@@ -175,7 +171,6 @@ class TouchpadWidget(Widget):
             self.double_tap_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
-        self.is_mouse_mode = True
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
         self.timer = Timer(0, self.timer_func)

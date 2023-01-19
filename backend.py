@@ -88,6 +88,9 @@ class Controller:
         if button == self.Esc:
             self.release_mouse_and_pressed()
 
+        if not self.is_mouse_mode and button in self.mouse_buttons:
+            return
+
         self.msg[0] = button + 128
         self.sock.send(self.msg)
         self.pressed[button] = 1
@@ -146,9 +149,12 @@ class Controller:
         self.layout = load_layout()
         configs = load_configs()
 
+        self.msg = bytearray(1)
         self.connect(configs)
 
-        self.msg = bytearray(1)
+        self.is_mouse_mode = True
+        self.is_shift_pressed = False
+        self.lang = 'en'
 
         self.LeftMouse = LeftMouse
         self.RightMouse = RightMouse
@@ -163,11 +169,7 @@ class Controller:
         self.Backspace = Backspace
         self.Esc = Esc
 
-        self.is_shift_pressed = False
-
         self.detailed_hints, self.preview_hints = generate_hints(self.layout)
-
-        self.lang = 'en'
 
         self.reset_typing()
 
