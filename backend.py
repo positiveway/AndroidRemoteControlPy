@@ -93,9 +93,10 @@ class Controller:
         self.pressed[button] = 1
 
     def send_released(self, button):
-        self.msg[0] = button
-        self.sock.send(self.msg)
-        self.pressed[button] = 0
+        if self.pressed[button] == 1:
+            self.msg[0] = button
+            self.sock.send(self.msg)
+            self.pressed[button] = 0
 
         # gc.collect()
 
