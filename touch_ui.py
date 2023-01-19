@@ -4,7 +4,7 @@ import time
 from kivy.app import App
 
 from backend import Controller
-from code_map import reverse_code_map, code_map
+from code_map import *
 from touchpad import TouchpadWidget
 
 ENABLE_VIBRATE = False
@@ -37,9 +37,9 @@ class APISenderApp(App):
         gc.collect()
 
     def double_click(self, button):
-        self.controller.send_type([self.controller.LeftMouse])
+        self.controller.send_type([self.LeftMouse])
         time.sleep(0.25)
-        self.controller.send_type([self.controller.LeftMouse])
+        self.controller.send_type([self.LeftMouse])
 
     def get_on_press_func(self, button_code):
         def on_press(button):
@@ -54,12 +54,12 @@ class APISenderApp(App):
         return on_release
 
     def get_send_type_func(self, button_code_seq):
-        def send_type(button):
-            if not isinstance(button_code_seq, (list, tuple)):
-                to_send = tuple(button_code_seq)
-            else:
-                to_send = button_code_seq
+        if not isinstance(button_code_seq, (list, tuple)):
+            to_send = tuple([button_code_seq])
+        else:
+            to_send = button_code_seq
 
+        def send_type(button):
             self.controller.send_type(to_send)
 
         return send_type
@@ -72,16 +72,12 @@ class APISenderApp(App):
 
         self.is_game_mode = self.controller.is_game_mode
 
-        self.Ctrl = self.controller.Ctrl
-        self.Alt = self.controller.Alt
-        self.Shift = self.controller.Shift
-        self.Caps = self.controller.Caps
-        self.Backspace = self.controller.Backspace
+        self.Backspace = Backspace
+        self.LeftMouse = LeftMouse
+        self.reverse_code_map = reverse_code_map
 
         self.font_size = self.controller.font_size
         self.small_font_size = self.controller.small_font_size
-
-        self.reverse_code_map = reverse_code_map
 
         if self.is_game_mode:
             self.touchpad.reset_typed_text = emtpy_func
@@ -111,7 +107,7 @@ class APISenderApp(App):
         self.label.text = self.typed_text
 
     def update_typed_text(self, letter):
-        if letter == self.Backspace:
+        if letter == Backspace:
             if self.typed_text:
                 self.typed_text = self.typed_text[:-1]
         else:

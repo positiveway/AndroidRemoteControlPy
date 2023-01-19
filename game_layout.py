@@ -1,5 +1,5 @@
 from kivy.uix.label import Label
-from code_map import code_map
+from code_map import *
 from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
 
 
@@ -22,7 +22,7 @@ def make_buttons(app):
     )
     app.space_btn = PressFuncButton(
         "Space", app,
-        func=app.get_send_type_func(code_map["Space"])
+        func=app.get_send_type_func(Space)
     )
 
 

@@ -1,16 +1,16 @@
 from kivy.uix.label import Label
-from code_map import code_map
+from code_map import *
 from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
 
 
 def make_buttons(app):
     app.shift_btn = PressReleaseButton(
         "Shift", app,
-        button_code=app.Shift
+        button_code=Shift
     )
     app.caps_btn = PressReleaseButton(
         "Caps", app,
-        button_code=app.Caps
+        button_code=Caps
     )
     app.up_btn = PressReleaseButton(
         "Up", app,
@@ -30,15 +30,15 @@ def make_buttons(app):
     )
     app.left_click = PressReleaseButton(
         "Left", app,
-        button_code=app.controller.LeftMouse
+        button_code=LeftMouse
     )
     app.right_click = PressReleaseButton(
         "Right", app,
-        button_code=app.controller.RightMouse
+        button_code=RightMouse
     )
     app.middle_click = PressReleaseButton(
         "Middle", app,
-        button_code=app.controller.MiddleMouse
+        button_code=MiddleMouse
     )
 
     app.double_click_btn = PressFuncButton(
@@ -47,43 +47,43 @@ def make_buttons(app):
     )
     app.space_btn = PressFuncButton(
         "Space", app,
-        func=app.get_send_type_func(code_map["Space"])
+        func=app.get_send_type_func(Space)
     )
     app.copy_btn = PressFuncButton(
         "Copy", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["C"]])
+        func=app.get_send_type_func(command_map['Copy'])
     )
     app.cut_btn = PressFuncButton(
         "Cut", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["X"]])
+        func=app.get_send_type_func(command_map['Cut'])
     )
     app.paste_btn = PressFuncButton(
         "Paste", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["V"]])
+        func=app.get_send_type_func(command_map['Paste'])
     )
     app.select_all_btn = PressFuncButton(
         "Select", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["A"]])
+        func=app.get_send_type_func(command_map['Select'])
     )
     app.format_btn = PressFuncButton(
         "Format", app,
-        func=app.get_send_type_func([app.Ctrl, app.Alt, code_map["L"]])
+        func=app.get_send_type_func(command_map['Format'])
     )
     app.search_btn = PressFuncButton(
         "Search", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["F"]])
+        func=app.get_send_type_func(command_map['Search'])
     )
     app.replace_btn = PressFuncButton(
         "Replace", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["R"]])
+        func=app.get_send_type_func(command_map['Replace'])
     )
     app.undo_btn = PressFuncButton(
         "Undo", app,
-        func=app.get_send_type_func([app.Ctrl, code_map["Z"]])
+        func=app.get_send_type_func(command_map['Undo'])
     )
     app.redo_btn = PressFuncButton(
         "Redo", app,
-        func=app.get_send_type_func([app.Ctrl, app.Shift, code_map["Z"]])
+        func=app.get_send_type_func(command_map['Redo'])
     )
     app.scroll_btn = PressFuncButton(
         "Scroll", app,

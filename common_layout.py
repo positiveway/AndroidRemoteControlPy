@@ -2,17 +2,17 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 
-from code_map import code_map
+from code_map import *
 
 
 def make_common_buttons(app):
     app.enter_btn = PressFuncButton(
         "Enter", app,
-        func=app.get_send_type_func(code_map["Enter"])
+        func=app.get_send_type_func(Enter)
     )
     app.esc_btn = PressFuncButton(
         "Esc", app,
-        func=app.get_send_type_func(app.controller.Esc)
+        func=app.get_send_type_func(Esc)
     )
     app.release_all_btn = PressFuncButton(
         "Release", app,

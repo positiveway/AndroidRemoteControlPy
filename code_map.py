@@ -70,6 +70,29 @@ code_map = {
     "Win": 125,
 }
 
-reverse_code_map = {}
-for key, val in code_map.items():
-    reverse_code_map[val] = key
+Ctrl = code_map['Ctrl']
+Alt = code_map['Alt']
+Shift = code_map['Shift']
+Caps = code_map['Caps']
+Enter = code_map['Enter']
+Esc = code_map['Esc']
+Backspace = code_map['Bs']
+Space = code_map['Space']
+
+LeftMouse = code_map['LeftMouse']
+RightMouse = code_map['RightMouse']
+MiddleMouse = code_map['MiddleMouse']
+
+command_map = {
+    'Select': (Ctrl, code_map['A']),
+    'Undo': (Ctrl, code_map['Z']),
+    'Redo': (Ctrl, Shift, code_map['Z']),
+    'Copy': (Ctrl, code_map['C']),
+    'Cut': (Ctrl, code_map['X']),
+    'Paste': (Ctrl, code_map['V']),
+    'Format': (Ctrl, Alt, code_map['L']),
+    'Search': (Ctrl, code_map['F']),
+    'Replace': (Ctrl, code_map['R']),
+}
+
+reverse_code_map = {val: key for key, val in code_map.items()}

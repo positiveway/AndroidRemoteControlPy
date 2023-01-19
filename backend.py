@@ -1,6 +1,6 @@
 import socket
 
-from code_map import code_map
+from code_map import *
 from typing_layout import load_layout, generate_hints, load_configs
 
 
@@ -140,17 +140,18 @@ class Controller:
 
         self.msg = bytearray(1)
 
-        self.LeftMouse = code_map["LeftMouse"]
-        self.RightMouse = code_map["RightMouse"]
-        self.MiddleMouse = code_map["MiddleMouse"]
+        self.LeftMouse = LeftMouse
+        self.RightMouse = RightMouse
+        self.MiddleMouse = MiddleMouse
         self.mouse_buttons = (self.LeftMouse, self.RightMouse, self.MiddleMouse)
 
-        self.Ctrl = code_map["Ctrl"]
-        self.Alt = code_map["Alt"]
-        self.Shift = code_map["Shift"]
-        self.Caps = code_map["Caps"]
-        self.Backspace = code_map["Bs"]
-        self.Esc = code_map["Esc"]
+        self.Ctrl = Ctrl
+        self.Alt = Alt
+        self.Shift = Shift
+        self.Caps = Caps
+        self.Enter = Enter
+        self.Backspace = Backspace
+        self.Esc = Esc
 
         self.is_shift_pressed = False
 
