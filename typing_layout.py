@@ -71,33 +71,3 @@ def generate_hints(layout):
 def load_configs():
     with open("configs.json", encoding="utf8") as file:
         return json.load(file)
-
-
-def convert_layout():
-    layout = {}
-    for dir1 in arrow_directions:
-        layout[dir1] = {}
-        for dir2 in arrow_directions:
-            layout[dir1][dir2] = ''
-
-    with open("layout.csv", encoding="utf8") as layout_csv:
-        content = layout_csv.readlines()
-
-    content = content[2:]
-    for line in content:
-        line = line.replace(' ', '').replace('\n', '').lower()
-        if line and not line.startswith(';'):
-            typing_positions, letters = line.split('=>')
-            pos1, pos2 = typing_positions.split('&')
-
-            letters = letters.replace('none', '')
-            letters = letters.split('|')
-            letters = [letter.capitalize() for letter in letters]
-
-            if letters[0]:
-                layout[pos1][pos2] = letters[0]
-
-    with open("layout_en.json", mode="w+", encoding='utf8') as file:
-        json.dump(layout, file, ensure_ascii=False, indent='  ')
-
-    return layout

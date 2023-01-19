@@ -32,6 +32,10 @@ class APISenderApp(App):
     def toggle_scroll(self, button):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
+    def release_all(self, button):
+        self.controller.release_all()
+        gc.collect()
+
     def double_click(self, button):
         self.controller.send_type([self.controller.LeftMouse])
         time.sleep(0.25)
@@ -100,10 +104,6 @@ class APISenderApp(App):
             self.update_label()
 
         gc.disable()
-        gc.collect()
-
-    def release_all(self, button):
-        self.controller.release_all()
         gc.collect()
 
     def reset_typed_text(self):

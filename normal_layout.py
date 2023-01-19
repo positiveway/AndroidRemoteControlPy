@@ -1,4 +1,3 @@
-from kivy.uix.button import Button
 from kivy.uix.label import Label
 from code_map import code_map
 from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
