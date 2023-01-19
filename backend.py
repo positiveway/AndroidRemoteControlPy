@@ -156,6 +156,7 @@ class Controller:
         self.mouse_buttons = (self.LeftMouse, self.RightMouse, self.MiddleMouse)
 
         self.Ctrl = code_map["Ctrl"]
+        self.Alt = code_map["Alt"]
         self.Shift = code_map["Shift"]
         self.Caps = code_map["Caps"]
         self.Backspace = code_map["Bs"]
@@ -188,5 +189,7 @@ class Controller:
         font_size_cfg = configs['font']['size']
         self.font_size = font_size_cfg['normal']
         self.small_font_size = font_size_cfg['small']
+
+        self.is_game_mode = configs['is_game_mode']
 
         self.init_pressed()

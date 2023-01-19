@@ -5,9 +5,12 @@ from kivy.app import App
 from backend import Controller
 from code_map import reverse_code_map, code_map
 from touchpad import TouchpadWidget
-from ui_layout import build_layout
 
 ENABLE_VIBRATE = False
+
+
+def emtpy_func():
+    pass
 
 
 def is_vibro_enabled():
@@ -27,6 +30,10 @@ if is_vibro_enabled():
 class APISenderApp(App):
     def toggle_scroll(self, button):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
+
+    def double_click(self, button):
+        self.controller.send_type(self.controller.LeftMouse)
+        self.controller.send_type(self.controller.LeftMouse)
 
     def get_on_press_func(self, button_code):
         def on_press(button):
@@ -55,11 +62,13 @@ class APISenderApp(App):
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
-        self.touchpad.reset_typed_text = self.reset_typed_text
 
         self.controller = self.touchpad.controller
 
+        self.is_game_mode = self.controller.is_game_mode
+
         self.Ctrl = self.controller.Ctrl
+        self.Alt = self.controller.Alt
         self.Shift = self.controller.Shift
         self.Caps = self.controller.Caps
         self.Backspace = self.controller.Backspace
@@ -69,16 +78,25 @@ class APISenderApp(App):
 
         self.reverse_code_map = reverse_code_map
 
-        build_layout(self)
+        if self.is_game_mode:
+            self.touchpad.reset_typed_text = emtpy_func
 
-        self.transform_for_display = {
-            'Space': ' ',
-            'Tab': '\t',
-            'Enter': '\n',
-            'Del': '',
-        }
-        self.reset_typed_text()
-        self.update_label()
+            from game_layout import build_layout
+            build_layout(self)
+        else:
+            self.touchpad.reset_typed_text = self.reset_typed_text
+
+            from normal_layout import build_layout
+            build_layout(self)
+
+            self.transform_for_display = {
+                'Space': ' ',
+                'Tab': '\t',
+                'Enter': '\n',
+                'Del': '',
+            }
+            self.reset_typed_text()
+            self.update_label()
 
         gc.disable()
         gc.collect()

@@ -46,7 +46,7 @@ class TouchpadWidget(Widget):
             self.prev_y = round(touch_event.y)
 
             if touch_event.is_double_tap:
-                self.toggle_scroll()
+                self.double_tap_func()
             else:
                 if self.is_mouse_mode:
                     self.init_x = self.prev_x
@@ -150,6 +150,9 @@ class TouchpadWidget(Widget):
         self.reset()
         self.recalc_size()
 
+    def right_click(self):
+        self.controller.send_type(self.controller.RightMouse)
+
     def toggle_scroll(self):
         self.is_mouse_mode = not self.is_mouse_mode
 
@@ -162,6 +165,11 @@ class TouchpadWidget(Widget):
         self.value_not_set = 1000
 
         self.controller = Controller()
+
+        if self.controller.is_game_mode:
+            self.double_tap_func = self.right_click
+        else:
+            self.double_tap_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
         self.is_mouse_mode = True

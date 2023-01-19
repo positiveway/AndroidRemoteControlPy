@@ -5,115 +5,130 @@ from kivy.uix.button import Button
 from code_map import reverse_code_map, code_map
 
 
-class CustomButton(Button):
-    def __init__(self, text, app, on_release=None, on_press=None):
-        if on_release is not None and on_press is not None:
-            super().__init__(text=text, font_size=app.font_size,
-                             on_press=on_press, on_release=on_release)
-        elif on_press is not None:
-            super().__init__(text=text, font_size=app.font_size,
-                             on_press=on_press)
-        elif on_release is not None:
-            super().__init__(text=text, font_size=app.font_size,
-                             on_release=on_release)
-        else:
-            raise ValueError("At least one action should be provided")
+class PressReleaseButton(Button):
+    def __init__(self, text, app, button=None, button_code=None):
+        if button_code is None and button is None:
+            raise ValueError()
+        if button_code is None:
+            button_code = code_map[button]
+
+        super().__init__(
+            text=text, font_size=app.font_size,
+            on_press=app.get_on_press_func(button_code),
+            on_release=app.get_on_release_func(button_code)
+        )
+
+
+class PressFuncButton(Button):
+    def __init__(self, text, app, func):
+        super().__init__(
+            text=text, font_size=app.font_size,
+            on_press=func
+        )
 
 
 def make_buttons(app):
-    app.shift_btn = CustomButton(
+    app.shift_btn = PressReleaseButton(
         "Shift", app,
-        on_release=app.get_on_release_func(app.controller.Shift),
-        on_press=app.get_on_press_func(app.controller.Shift)
+        button_code=app.Shift
     )
-    app.caps_btn = CustomButton(
+    app.caps_btn = PressReleaseButton(
         "Caps", app,
-        on_release=app.get_on_release_func(app.controller.Caps),
-        on_press=app.get_on_press_func(app.controller.Caps)
+        button_code=app.Caps
     )
-    app.clear_btn = CustomButton(
-        "Bs", app,
-        on_release=app.clear
+    app.up_btn = PressReleaseButton(
+        "Up", app,
+        button="Up"
     )
-    app.enter_btn = CustomButton(
-        "Enter", app,
-        on_release=app.get_send_type_func(code_map["Enter"])
+    app.down_btn = PressReleaseButton(
+        "Down", app,
+        button="Down"
     )
-    app.space_btn = CustomButton(
-        "Space", app,
-        on_release=app.get_send_type_func(code_map["Space"])
+    app.left_btn = PressReleaseButton(
+        "Left", app,
+        button="Left"
     )
-    app.copy_btn = CustomButton(
-        "Copy", app,
-        on_release=app.get_send_seq_func([app.Ctrl, code_map["C"]])
+    app.right_btn = PressReleaseButton(
+        "Right", app,
+        button="Right"
     )
-    app.cut_btn = CustomButton(
-        "Cut", app,
-        on_release=app.get_send_seq_func([app.Ctrl, code_map["X"]])
+    app.left_click = PressReleaseButton(
+        "Left", app,
+        button_code=app.controller.LeftMouse
     )
-    app.paste_btn = CustomButton(
-        "Paste", app,
-        on_release=app.get_send_seq_func([app.Ctrl, code_map["V"]])
+    app.right_click = PressReleaseButton(
+        "Right", app,
+        button_code=app.controller.RightMouse
     )
-    app.select_all_btn = CustomButton(
-        "Select", app,
-        on_release=app.get_send_seq_func([app.Ctrl, code_map["A"]])
-    )
-    app.undo_btn = CustomButton(
-        "Undo", app,
-        on_release=app.get_send_seq_func([app.Ctrl, code_map["Z"]])
-    )
-    app.redo_btn = CustomButton(
-        "Redo", app,
-        on_release=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
+    app.middle_click = PressReleaseButton(
+        "Middle", app,
+        button_code=app.controller.MiddleMouse
     )
 
-    app.up_btn = CustomButton(
-        "Up", app,
-        on_release=app.get_on_release_func(code_map["Up"]),
-        on_press=app.get_on_press_func(code_map["Up"])
+    app.double_click_btn = PressFuncButton(
+        "X2", app,
+        func=app.double_click
     )
-    app.down_btn = CustomButton(
-        "Down", app,
-        on_release=app.get_on_release_func(code_map["Down"]),
-        on_press=app.get_on_press_func(code_map["Down"])
+
+    app.clear_btn = PressFuncButton(
+        "Bs", app,
+        func=app.clear
     )
-    app.left_btn = CustomButton(
-        "Left", app,
-        on_release=app.get_on_release_func(code_map["Left"]),
-        on_press=app.get_on_press_func(code_map["Left"])
+    app.enter_btn = PressFuncButton(
+        "Enter", app,
+        func=app.get_send_type_func(code_map["Enter"])
     )
-    app.right_btn = CustomButton(
-        "Right", app,
-        on_release=app.get_on_release_func(code_map["Right"]),
-        on_press=app.get_on_press_func(code_map["Right"])
+    app.space_btn = PressFuncButton(
+        "Space", app,
+        func=app.get_send_type_func(code_map["Space"])
     )
-    app.esc_btn = CustomButton(
+    app.copy_btn = PressFuncButton(
+        "Copy", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["C"]])
+    )
+    app.cut_btn = PressFuncButton(
+        "Cut", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["X"]])
+    )
+    app.paste_btn = PressFuncButton(
+        "Paste", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["V"]])
+    )
+    app.select_all_btn = PressFuncButton(
+        "Select", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["A"]])
+    )
+    app.format_btn = PressFuncButton(
+        "Format", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["L"]])
+    )
+    app.search_btn = PressFuncButton(
+        "Search", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["F"]])
+    )
+    app.replace_btn = PressFuncButton(
+        "Replace", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["R"]])
+    )
+    app.undo_btn = PressFuncButton(
+        "Undo", app,
+        func=app.get_send_seq_func([app.Ctrl, code_map["Z"]])
+    )
+    app.redo_btn = PressFuncButton(
+        "Redo", app,
+        func=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
+    )
+    app.esc_btn = PressFuncButton(
         "Esc", app,
-        on_release=app.get_send_type_func(app.controller.Esc)
+        func=app.get_send_type_func(app.controller.Esc)
     )
-    app.release_all_btn = CustomButton(
+    app.release_all_btn = PressFuncButton(
         "Release", app,
-        on_release=app.release_all
+        func=app.release_all
     )
-    app.scroll_btn = CustomButton(
+    app.scroll_btn = PressFuncButton(
         "Scroll", app,
-        on_release=app.toggle_scroll,
-    )
-    app.left_click = CustomButton(
-        "Left", app,
-        on_release=app.get_on_release_func(app.controller.LeftMouse),
-        on_press=app.get_on_press_func(app.controller.LeftMouse)
-    )
-    app.right_click = CustomButton(
-        "Right", app,
-        on_release=app.get_on_release_func(app.controller.RightMouse),
-        on_press=app.get_on_press_func(app.controller.RightMouse)
-    )
-    app.middle_click = CustomButton(
-        "Middle", app,
-        on_release=app.get_on_release_func(app.controller.MiddleMouse),
-        on_press=app.get_on_press_func(app.controller.MiddleMouse)
+        func=app.toggle_scroll,
     )
 
 
@@ -137,7 +152,7 @@ def fill_layout(app):
 
     right_of_typing_layout = GridLayout(cols=2, rows=2)
     right_of_typing_layout.add_widget(Label())
-    right_of_typing_layout.add_widget(app.esc_btn)
+    right_of_typing_layout.add_widget(app.double_click_btn)
     right_of_typing_layout.add_widget(Label())
     right_of_typing_layout.add_widget(app.space_btn)
 
@@ -169,12 +184,12 @@ def fill_layout(app):
     extra_buttons_2_left.add_widget(app.down_btn)
     extra_buttons_2_left.add_widget(app.right_btn)
 
-    extra_buttons_2_right.add_widget(Label())
     extra_buttons_2_right.add_widget(app.select_all_btn)
-    extra_buttons_2_right.add_widget(Label())
-    extra_buttons_2_right.add_widget(Label())
     extra_buttons_2_right.add_widget(app.undo_btn)
     extra_buttons_2_right.add_widget(app.redo_btn)
+    extra_buttons_2_right.add_widget(Label())
+    extra_buttons_2_right.add_widget(Label())
+    extra_buttons_2_right.add_widget(Label())
 
     extra_buttons_2.add_widget(extra_buttons_2_left)
     extra_buttons_2.add_widget(extra_buttons_2_right)
@@ -191,8 +206,8 @@ def fill_layout(app):
     touchpad_layout.add_widget(app.middle_click)
     touchpad_layout.add_widget(app.right_click)
 
-    touchpad_layout.add_widget(app.scroll_btn)
-    touchpad_layout.add_widget(app.left_click)
+    touchpad_layout.add_widget(app.search_btn)
+    touchpad_layout.add_widget(app.replace_btn)
 
     right_side = GridLayout(cols=1, rows=2)
     right_side.add_widget(app.touchpad)
