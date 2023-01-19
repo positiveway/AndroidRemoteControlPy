@@ -5,6 +5,29 @@ from kivy.uix.button import Button
 from code_map import reverse_code_map, code_map
 
 
+class Layout(GridLayout):
+    def __init__(self, rows, cols):
+        self.grid = [[None for i in range(cols)] for j in range(rows)]
+        super().__init__(rows=rows, cols=cols)
+
+    def add(self, row, col, widget):
+        row -= 1
+        col -= 1
+        if self.grid[row][col] is not None:
+            raise ValueError("Duplicate position")
+
+        self.grid[row][col] = widget
+
+    def fill(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                widget = self.grid[row][col]
+                if widget is None:
+                    widget = Label()
+
+                self.add_widget(widget)
+
+
 class PressReleaseButton(Button):
     def __init__(self, text, app, button=None, button_code=None):
         if button_code is None and button is None:
