@@ -1,23 +1,5 @@
 {
   "is_game_mode": false,
-  "connection": {
-    "via_wifi": true,
-    "wifi": {
-      "device_num": 104,
-      "network_num": 1
-    },
-    "phone": {
-      "device_num": 200,
-      "network_num": 161
-    }
-  },
-  "connect_over_phone": false,
-  "font": {
-    "size": {
-      "normal": 82,
-      "small": 28
-    }
-  },
   "touchpad": {
     "hold": {
       "normal": {
@@ -29,7 +11,7 @@
         "time": 0.7
       }
     },
-    "visuals": true
+    "visuals": false
   },
   "scroll": {
     "normal": {
@@ -45,5 +27,22 @@
     "visuals": true,
     "thresholdPct": 70,
     "angleMargin": 20
+  },
+  "font": {
+    "size": {
+      "normal": 82,
+      "small": 28
+    }
+  },
+  "connection": {
+    "via_wifi": true,
+    "wifi": {
+      "device_num": 104,
+      "network_num": 1
+    },
+    "phone": {
+      "device_num": 200,
+      "network_num": 161
+    }
   }
 }
