@@ -1,14 +1,85 @@
 import json
 
+from code_map import code_map, reverse_code_map
+
+langs = ['en', 'ru']
+
+arrows_to_btn_num = {
+    "🢄": 1, "🢁": 2, "🢅": 3,
+    "🢀": 4, "⬤": 5, "🢂": 6,
+    "🢇": 7, "🢃": 8, "🢆": 9,
+}
+
+arrow_directions = arrows_to_btn_num.keys()
+num_directions = arrows_to_btn_num.values()
+
 
 def load_layout():
-    arrows_to_btn_num = {
-        "🢄": 1, "🢁": 2, "🢅": 3,
-        "🢀": 4, "⬤": 5, "🢂": 6,
-        "🢇": 7, "🢃": 8, "🢆": 9,
-    }
+    lang_layout = {}
+    for lang in langs:
+        with open(f"layout_{lang}.json", mode="r", encoding='utf8') as file:
+            layout = json.load(file)
 
+        converted = {}
+        for dir1 in arrow_directions:
+            num1 = arrows_to_btn_num[dir1]
+            converted[num1] = {}
+            for dir2 in arrow_directions:
+                try:
+                    letter = layout[dir1][dir2]
+                except KeyError:
+                    continue
+                else:
+                    num2 = arrows_to_btn_num[dir2]
+                    if letter:
+                        converted[num1][num2] = code_map[letter]
+
+        lang_layout[lang] = converted
+
+    return lang_layout
+
+
+def generate_hints(layout):
+    detailed_hints = {}
+    preview_hints = {}
+
+    for lang in langs:
+        detailed_hints[lang] = {}
+        preview_hints[lang] = {}
+
+        for dir1 in num_directions:
+            detailed_hints[lang][dir1] = {}
+            preview_hints[lang][dir1] = ''
+
+            for dir2 in num_directions:
+                try:
+                    letter = layout[lang][dir1][dir2]
+                except KeyError:
+                    letter = ""
+                else:
+                    letter = reverse_code_map[letter]
+
+                detailed_hints[lang][dir1][dir2] = letter
+
+            dirs2 = detailed_hints[lang][dir1].values()
+            dirs2 = [d for d in dirs2 if d]
+            preview_hints[lang][dir1] = " ".join(dirs2)
+
+    return detailed_hints, preview_hints
+
+
+def load_configs():
+    with open("configs.json", encoding="utf8") as file:
+        return json.load(file)
+
+
+def convert_layout():
     layout = {}
+    for dir1 in arrow_directions:
+        layout[dir1] = {}
+        for dir2 in arrow_directions:
+            layout[dir1][dir2] = ''
+
     with open("layout.csv", encoding="utf8") as layout_csv:
         content = layout_csv.readlines()
 
@@ -17,61 +88,16 @@ def load_layout():
         line = line.replace(' ', '').replace('\n', '').lower()
         if line and not line.startswith(';'):
             typing_positions, letters = line.split('=>')
-            typing_positions = typing_positions.split('&')
-            typing_positions = (
-                arrows_to_btn_num[typing_positions[0]],
-                arrows_to_btn_num[typing_positions[1]]
-            )
+            pos1, pos2 = typing_positions.split('&')
 
             letters = letters.replace('none', '')
             letters = letters.split('|')
             letters = [letter.capitalize() for letter in letters]
 
-            if typing_positions in layout:
-                raise ValueError(f"Repeated: {letters}")
-
-            layout[typing_positions] = {}
             if letters[0]:
-                layout[typing_positions]['en'] = letters[0]
-            if letters[1]:
-                layout[typing_positions]['ru'] = letters[1]
+                layout[pos1][pos2] = letters[0]
+
+    with open("layout_en.json", mode="w+", encoding='utf8') as file:
+        json.dump(layout, file, ensure_ascii=False, indent='  ')
 
     return layout
-
-
-def generate_hints(layout):
-    langs = ['en', 'ru']
-    directions = tuple(range(1, 10))
-    detailed_hints = {}
-    preview_hints = {}
-
-    for lang in langs:
-        detailed_hints[lang] = {}
-        preview_hints[lang] = {}
-        for direction1 in directions:
-            detailed_hints[lang][direction1] = {}
-
-    for direction1 in directions:
-        for direction2 in directions:
-            pos = (direction1, direction2)
-            if pos in layout:
-                letters = layout[pos]
-            else:
-                letters = {}
-
-            for lang in langs:
-                letter = letters.get(lang, "")
-                detailed_hints[lang][direction1][direction2] = letter
-
-    for lang in langs:
-        for direction1 in directions:
-            dirs2 = detailed_hints[lang][direction1].values()
-            dirs2 = [d for d in dirs2 if d]
-            preview_hints[lang][direction1] = " ".join(dirs2)
-
-    return detailed_hints, preview_hints
-
-
-def load_configs():
-    with open("configs.json", encoding="utf8") as file:
-        return json.load(file)

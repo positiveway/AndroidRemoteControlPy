@@ -15,26 +15,22 @@ class Controller:
     def get_preview_hints(self):
         return self.preview_hints[self.lang]
 
-    def print_layout_error(self, typing_positions, error):
-        print(f'no letter for this position: {typing_positions} or lang: {self.lang}, error key: {error}')
-
     def detect_letter(self):
-        typing_positions = (self.typing_btn_1, self.typing_btn_2)
-
         try:
-            letter = self.layout[typing_positions][self.lang]
+            letter = self.layout[self.lang][self.typing_btn_1][self.typing_btn_2]
         except KeyError as error:
-            self.print_layout_error(typing_positions, error)
+            print(
+                f'no letter for this position: ({self.typing_btn_1}, {self.typing_btn_2}) or lang: {self.lang}, error key: {error}')
             return None
 
         return letter
 
-    def update_typing_state(self, btn_num):
+    def update_typing_state(self, btn_direction):
         if self.typing_btn_1 is None:
-            self.typing_btn_1 = btn_num
+            self.typing_btn_1 = btn_direction
             return None
         else:
-            self.typing_btn_2 = btn_num
+            self.typing_btn_2 = btn_direction
             letter = self.detect_letter()
             self.reset_typing()
             return letter
@@ -73,16 +69,12 @@ class Controller:
             self.sock.send(self.msg)
             self.pressed[button] = 0
 
-    def send_sequence(self, seq):
+    def send_type(self, seq):
         for button in seq:
             self.send_pressed(button)
 
         for button in reversed(seq):
             self.send_released(button)
-
-    def send_type(self, button):
-        self.send_pressed(button)
-        self.send_released(button)
 
     def send_pressed(self, button):
         if button == self.Esc:
@@ -163,10 +155,6 @@ class Controller:
         self.is_shift_pressed = False
 
         self.detailed_hints, self.preview_hints = generate_hints(self.layout)
-
-        for letters in self.layout.values():
-            for lang, letter in letters.items():
-                letters[lang] = code_map[letter]
 
         self.lang = 'en'
 

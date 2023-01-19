@@ -1,4 +1,5 @@
 import gc
+import time
 
 from kivy.app import App
 
@@ -32,9 +33,9 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def double_click(self, button):
-        self.controller.send_pressed(self.controller.LeftMouse)
-        self.controller.send_pressed(self.controller.LeftMouse)
-        self.controller.send_released(self.controller.LeftMouse)
+        self.controller.send_type([self.controller.LeftMouse])
+        time.sleep(0.25)
+        self.controller.send_type([self.controller.LeftMouse])
 
     def get_on_press_func(self, button_code):
         def on_press(button):
@@ -48,17 +49,16 @@ class APISenderApp(App):
 
         return on_release
 
-    def get_send_type_func(self, button_code):
+    def get_send_type_func(self, button_code_seq):
         def send_type(button):
-            self.controller.send_type(button_code)
+            if not isinstance(button_code_seq, (list, tuple)):
+                to_send = tuple(button_code_seq)
+            else:
+                to_send = button_code_seq
+
+            self.controller.send_type(to_send)
 
         return send_type
-
-    def get_send_seq_func(self, seq):
-        def send_seq(button):
-            self.controller.send_sequence(seq)
-
-        return send_seq
 
     def build(self):
         self.touchpad = TouchpadWidget()
@@ -129,9 +129,9 @@ class APISenderApp(App):
             self.controller.send_type(self.Backspace)
             self.update_typed_text(self.Backspace)
 
-    def get_typing_btn_func(self, button_num):
+    def get_typing_btn_func(self, btn_direction):
         def typing_btn_pressed(button):
-            letter = self.controller.update_typing_state(button_num)
+            letter = self.controller.update_typing_state(btn_direction)
             if letter is not None:
                 self.controller.send_type(letter)
                 self.update_typed_text(letter)

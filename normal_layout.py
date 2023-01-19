@@ -46,49 +46,45 @@ def make_buttons(app):
         "X2", app,
         func=app.double_click
     )
-    app.clear_btn = PressFuncButton(
-        "Bs", app,
-        func=app.clear
-    )
     app.space_btn = PressFuncButton(
         "Space", app,
         func=app.get_send_type_func(code_map["Space"])
     )
     app.copy_btn = PressFuncButton(
         "Copy", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["C"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["C"]])
     )
     app.cut_btn = PressFuncButton(
         "Cut", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["X"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["X"]])
     )
     app.paste_btn = PressFuncButton(
         "Paste", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["V"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["V"]])
     )
     app.select_all_btn = PressFuncButton(
         "Select", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["A"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["A"]])
     )
     app.format_btn = PressFuncButton(
         "Format", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["L"]])
+        func=app.get_send_type_func([app.Ctrl, app.Alt, code_map["L"]])
     )
     app.search_btn = PressFuncButton(
         "Search", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["F"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["F"]])
     )
     app.replace_btn = PressFuncButton(
         "Replace", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["R"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["R"]])
     )
     app.undo_btn = PressFuncButton(
         "Undo", app,
-        func=app.get_send_seq_func([app.Ctrl, code_map["Z"]])
+        func=app.get_send_type_func([app.Ctrl, code_map["Z"]])
     )
     app.redo_btn = PressFuncButton(
         "Redo", app,
-        func=app.get_send_seq_func([app.Ctrl, app.Shift, code_map["Z"]])
+        func=app.get_send_type_func([app.Ctrl, app.Shift, code_map["Z"]])
     )
     app.scroll_btn = PressFuncButton(
         "Scroll", app,
@@ -186,31 +182,7 @@ def fill_layout(app):
     app.root.fill()
 
 
-def make_typing_buttons(app):
-    app.typing_buttons = Layout(cols=3, rows=3)
-    app.typing_btn_1 = Button(on_press=app.get_typing_btn_func(button_num=1))
-    app.typing_btn_2 = Button(on_press=app.get_typing_btn_func(button_num=2))
-    app.typing_btn_3 = Button(on_press=app.get_typing_btn_func(button_num=3))
-    app.typing_btn_4 = Button(on_press=app.get_typing_btn_func(button_num=4))
-    app.typing_btn_5 = Button(on_press=app.get_typing_btn_func(button_num=5))
-    app.typing_btn_6 = Button(on_press=app.get_typing_btn_func(button_num=6))
-    app.typing_btn_7 = Button(on_press=app.get_typing_btn_func(button_num=7))
-    app.typing_btn_8 = Button(on_press=app.get_typing_btn_func(button_num=8))
-    app.typing_btn_9 = Button(on_press=app.get_typing_btn_func(button_num=9))
-    app.typing_buttons.add(1, 1, app.typing_btn_1)
-    app.typing_buttons.add(1, 2, app.typing_btn_2)
-    app.typing_buttons.add(1, 3, app.typing_btn_3)
-    app.typing_buttons.add(2, 1, app.typing_btn_4)
-    app.typing_buttons.add(2, 2, app.clear_btn)
-    app.typing_buttons.add(2, 3, app.typing_btn_6)
-    app.typing_buttons.add(3, 1, app.typing_btn_7)
-    app.typing_buttons.add(3, 2, app.typing_btn_8)
-    app.typing_buttons.add(3, 3, app.typing_btn_9)
-    app.typing_buttons.fill()
-
-
 def build_layout(app):
     make_common_buttons(app)
     make_buttons(app)
-    make_typing_buttons(app)
     fill_layout(app)
