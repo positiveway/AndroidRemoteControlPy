@@ -124,8 +124,9 @@ class TouchpadWidget(Widget):
             return super(TouchpadWidget, self).on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
-        self.reset()
-        self.controller.send_released(self.controller.LeftMouse)
+        if self.prev_x != self.value_not_set:  # originated within this element
+            self.reset()
+            self.controller.send_released(self.controller.LeftMouse)
 
         if self.is_in_zone(touch_event):
             self.clear_canvas()
