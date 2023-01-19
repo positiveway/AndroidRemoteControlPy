@@ -63,7 +63,12 @@ def generate_hints(layout):
 
             dirs2 = detailed_hints[lang][dir1].values()
             dirs2 = [d for d in dirs2 if d]
-            preview_hints[lang][dir1] = " ".join(dirs2)
+            row_len = 2
+            row1 = ' '.join(dirs2[:row_len])
+            row2 = ' '.join(dirs2[row_len:row_len * 2])
+            row3 = ' '.join(dirs2[row_len * 2:row_len * 3])
+            row4 = ' '.join(dirs2[row_len * 3:])
+            preview_hints[lang][dir1] = '\n'.join((row1, row2, row3, row4))
 
     return detailed_hints, preview_hints
 

@@ -30,10 +30,14 @@ class Controller:
             self.typing_btn_1 = btn_direction
             return None
         else:
-            self.typing_btn_2 = btn_direction
-            letter = self.detect_letter()
-            self.reset_typing()
-            return letter
+            if btn_direction == self.CentralDir:
+                self.reset_typing()
+                return None
+            else:
+                self.typing_btn_2 = btn_direction
+                letter = self.detect_letter()
+                self.reset_typing()
+                return letter
 
     def reset_typing(self):
         self.typing_btn_1 = None
@@ -137,6 +141,8 @@ class Controller:
         self.hold_time = self.hold_cfg[profile]["time"]
 
     def __init__(self):
+        self.CentralDir = 5
+
         self.layout = load_layout()
         configs = load_configs()
 

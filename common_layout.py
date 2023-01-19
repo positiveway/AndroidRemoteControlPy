@@ -41,7 +41,7 @@ def make_typing_buttons(app):
     app.typing_buttons.add(1, 2, app.typing_btn_2)
     app.typing_buttons.add(1, 3, app.typing_btn_3)
     app.typing_buttons.add(2, 1, app.typing_btn_4)
-    app.typing_buttons.add(2, 2, app.clear_btn)
+    app.typing_buttons.add(2, 2, app.typing_btn_5)
     app.typing_buttons.add(2, 3, app.typing_btn_6)
     app.typing_buttons.add(3, 1, app.typing_btn_7)
     app.typing_buttons.add(3, 2, app.typing_btn_8)
