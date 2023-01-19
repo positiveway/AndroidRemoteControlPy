@@ -53,7 +53,7 @@ class TouchpadWidget(Widget):
                     self.init_y = self.prev_y
                     self.start_timer()
 
-            self.reset_typed_text()
+            self.clear_typed_text()
             return True
         else:
             return super(TouchpadWidget, self).on_touch_down(touch_event)

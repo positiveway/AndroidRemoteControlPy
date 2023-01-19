@@ -75,12 +75,12 @@ class APISenderApp(App):
         self.small_font_size = self.controller.small_font_size
 
         if self.is_game_mode:
-            self.touchpad.reset_typed_text = emtpy_func
+            self.touchpad.clear_typed_text = emtpy_func
 
             from game_layout import build_layout
             build_layout(self)
         else:
-            self.touchpad.reset_typed_text = self.reset_typed_text
+            self.touchpad.clear_typed_text = self.clear_typed_text
 
             from normal_layout import build_layout
             build_layout(self)
@@ -91,13 +91,13 @@ class APISenderApp(App):
                 'Enter': '\n',
                 'Del': '',
             }
-            self.reset_typed_text()
+            self.clear_typed_text()
             self.update_label()
 
         gc.disable()
         gc.collect()
 
-    def reset_typed_text(self):
+    def clear_typed_text(self):
         self.typed_text = ""
         self.label.text = self.typed_text
 
