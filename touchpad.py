@@ -162,6 +162,8 @@ class TouchpadWidget(Widget):
         self.timer.start()
 
     def init(self):
+        self.always_release = True
+
         self.value_not_set = 1000
 
         self.controller = Controller()
