@@ -135,7 +135,12 @@ class Controller:
         self.pressed[button] = 1
 
     def send_released(self, button):
-        if button in self.modifiers:
+        if button == self.Caps:
+            modifier = self.Shift
+        else:
+            modifier = button
+
+        if modifier in self.modifiers:
             return
 
         if self.pressed[button] == 1:
