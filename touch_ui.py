@@ -41,24 +41,6 @@ class APISenderApp(App):
         time.sleep(0.25)
         self.controller.send_type([self.LeftMouse])
 
-    def get_on_press_func(self, button_code):
-        def on_press(button):
-            self.controller.send_pressed(button_code)
-
-        return on_press
-
-    def get_on_release_func(self, button_code):
-        def on_release(button):
-            self.controller.send_released(button_code)
-
-        return on_release
-
-    def get_send_type_func(self, button_code_seq):
-        def send_type(button):
-            self.controller.send_type(button_code_seq)
-
-        return send_type
-
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
