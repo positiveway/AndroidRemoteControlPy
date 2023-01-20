@@ -203,7 +203,7 @@ class Controller:
             Ctrl: 0,
             Alt: 0,
         }
-        self.modifiers = self.modifiers_state.keys()
+        self.modifiers = tuple(self.modifiers_state.keys())
 
     def release_modifiers(self):
         for modifier in self.modifiers:

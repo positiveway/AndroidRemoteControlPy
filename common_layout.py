@@ -70,7 +70,7 @@ class UniversalButton(Button):
             if not isinstance(button_codes, (tuple, list)):
                 button_codes = tuple([button_codes])
 
-        reverse_codes = reversed(button_codes)
+        reverse_codes = tuple(reversed(button_codes))
 
         if on_press_only:
             def on_press(button):
