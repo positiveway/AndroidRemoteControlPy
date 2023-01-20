@@ -1,28 +1,36 @@
 from kivy.uix.label import Label
 from code_map import *
-from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
+from common_layout import Layout, make_common_buttons, UniversalButton
 
 
 def make_buttons(app):
-    app.w_btn = PressReleaseButton(
+    app.w_btn = UniversalButton(
         "W", app,
-        button="W"
+        buttons="W"
     )
-    app.a_btn = PressReleaseButton(
+    app.a_btn = UniversalButton(
         "A", app,
-        button="A"
+        buttons="A"
     )
-    app.s_btn = PressReleaseButton(
+    app.s_btn = UniversalButton(
         "S", app,
-        button="S"
+        buttons="S"
     )
-    app.d_btn = PressReleaseButton(
+    app.d_btn = UniversalButton(
         "D", app,
-        button="D"
+        buttons="D"
     )
-    app.space_btn = PressFuncButton(
+    app.wa_btn = UniversalButton(
+        "WA", app,
+        buttons=["W", "A"]
+    )
+    app.wd_btn = UniversalButton(
+        "WD", app,
+        buttons=["W", "D"]
+    )
+    app.space_btn = UniversalButton(
         "Space", app,
-        func=app.get_send_type_func(Space)
+        buttons="Space"
     )
 
 
@@ -30,7 +38,9 @@ def fill_layout(app):
     app.root = Layout(cols=2, rows=1)
 
     wasd_layout = Layout(cols=3, rows=2)
+    wasd_layout.add(1, 1, app.wa_btn)
     wasd_layout.add(1, 2, app.w_btn)
+    wasd_layout.add(1, 3, app.wd_btn)
     wasd_layout.add(2, 1, app.a_btn)
     wasd_layout.add(2, 2, app.s_btn)
     wasd_layout.add(2, 3, app.d_btn)

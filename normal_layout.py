@@ -1,93 +1,93 @@
 from kivy.uix.label import Label
 from code_map import *
-from common_layout import PressReleaseButton, PressFuncButton, Layout, make_common_buttons
+from common_layout import UniversalButton, Layout, make_common_buttons
 
 
 def make_buttons(app):
-    app.shift_btn = PressReleaseButton(
+    app.shift_btn = UniversalButton(
         "Shift", app,
-        button_code=Shift
+        button_codes=Shift
     )
-    app.caps_btn = PressReleaseButton(
+    app.caps_btn = UniversalButton(
         "Caps", app,
-        button_code=Caps
+        button_codes=Caps
     )
-    app.up_btn = PressReleaseButton(
+    app.up_btn = UniversalButton(
         "Up", app,
-        button="Up"
+        buttons="Up"
     )
-    app.down_btn = PressReleaseButton(
+    app.down_btn = UniversalButton(
         "Down", app,
-        button="Down"
+        buttons="Down"
     )
-    app.left_btn = PressReleaseButton(
+    app.left_btn = UniversalButton(
         "Left", app,
-        button="Left"
+        buttons="Left"
     )
-    app.right_btn = PressReleaseButton(
+    app.right_btn = UniversalButton(
         "Right", app,
-        button="Right"
+        buttons="Right"
     )
-    app.left_click = PressReleaseButton(
+    app.left_click = UniversalButton(
         "Left", app,
-        button_code=LeftMouse
+        button_codes=LeftMouse
     )
-    app.right_click = PressReleaseButton(
+    app.right_click = UniversalButton(
         "Right", app,
-        button_code=RightMouse
+        button_codes=RightMouse
     )
-    app.middle_click = PressReleaseButton(
+    app.middle_click = UniversalButton(
         "Middle", app,
-        button_code=MiddleMouse
+        button_codes=MiddleMouse
     )
 
-    app.double_click_btn = PressFuncButton(
+    app.scroll_btn = UniversalButton(
+        "Scroll", app,
+        func=app.toggle_scroll,
+    )
+    app.double_click_btn = UniversalButton(
         "X2", app,
         func=app.double_click
     )
-    app.space_btn = PressFuncButton(
+    app.space_btn = UniversalButton(
         "Space", app,
-        func=app.get_send_type_func(Space)
+        button_codes=Space, on_press_only=True
     )
-    app.copy_btn = PressFuncButton(
+    app.copy_btn = UniversalButton(
         "Copy", app,
-        func=app.get_send_type_func(code_map['Copy'])
+        buttons='Copy', on_press_only=True
     )
-    app.cut_btn = PressFuncButton(
+    app.cut_btn = UniversalButton(
         "Cut", app,
-        func=app.get_send_type_func(code_map['Cut'])
+        buttons='Cut', on_press_only=True
     )
-    app.paste_btn = PressFuncButton(
+    app.paste_btn = UniversalButton(
         "Paste", app,
-        func=app.get_send_type_func(code_map['Paste'])
+        buttons='Paste', on_press_only=True
     )
-    app.select_all_btn = PressFuncButton(
+    app.select_all_btn = UniversalButton(
         "Select", app,
-        func=app.get_send_type_func(code_map['Select'])
+        buttons='Select', on_press_only=True
     )
-    app.format_btn = PressFuncButton(
+    app.format_btn = UniversalButton(
         "Format", app,
-        func=app.get_send_type_func(code_map['Format'])
+        buttons='Format', on_press_only=True
     )
-    app.search_btn = PressFuncButton(
+    app.search_btn = UniversalButton(
         "Search", app,
-        func=app.get_send_type_func(code_map['Search'])
+        buttons='Search', on_press_only=True
     )
-    app.replace_btn = PressFuncButton(
+    app.replace_btn = UniversalButton(
         "Replace", app,
-        func=app.get_send_type_func(code_map['Replace'])
+        buttons='Replace', on_press_only=True
     )
-    app.undo_btn = PressFuncButton(
+    app.undo_btn = UniversalButton(
         "Undo", app,
-        func=app.get_send_type_func(code_map['Undo'])
+        buttons='Undo', on_press_only=True
     )
-    app.redo_btn = PressFuncButton(
+    app.redo_btn = UniversalButton(
         "Redo", app,
-        func=app.get_send_type_func(code_map['Redo'])
-    )
-    app.scroll_btn = PressFuncButton(
-        "Scroll", app,
-        func=app.toggle_scroll,
+        buttons='Redo', on_press_only=True
     )
 
 

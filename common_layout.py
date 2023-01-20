@@ -6,19 +6,19 @@ from code_map import *
 
 
 def make_common_buttons(app):
-    app.enter_btn = PressFuncButton(
+    app.enter_btn = UniversalButton(
         "Enter", app,
-        func=app.get_send_type_func(Enter)
+        button_codes=Enter, on_press_only=True
     )
-    app.esc_btn = PressFuncButton(
+    app.esc_btn = UniversalButton(
         "Esc", app,
-        func=app.get_send_type_func(Esc)
+        button_codes=Esc, on_press_only=True
     )
-    app.release_all_btn = PressFuncButton(
+    app.release_all_btn = UniversalButton(
         "Release", app,
         func=app.release_all
     )
-    app.clear_btn = PressFuncButton(
+    app.clear_btn = UniversalButton(
         "Bs", app,
         func=app.clear
     )
@@ -49,6 +49,57 @@ def make_typing_buttons(app):
     app.typing_buttons.fill()
 
 
+class UniversalButton(Button):
+    def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=False):
+        if func is not None:
+            super().__init__(
+                text=text, font_size=app.font_size,
+                on_press=func,
+            )
+            return
+
+        if buttons is None and button_codes is None:
+            raise ValueError('At least one should be provided')
+        elif buttons is not None:
+            if not isinstance(buttons, (tuple, list)):
+                buttons = tuple([buttons])
+
+            button_codes = [code_map[button] for button in buttons]
+
+        else:
+            if not isinstance(button_codes, (tuple, list)):
+                button_codes = tuple([button_codes])
+
+        reverse_codes = reversed(button_codes)
+
+        if on_press_only:
+            def on_press(button):
+                for button_code in button_codes:
+                    app.controller.send_pressed(button_code)
+
+                for button_code in reverse_codes:
+                    app.controller.send_released(button_code)
+
+            super().__init__(
+                text=text, font_size=app.font_size,
+                on_press=on_press
+            )
+        else:
+            def on_press(button):
+                for button_code in button_codes:
+                    app.controller.send_pressed(button_code)
+
+            def on_release(button):
+                for button_code in reverse_codes:
+                    app.controller.send_released(button_code)
+
+            super().__init__(
+                text=text, font_size=app.font_size,
+                on_press=on_press,
+                on_release=on_release,
+            )
+
+
 class Layout(GridLayout):
     def __init__(self, rows, cols):
         self.grid = [[None for i in range(cols)] for j in range(rows)]
@@ -70,25 +121,3 @@ class Layout(GridLayout):
                     widget = Label()
 
                 self.add_widget(widget)
-
-
-class PressReleaseButton(Button):
-    def __init__(self, text, app, button=None, button_code=None):
-        if button_code is None and button is None:
-            raise ValueError()
-        if button_code is None:
-            button_code = code_map[button]
-
-        super().__init__(
-            text=text, font_size=app.font_size,
-            on_press=app.get_on_press_func(button_code),
-            on_release=app.get_on_release_func(button_code)
-        )
-
-
-class PressFuncButton(Button):
-    def __init__(self, text, app, func):
-        super().__init__(
-            text=text, font_size=app.font_size,
-            on_press=func
-        )
