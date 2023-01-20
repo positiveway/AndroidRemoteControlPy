@@ -63,10 +63,12 @@ class Controller:
 
     def release_mouse_and_pressed(self):
         self.release_mouse()
+        self.reset_modifiers()
         self.release_all_pressed()
 
     def release_all(self):
         self.release_mouse()
+        self.reset_modifiers()
 
         for button in self.pressed.keys():
             self.msg[0] = button
@@ -88,7 +90,43 @@ class Controller:
         if button == self.Esc:
             self.release_mouse_and_pressed()
 
-        if not self.is_mouse_mode and button in self.mouse_buttons:
+        elif not self.is_mouse_mode and button in self.mouse_buttons:
+            return
+
+        elif button in self.modifiers:
+            if button == self.Caps:
+                modifier = self.Shift
+            else:
+                modifier = button
+
+            state = self.modifiers_state[modifier]
+
+            if state == 0:
+                if button == self.Caps:
+                    self.modifiers_state[modifier] = 2
+                else:
+                    self.modifiers_state[modifier] = 1
+
+                self.msg[0] = modifier + 128
+                self.sock.send(self.msg)
+
+            elif state == 1:
+                if button == self.Caps:
+                    self.modifiers_state[modifier] = 0
+                    self.msg[0] = modifier
+                    self.sock.send(self.msg)
+                else:
+                    self.modifiers_state[modifier] = 0
+                    self.msg[0] = modifier
+                    self.sock.send(self.msg)
+
+            elif state == 2:
+                if button == self.Caps:
+                    self.modifiers_state[modifier] = 0
+                    self.msg[0] = modifier
+                    self.sock.send(self.msg)
+            else:
+                ValueError(f'incorrect state: {state}')
             return
 
         self.msg[0] = button + 128
@@ -96,10 +134,19 @@ class Controller:
         self.pressed[button] = 1
 
     def send_released(self, button):
+        if button in self.modifiers:
+            return
+
         if self.pressed[button] == 1:
             self.msg[0] = button
             self.sock.send(self.msg)
             self.pressed[button] = 0
+
+            for modifier, state in self.modifiers_state.items():
+                if state == 1:
+                    self.modifiers_state[modifier] = 0
+                    self.msg[0] = modifier
+                    self.sock.send(self.msg)
 
         # gc.collect()
 
@@ -143,6 +190,18 @@ class Controller:
         self.hold_dist = self.hold_cfg[profile]["dist"]
         self.hold_time = self.hold_cfg[profile]["time"]
 
+    def init_modifiers(self):
+        self.modifiers_state = {
+            Shift: 0,
+            Ctrl: 0,
+            Alt: 0,
+        }
+        self.modifiers = self.modifiers_state.keys()
+
+    def reset_modifiers(self):
+        for modifier in self.modifiers:
+            self.modifiers_state[modifier] = 0
+
     def __init__(self):
         self.CentralDir = 5
 
@@ -153,8 +212,9 @@ class Controller:
         self.connect(configs)
 
         self.is_mouse_mode = True
-        self.is_shift_pressed = False
         self.lang = 'en'
+
+        self.init_modifiers()
 
         self.LeftMouse = LeftMouse
         self.RightMouse = RightMouse
