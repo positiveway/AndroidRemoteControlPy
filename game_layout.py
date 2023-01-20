@@ -34,7 +34,7 @@ def make_buttons(app):
     )
     app.shift_btn = UniversalButton(
         "Shift", app,
-        button_codes="Caps"
+        button_codes=Caps
     )
 
 
