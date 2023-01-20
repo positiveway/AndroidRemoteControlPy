@@ -9,6 +9,46 @@ def resole_angle(angle):
 
 
 class Controller:
+    def connect(self, configs):
+        connection_cfg = configs["connection"]
+        if connection_cfg['via_wifi']:
+            connection_cfg = connection_cfg['wifi']
+        else:
+            connection_cfg = connection_cfg['phone']
+
+        network_num = connection_cfg["network_num"]
+        device_num = connection_cfg["device_num"]
+
+        server_ip = f'192.168.{network_num}.{device_num}'
+        server_port = 5005
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.connect((server_ip, server_port))
+
+    def cycle_profile(self, profile):
+        return (profile + 1) % 2
+
+    def set_scroll_profile(self):
+        if self.scroll_speed_profile == 0:
+            profile = "normal"
+        else:
+            profile = "fast"
+
+        self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
+
+    def toggle_scroll_speed(self):
+        self.scroll_speed_profile = self.cycle_profile(self.scroll_speed_profile)
+        self.set_scroll_profile()
+
+    def set_hold_profile(self, profile):
+        if profile == 0:
+            profile = "normal"
+        else:
+            profile = "during_scroll"
+
+        self.hold_dist = self.hold_cfg[profile]["dist"]
+        self.hold_time = self.hold_cfg[profile]["time"]
+
     def get_detailed_hints(self, direction):
         return self.detailed_hints[self.lang][direction]
 
@@ -63,17 +103,18 @@ class Controller:
 
     def release_mouse_and_pressed(self):
         self.release_mouse()
-        self.reset_modifiers()
+        self.release_modifiers()
         self.release_all_pressed()
 
     def release_all(self):
         self.release_mouse()
-        self.reset_modifiers()
+        self.release_modifiers()
 
         for button in self.pressed.keys():
-            self.msg[0] = button
-            self.sock.send(self.msg)
-            self.pressed[button] = 0
+            if not isinstance(button, (tuple, list)):
+                self.msg[0] = button
+                self.sock.send(self.msg)
+                self.pressed[button] = 0
 
     def send_type(self, seq):
         if not isinstance(seq, (tuple, list)):
@@ -156,46 +197,6 @@ class Controller:
 
         # gc.collect()
 
-    def connect(self, configs):
-        connection_cfg = configs["connection"]
-        if connection_cfg['via_wifi']:
-            connection_cfg = connection_cfg['wifi']
-        else:
-            connection_cfg = connection_cfg['phone']
-
-        network_num = connection_cfg["network_num"]
-        device_num = connection_cfg["device_num"]
-
-        server_ip = f'192.168.{network_num}.{device_num}'
-        server_port = 5005
-
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.connect((server_ip, server_port))
-
-    def cycle_profile(self, profile):
-        return (profile + 1) % 2
-
-    def set_scroll_profile(self):
-        if self.scroll_speed_profile == 0:
-            profile = "normal"
-        else:
-            profile = "fast"
-
-        self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
-
-    def toggle_scroll_speed(self):
-        self.scroll_speed_profile = self.cycle_profile(self.scroll_speed_profile)
-        self.set_scroll_profile()
-
-    def set_hold_profile(self, profile):
-        if profile == 0:
-            profile = "normal"
-        else:
-            profile = "during_scroll"
-
-        self.hold_dist = self.hold_cfg[profile]["dist"]
-        self.hold_time = self.hold_cfg[profile]["time"]
-
     def init_modifiers(self):
         self.modifiers_state = {
             Shift: 0,
@@ -204,8 +205,10 @@ class Controller:
         }
         self.modifiers = self.modifiers_state.keys()
 
-    def reset_modifiers(self):
+    def release_modifiers(self):
         for modifier in self.modifiers:
+            self.msg[0] = modifier
+            self.sock.send(self.msg)
             self.modifiers_state[modifier] = 0
 
     def __init__(self):
@@ -220,8 +223,6 @@ class Controller:
         self.is_mouse_mode = True
         self.lang = 'en'
 
-        self.init_modifiers()
-
         self.LeftMouse = LeftMouse
         self.RightMouse = RightMouse
         self.MiddleMouse = MiddleMouse
@@ -235,9 +236,11 @@ class Controller:
         self.Backspace = Backspace
         self.Esc = Esc
 
-        self.detailed_hints, self.preview_hints = generate_hints(self.layout)
-
+        self.init_modifiers()
+        self.init_pressed()
         self.reset_typing()
+
+        self.detailed_hints, self.preview_hints = generate_hints(self.layout)
 
         self.scroll_cfg = configs['scroll']
         self.scroll_speed_profile = 0
@@ -253,5 +256,3 @@ class Controller:
         self.small_font_size = font_size_cfg['small']
 
         self.is_game_mode = configs['is_game_mode']
-
-        self.init_pressed()
