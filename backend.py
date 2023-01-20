@@ -93,41 +93,42 @@ class Controller:
         elif not self.is_mouse_mode and button in self.mouse_buttons:
             return
 
-        elif button in self.modifiers:
+        else:
             if button == self.Caps:
                 modifier = self.Shift
             else:
                 modifier = button
 
-            state = self.modifiers_state[modifier]
+            if modifier in self.modifiers:
+                state = self.modifiers_state[modifier]
 
-            if state == 0:
-                if button == self.Caps:
-                    self.modifiers_state[modifier] = 2
+                if state == 0:
+                    if button == self.Caps:
+                        self.modifiers_state[modifier] = 2
+                    else:
+                        self.modifiers_state[modifier] = 1
+
+                    self.msg[0] = modifier + 128
+                    self.sock.send(self.msg)
+
+                elif state == 1:
+                    if button == self.Caps:
+                        self.modifiers_state[modifier] = 0
+                        self.msg[0] = modifier
+                        self.sock.send(self.msg)
+                    else:
+                        self.modifiers_state[modifier] = 0
+                        self.msg[0] = modifier
+                        self.sock.send(self.msg)
+
+                elif state == 2:
+                    if button == self.Caps:
+                        self.modifiers_state[modifier] = 0
+                        self.msg[0] = modifier
+                        self.sock.send(self.msg)
                 else:
-                    self.modifiers_state[modifier] = 1
-
-                self.msg[0] = modifier + 128
-                self.sock.send(self.msg)
-
-            elif state == 1:
-                if button == self.Caps:
-                    self.modifiers_state[modifier] = 0
-                    self.msg[0] = modifier
-                    self.sock.send(self.msg)
-                else:
-                    self.modifiers_state[modifier] = 0
-                    self.msg[0] = modifier
-                    self.sock.send(self.msg)
-
-            elif state == 2:
-                if button == self.Caps:
-                    self.modifiers_state[modifier] = 0
-                    self.msg[0] = modifier
-                    self.sock.send(self.msg)
-            else:
-                ValueError(f'incorrect state: {state}')
-            return
+                    ValueError(f'incorrect state: {state}')
+                return
 
         self.msg[0] = button + 128
         self.sock.send(self.msg)
