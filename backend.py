@@ -76,7 +76,7 @@ class Controller:
             self.pressed[button] = 0
 
     def send_type(self, seq):
-        if not isinstance(seq, (list, tuple)):
+        if not isinstance(seq, (tuple, list)):
             self.send_pressed(seq)
             self.send_released(seq)
         else:
