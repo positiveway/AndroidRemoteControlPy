@@ -1,3 +1,4 @@
+import gc
 import socket
 
 from code_map import *
@@ -136,39 +137,39 @@ class Controller:
 
         else:
             if button == self.Caps:
-                modifier = self.Shift
+                self.cur_modifier = self.Shift
             else:
-                modifier = button
+                self.cur_modifier = button
 
-            if modifier in self.modifiers:
-                state = self.modifiers_state[modifier]
+            if self.cur_modifier in self.modifiers:
+                self.cur_modifier_state = self.modifiers_state[self.cur_modifier]
 
-                if state == 0:
+                if self.cur_modifier_state == 0:
                     if button == self.Caps:
-                        self.modifiers_state[modifier] = 2
+                        self.modifiers_state[self.cur_modifier] = 2
                     else:
-                        self.modifiers_state[modifier] = 1
+                        self.modifiers_state[self.cur_modifier] = 1
 
-                    self.msg[0] = modifier + 128
+                    self.msg[0] = self.cur_modifier + 128
                     self.sock.send(self.msg)
 
-                elif state == 1:
+                elif self.cur_modifier_state == 1:
                     if button == self.Caps:
-                        self.modifiers_state[modifier] = 0
-                        self.msg[0] = modifier
+                        self.modifiers_state[self.cur_modifier] = 0
+                        self.msg[0] = self.cur_modifier
                         self.sock.send(self.msg)
                     else:
-                        self.modifiers_state[modifier] = 0
-                        self.msg[0] = modifier
+                        self.modifiers_state[self.cur_modifier] = 0
+                        self.msg[0] = self.cur_modifier
                         self.sock.send(self.msg)
 
-                elif state == 2:
+                elif self.cur_modifier_state == 2:
                     if button == self.Caps:
-                        self.modifiers_state[modifier] = 0
-                        self.msg[0] = modifier
+                        self.modifiers_state[self.cur_modifier] = 0
+                        self.msg[0] = self.cur_modifier
                         self.sock.send(self.msg)
                 else:
-                    ValueError(f'incorrect state: {state}')
+                    ValueError(f'incorrect state: {self.cur_modifier_state}')
                 return
 
         self.msg[0] = button + 128
@@ -177,11 +178,11 @@ class Controller:
 
     def send_released(self, button):
         if button == self.Caps:
-            modifier = self.Shift
+            self.cur_modifier = self.Shift
         else:
-            modifier = button
+            self.cur_modifier = button
 
-        if modifier in self.modifiers:
+        if self.cur_modifier in self.modifiers:
             return
 
         if self.pressed[button] == 1:
@@ -195,7 +196,7 @@ class Controller:
                     self.msg[0] = modifier
                     self.sock.send(self.msg)
 
-        # gc.collect()
+            # gc.collect()
 
     def init_modifiers(self):
         self.modifiers_state = {
@@ -204,6 +205,8 @@ class Controller:
             Alt: 0,
         }
         self.modifiers = tuple(self.modifiers_state.keys())
+        self.cur_modifier = 0
+        self.cur_modifier_state = 0
 
     def release_modifiers(self):
         for modifier in self.modifiers:
