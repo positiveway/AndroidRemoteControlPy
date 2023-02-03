@@ -35,7 +35,7 @@ right_first
 || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
 || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
 ||========================||========================||========================||
-}
+
 
 RU
 left_first
