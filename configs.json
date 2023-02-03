@@ -4,8 +4,8 @@
     "double_click_delay": 0.25,
     "hold": {
       "normal": {
-        "dist": 20,
-        "time": 0.5
+        "dist": 15,
+        "time": 0.6
       },
       "during_scroll": {
         "dist": 20,
