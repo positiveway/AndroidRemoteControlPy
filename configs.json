@@ -4,7 +4,7 @@
     "hold": {
       "normal": {
         "dist": 20,
-        "time": 0.25
+        "time": 0.5
       },
       "during_scroll": {
         "dist": 20,

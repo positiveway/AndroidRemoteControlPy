@@ -4,7 +4,7 @@ from threading import Timer
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 
-from backend import Controller
+from controller import Controller
 
 
 def divide_with_reminder(a, b: int):
@@ -31,10 +31,11 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
+        # if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
+        if self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set or \
                     hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
-                self.controller.send_pressed(self.controller.LeftMouse)
+                self.toggle_scroll()
 
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
@@ -44,10 +45,10 @@ class TouchpadWidget(Widget):
             if touch_event.is_double_tap:
                 self.double_tap_func()
             else:
-                if self.controller.is_mouse_mode:
-                    self.init_x = self.prev_x
-                    self.init_y = self.prev_y
-                    self.start_timer()
+                # if self.controller.is_mouse_mode:
+                self.init_x = self.prev_x
+                self.init_y = self.prev_y
+                self.start_timer()
 
             self.clear_typed_text()
             return True
@@ -150,6 +151,9 @@ class TouchpadWidget(Widget):
     def right_click(self):
         self.controller.send_type(self.controller.RightMouse)
 
+    def left_press(self):
+        self.controller.send_pressed(self.controller.LeftMouse)
+
     def toggle_scroll(self):
         self.controller.is_mouse_mode = not self.controller.is_mouse_mode
 
@@ -168,7 +172,7 @@ class TouchpadWidget(Widget):
         if self.controller.is_game_mode:
             self.double_tap_func = self.right_click
         else:
-            self.double_tap_func = self.toggle_scroll
+            self.double_tap_func = self.left_press
 
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad

@@ -1,8 +1,9 @@
 import gc
 import socket
+from time import sleep
 
 from code_map import *
-from typing_layout import load_layout, generate_hints, load_configs
+from typing_layout import DIRECTIONS
 
 
 def resole_angle(angle):
@@ -50,30 +51,50 @@ class Controller:
         self.hold_dist = self.hold_cfg[profile]["dist"]
         self.hold_time = self.hold_cfg[profile]["time"]
 
-    def get_detailed_hints(self, direction):
-        return self.detailed_hints[self.lang][direction]
+    def get_detailed_hints(self):
+        direction = self.typing_btn_1
 
-    def get_preview_hints(self):
-        return self.preview_hints[self.lang]
+        if self.is_left:
+            hints = self.left_detailed_hints
+        else:
+            hints = self.right_detailed_hints
+
+        return hints[self.lang][direction]
+
+    def get_preview_hints(self, is_left):
+        if is_left:
+            hints = self.left_preview_hints
+        else:
+            hints = self.right_preview_hints
+
+        return hints[self.lang]
 
     def detect_letter(self):
-        try:
-            letter = self.layout[self.lang][self.typing_btn_1][self.typing_btn_2]
-        except KeyError as error:
-            print(
-                f'no letter for this position: ({self.typing_btn_1}, {self.typing_btn_2}) or lang: {self.lang}, error key: {error}')
+        if self.is_left:
+            layout = self.left_first_layout
+        else:
+            layout = self.right_first_layout
+
+        letter = layout[self.lang][self.typing_btn_1][self.typing_btn_2]
+        if letter == '':
+            print(f'no letter for this position: ({self.typing_btn_1}, {self.typing_btn_2}) or lang: {self.lang}')
             return None
 
         return letter
 
-    def update_typing_state(self, btn_direction):
+    def update_typing_state(self, btn_direction, is_left):
         if self.typing_btn_1 is None:
             self.typing_btn_1 = btn_direction
+            self.is_left = is_left
             return None
         else:
-            if btn_direction == self.CentralDir:
-                self.reset_typing()
-                return None
+            if self.is_left == is_left:
+                if btn_direction == self.CentralDir:
+                    self.reset_typing()
+                    return self.Switch_code
+                else:
+                    self.reset_typing()
+                    return None
             else:
                 self.typing_btn_2 = btn_direction
                 letter = self.detect_letter()
@@ -83,6 +104,14 @@ class Controller:
     def reset_typing(self):
         self.typing_btn_1 = None
         self.typing_btn_2 = None
+        self.is_left = None
+
+    def mouse_mode_btn_pressed(self, btn_direction):
+        command = self.mouse_mode_layout[btn_direction]
+        if command == '':
+            command = None
+
+        return command
 
     def init_pressed(self):
         self.pressed = {}
@@ -112,7 +141,7 @@ class Controller:
         self.release_modifiers()
 
         for button in self.pressed.keys():
-            if not isinstance(button, (tuple, list)):
+            if not isinstance(button, (tuple, list)) and button > 0:
                 self.msg[0] = button
                 self.sock.send(self.msg)
                 self.pressed[button] = 0
@@ -214,10 +243,23 @@ class Controller:
             self.sock.send(self.msg)
             self.modifiers_state[modifier] = 0
 
-    def __init__(self):
-        self.CentralDir = 5
+    def double_click(self):
+        self.send_type(self.LeftMouse)
+        sleep(0.25)
+        self.send_type(self.LeftMouse)
 
-        self.layout = load_layout()
+    def __init__(self):
+        from typing_layout import load_layout, generate_hints, generate_mouse_hints, load_configs
+
+        self.CentralDir = 5 - 1
+
+        self.mouse_mode_layout, self.left_first_layout, self.right_first_layout = load_layout()
+
+        self.left_detailed_hints, self.left_preview_hints = generate_hints(self.left_first_layout)
+        self.right_detailed_hints, self.right_preview_hints = generate_hints(self.right_first_layout)
+        self.empty_hints = tuple(['' for _ in DIRECTIONS])
+        self.mouse_hints = generate_mouse_hints(self.mouse_mode_layout)
+
         configs = load_configs()
 
         self.msg = bytearray(1)
@@ -235,15 +277,12 @@ class Controller:
         self.Alt = Alt
         self.Shift = Shift
         self.Caps = Caps
-        self.Enter = Enter
-        self.Backspace = Backspace
+        self.Switch_code = Switch_code
         self.Esc = Esc
 
         self.init_modifiers()
         self.init_pressed()
         self.reset_typing()
-
-        self.detailed_hints, self.preview_hints = generate_hints(self.layout)
 
         self.scroll_cfg = configs['scroll']
         self.scroll_speed_profile = 0

@@ -1,6 +1,8 @@
 code_map = {
     "Clear": -1,
     "Switch": -2,
+    "EmptyW": -3,
+    "X2": -4,
     "Esc": 1,
     "1": 2,
     "2": 3,
@@ -78,8 +80,10 @@ Shift = code_map['Shift']
 Caps = code_map['Caps']
 Enter = code_map['Enter']
 Esc = code_map['Esc']
+Switch_code = code_map['Switch']
 Backspace = code_map['BS']
 Space = code_map['Space']
+EmptyW_code = code_map['EmptyW']
 
 LeftMouse = code_map['LeftM']
 RightMouse = code_map['RightM']

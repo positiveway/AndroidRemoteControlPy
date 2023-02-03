@@ -1,10 +1,9 @@
 import gc
-import time
 
 from kivy.app import App
 
-from backend import Controller
-from code_map import *
+from controller import Controller
+from normal_layout import *
 from touchpad import TouchpadWidget
 
 ENABLE_VIBRATE = False
@@ -33,13 +32,12 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def release_all(self, button):
+        self.set_typing_mode(False)
         self.controller.release_all()
         gc.collect()
 
     def double_click(self, button):
-        self.controller.send_type([self.LeftMouse])
-        time.sleep(0.25)
-        self.controller.send_type([self.LeftMouse])
+        self.controller.double_click()
 
     def build(self):
         self.touchpad = TouchpadWidget()
@@ -52,6 +50,9 @@ class APISenderApp(App):
         self.Backspace = Backspace
         self.LeftMouse = LeftMouse
         self.ClearBtnCode = code_map['Clear']
+        self.Switch_code = Switch_code
+        self.EmptyW_code = EmptyW_code
+
         self.reverse_code_map = reverse_code_map
 
         self.font_size = self.controller.font_size
@@ -74,8 +75,8 @@ class APISenderApp(App):
                 'Enter': '\n',
                 'Del': '',
             }
-            self.clear_typed_text()
-            self.update_label()
+
+            self.set_typing_mode(False)
 
         gc.disable()
         gc.collect()
@@ -84,8 +85,19 @@ class APISenderApp(App):
         self.typed_text = ""
         self.label.text = self.typed_text
 
+    def set_typing_mode(self, state):
+        self.typing_mode = state
+        self.touchpad_or_btn_layout.toggle()
+
+        self.clear_selection()
+        self.clear_typed_text()
+        self.update_hints()
+
+    def toggle_typing_mode(self):
+        self.set_typing_mode(not self.typing_mode)
+
     def update_typed_text(self, letter):
-        if letter == Backspace:
+        if letter == self.Backspace:
             if self.typed_text:
                 self.typed_text = self.typed_text[:-1]
         else:
@@ -100,52 +112,66 @@ class APISenderApp(App):
 
     def clear_as_button(self, button):
         self.clear_selection()
-        self.update_label()
+        self.update_hints()
 
-    def get_typing_btn_func(self, btn_direction):
-        def typing_btn_pressed(button):
-            letter = self.controller.update_typing_state(btn_direction)
-            if letter is not None:
-                if letter == self.ClearBtnCode:
-                    self.clear_selection()
+    def typing_btn_pressed(self, btn: TypingButton):
+        if self.typing_mode:
+            letter = self.controller.update_typing_state(btn.direction, btn.is_left)
+        else:
+            letter = self.controller.mouse_mode_btn_pressed(btn.direction)
+
+        if letter is not None:
+            if letter == self.EmptyW_code:
+                return
+            elif letter == self.ClearBtnCode:
+                self.clear_selection()
+            elif letter == self.Switch_code:
+                self.toggle_typing_mode()
+            elif letter == code_map['X2']:
+                self.controller.double_click()
+            else:
+                self.controller.send_type(letter)
+                self.update_typed_text(letter)
+
+                #     if is_vibro_enabled():
+                #         vibrator.vibrate(0.5)
+
+        self.update_hints()
+
+    def update_button_hints(self, prefix, hints, font_size):
+        for num in DIRECTIONS:
+            button = getattr(self, f'{prefix}_typing_btn_{num}')
+            setattr(button, 'font_size', font_size)
+            setattr(button, 'text', hints[button.direction])
+
+    def clear_buttons(self):
+        self.update_button_hints('l', self.controller.empty_hints, self.font_size)
+        self.update_button_hints('r', self.controller.empty_hints, self.font_size)
+
+    def update_hints(self):
+        self.clear_buttons()
+
+        if self.typing_mode:
+            if self.controller.typing_btn_1 is None:
+                font_size = self.small_font_size
+
+                hints = self.controller.get_preview_hints(is_left=True)
+                self.update_button_hints('l', hints, font_size)
+
+                hints = self.controller.get_preview_hints(is_left=False)
+                self.update_button_hints('r', hints, font_size)
+            else:
+                font_size = self.font_size
+                hints = self.controller.get_detailed_hints()
+
+                if self.controller.is_left:
+                    self.update_button_hints('r', hints, font_size)
                 else:
-                    self.controller.send_type(letter)
-                    self.update_typed_text(letter)
-
-                    #     if is_vibro_enabled():
-                    #         vibrator.vibrate(0.5)
-
-            self.update_label()
-
-        return typing_btn_pressed
-
-    def update_label(self):
-        if self.controller.typing_btn_1 is None:
-            font_size = self.small_font_size
-            hints = self.controller.get_preview_hints()
+                    self.update_button_hints('l', hints, font_size)
         else:
             font_size = self.font_size
-            hints = self.controller.get_detailed_hints(self.controller.typing_btn_1)
-
-        self.typing_btn_1.font_size = font_size
-        self.typing_btn_2.font_size = font_size
-        self.typing_btn_3.font_size = font_size
-        self.typing_btn_4.font_size = font_size
-        self.typing_btn_5.font_size = font_size
-        self.typing_btn_6.font_size = font_size
-        self.typing_btn_7.font_size = font_size
-        self.typing_btn_8.font_size = font_size
-        self.typing_btn_9.font_size = font_size
-
-        self.typing_btn_1.text = hints[1]
-        self.typing_btn_2.text = hints[2]
-        self.typing_btn_3.text = hints[3]
-        self.typing_btn_4.text = hints[4]
-        self.typing_btn_5.text = hints[5]
-        self.typing_btn_6.text = hints[6]
-        self.typing_btn_7.text = hints[7]
-        self.typing_btn_8.text = hints[8]
-        self.typing_btn_9.text = hints[9]
+            hints = self.controller.mouse_hints
+            self.update_button_hints('l', hints, font_size)
 
     def on_stop(self):
         self.controller.release_mouse_and_pressed()

@@ -23,17 +23,17 @@ left_first
 
 right_first
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| A       B       C      || J       K       L      || S       T       U      ||
+|| D       E       F      || M       N       O      || V       W       X      ||
+|| G       H       I      || P       Q       R      || Y       Z       0      ||
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| 1       2       3      || Copy    Cut     Paste  || Caps    Shift   Select ||
+|| 4       5       6      || Enter   Switch  Space  || Undo    Redo    Esc    ||
+|| 7       8       9      || EmptyW  RightM  MidM   || Del     BS      Tab    ||
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| EmptyW  EmptyW  EmptyW || Alt     `       \      || EmptyW  EmptyW  Win    ||
+|| EmptyW  EmptyW  EmptyW || Ctrl    =       /      || EmptyW  ;       '      ||
+|| EmptyW  EmptyW  EmptyW || -       [       ]      || EmptyW  .       ,      ||
 ||========================||========================||========================||
 
 

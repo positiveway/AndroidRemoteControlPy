@@ -1,6 +1,9 @@
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from code_map import *
 from common_layout import UniversalButton, Layout, make_common_buttons
+from typing_layout import DIRECTIONS
 
 
 def make_buttons(app):
@@ -121,7 +124,7 @@ def fill_layout(app):
     clear_layout.fill()
 
     typing_layout = Layout(cols=2, rows=2, inverted=True)
-    typing_layout.add(1, 1, app.typing_buttons)
+    typing_layout.add(1, 1, app.l_typing_buttons)
     typing_layout.add(1, 2, arrows_compact_layout)
     typing_layout.add(2, 1, clear_layout)
     typing_layout.fill()
@@ -134,8 +137,10 @@ def fill_layout(app):
     touchpad_layout.add(2, 2, app.double_click_btn)
     touchpad_layout.fill()
 
+    app.touchpad_or_btn_layout = LayeredLayout(app)
+
     right_side = Layout(cols=1, rows=2, inverted=True)
-    right_side.add(1, 1, app.touchpad)
+    right_side.add(1, 1, app.touchpad_or_btn_layout)
     right_side.add(2, 1, touchpad_layout)
     right_side.fill()
 
@@ -144,7 +149,45 @@ def fill_layout(app):
     app.root.fill()
 
 
+class LayeredLayout(GridLayout):
+    def __init__(self, app):
+        self.app = app
+        super().__init__(cols=1, rows=1)
+
+    def toggle(self):
+        self.clear_widgets()
+
+        if self.app.typing_mode:
+            self.app.touchpad.disabled = True
+            self.app.r_typing_buttons.disabled = False
+            self.add_widget(self.app.r_typing_buttons)
+        else:
+            self.app.touchpad.disabled = False
+            self.app.r_typing_buttons.disabled = True
+            self.add_widget(self.app.touchpad)
+
+
+class TypingButton(Button):
+    def __init__(self, btn_direction, is_left, app):
+        self.direction = btn_direction
+        self.is_left = is_left
+        super().__init__(on_press=app.typing_btn_pressed)
+
+
+def make_typing_buttons(app):
+    app.l_typing_buttons = GridLayout(cols=3, rows=3)
+    app.r_typing_buttons = GridLayout(cols=3, rows=3)
+
+    for num in DIRECTIONS:
+        setattr(app, f'l_typing_btn_{num}', TypingButton(num, True, app))
+        app.l_typing_buttons.add_widget(getattr(app, f'l_typing_btn_{num}'))
+
+        setattr(app, f'r_typing_btn_{num}', TypingButton(num, False, app))
+        app.r_typing_buttons.add_widget(getattr(app, f'r_typing_btn_{num}'))
+
+
 def build_layout(app):
     make_common_buttons(app)
     make_buttons(app)
+    make_typing_buttons(app)
     fill_layout(app)
