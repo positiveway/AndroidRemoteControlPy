@@ -149,29 +149,26 @@ class Controller:
 
     def release_mouse(self):
         for button in self.mouse_buttons:
-            self.msg[0] = button
-            self.sock.send(self.msg)
-            self.btn_states.release(button)
+            self.force_release(button)
 
     def release_all_pressed(self):
         for button in self.btn_states.all_pressed():
-            self.msg[0] = button
-            self.sock.send(self.msg)
-            self.btn_states.release(button)
+            self.force_release(button)
 
     def release_mouse_and_pressed(self):
         self.release_mouse()
-        self.release_modifiers()
+        self.force_release_modifiers()
         self.release_all_pressed()
 
     def release_all(self):
         self.release_mouse()
-        self.release_modifiers()
+        self.force_release_modifiers()
 
         for button in self.btn_states.all():
-            self.msg[0] = button
-            self.sock.send(self.msg)
-            self.btn_states.release(button)
+            self.force_release(button)
+
+        self.reset_typing()
+        gc.collect()
 
     def send_type(self, seq):
         if not is_iterable(seq):
@@ -202,35 +199,25 @@ class Controller:
 
                 if self.cur_modifier_state == 0:
                     if button == self.Caps:
-                        self.modifiers_state[self.cur_modifier] = 2
+                        self.press_modifier(2)
                     else:
-                        self.modifiers_state[self.cur_modifier] = 1
-
-                    self.msg[0] = self.cur_modifier + 128
-                    self.sock.send(self.msg)
+                        self.press_modifier(1)
 
                 elif self.cur_modifier_state == 1:
                     if button == self.Caps:
-                        self.modifiers_state[self.cur_modifier] = 0
-                        self.msg[0] = self.cur_modifier
-                        self.sock.send(self.msg)
+                        self.release_modifier()
                     else:
-                        self.modifiers_state[self.cur_modifier] = 0
-                        self.msg[0] = self.cur_modifier
-                        self.sock.send(self.msg)
+                        self.release_modifier()
 
                 elif self.cur_modifier_state == 2:
                     if button == self.Caps:
-                        self.modifiers_state[self.cur_modifier] = 0
-                        self.msg[0] = self.cur_modifier
-                        self.sock.send(self.msg)
+                        self.release_modifier()
                 else:
                     ValueError(f'incorrect state: {self.cur_modifier_state}')
                 return
 
         if self.btn_states.press(button):
-            self.msg[0] = button + 128
-            self.sock.send(self.msg)
+            self._send_pressed(button)
 
     def send_released(self, button):
         if button == self.Caps:
@@ -242,16 +229,9 @@ class Controller:
             return
 
         if self.btn_states.release(button):
-            self.msg[0] = button
-            self.sock.send(self.msg)
-
-            for modifier, state in self.modifiers_state.items():
-                if state == 1:
-                    self.modifiers_state[modifier] = 0
-                    self.msg[0] = modifier
-                    self.sock.send(self.msg)
-
-            # gc.collect()
+            self._send_released(button)
+            self.release_all_modifiers()
+            gc.collect()
 
     def init_modifiers(self):
         self.modifiers_state = {
@@ -263,15 +243,40 @@ class Controller:
         self.cur_modifier = 0
         self.cur_modifier_state = 0
 
-    def release_modifiers(self):
+    def release_all_modifiers(self):
+        for modifier, state in self.modifiers_state.items():
+            if state == 1:
+                self._send_released(modifier)
+                self.modifiers_state[modifier] = 0
+
+    def force_release_modifiers(self):
         for modifier in self.modifiers:
-            self.msg[0] = modifier
-            self.sock.send(self.msg)
+            self._send_released(modifier)
             self.modifiers_state[modifier] = 0
+
+    def press_modifier(self, state):
+        self._send_pressed(self.cur_modifier)
+        self.modifiers_state[self.cur_modifier] = state
+
+    def release_modifier(self):
+        self._send_released(self.cur_modifier)
+        self.modifiers_state[self.cur_modifier] = 0
+
+    def _send_pressed(self, button):
+        self.msg[0] = button + 128
+        self.sock.send(self.msg)
+
+    def _send_released(self, button):
+        self.msg[0] = button
+        self.sock.send(self.msg)
+
+    def force_release(self, button):
+        self._send_released(button)
+        self.btn_states.release(button)
 
     def double_click(self):
         self.send_type(self.LeftMouse)
-        sleep(0.25)
+        sleep(self.double_click_delay)
         self.send_type(self.LeftMouse)
 
     def __init__(self):
@@ -315,6 +320,7 @@ class Controller:
         self.set_scroll_profile()
 
         touchpad_cfg = configs['touchpad']
+        self.double_click_delay = touchpad_cfg['double_click_delay']
         self.hold_cfg = touchpad_cfg['hold']
         self.set_hold_profile(0)
         self.visuals_for_touchpad = touchpad_cfg['visuals']

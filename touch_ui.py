@@ -32,9 +32,8 @@ class APISenderApp(App):
         self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
 
     def release_all(self, button):
-        self.set_typing_mode(False)
         self.controller.release_all()
-        gc.collect()
+        self.set_typing_mode(False)
 
     def double_click(self, button):
         self.controller.double_click()

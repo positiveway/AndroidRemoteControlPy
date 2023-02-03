@@ -1,6 +1,7 @@
 {
   "is_game_mode": false,
   "touchpad": {
+    "double_click_delay": 0.25,
     "hold": {
       "normal": {
         "dist": 20,
