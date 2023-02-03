@@ -18,10 +18,6 @@ def make_common_buttons(app):
         "Release", app,
         func=app.release_all
     )
-    app.clear_btn = UniversalButton(
-        "Bs", app,
-        func=app.clear
-    )
 
     make_typing_buttons(app)
 

@@ -51,6 +51,7 @@ class APISenderApp(App):
 
         self.Backspace = Backspace
         self.LeftMouse = LeftMouse
+        self.ClearBtnCode = code_map['Clear']
         self.reverse_code_map = reverse_code_map
 
         self.font_size = self.controller.font_size
@@ -94,23 +95,21 @@ class APISenderApp(App):
 
         self.label.text = self.typed_text
 
-    def clear(self, button):
-        if self.controller.typing_btn_1 is not None:
-            self.controller.reset_typing()
-            self.update_label()
-        else:
-            self.controller.send_type(self.Backspace)
-            self.update_typed_text(self.Backspace)
+    def clear_selection(self):
+        self.controller.reset_typing()
 
     def get_typing_btn_func(self, btn_direction):
         def typing_btn_pressed(button):
             letter = self.controller.update_typing_state(btn_direction)
             if letter is not None:
-                self.controller.send_type(letter)
-                self.update_typed_text(letter)
+                if letter == self.ClearBtnCode:
+                    self.clear_selection()
+                else:
+                    self.controller.send_type(letter)
+                    self.update_typed_text(letter)
 
-                #     if is_vibro_enabled():
-                #         vibrator.vibrate(0.5)
+                    #     if is_vibro_enabled():
+                    #         vibrator.vibrate(0.5)
 
             self.update_label()
 

@@ -1,4 +1,6 @@
 code_map = {
+    "Clear": -1,
+    "Switch": -2,
     "Esc": 1,
     "1": 2,
     "2": 3,
