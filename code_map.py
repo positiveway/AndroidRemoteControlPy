@@ -12,7 +12,7 @@ code_map = {
     "0": 11,
     "-": 12,
     "=": 13,
-    "Bs": 14,
+    "BS": 14,
     "Tab": 15,
     "Q": 16,
     "W": 17,
@@ -55,17 +55,17 @@ code_map = {
     "Alt": 56,
     "Space": 57,
     "Caps": 58,
-    "LeftMouse": 90,
-    "RightMouse": 91,
-    "MiddleMouse": 92,
+    "LeftM": 90,
+    "RightM": 91,
+    "MidM": 92,
     "Up": 103,
     "Left": 105,
     "Right": 106,
     "Down": 108,
     "Del": 111,
     "Mute": 113,
-    "VolumeDown": 114,
-    "VolumeUp": 115,
+    "VolDown": 114,
+    "VolUp": 115,
     "Scale": 120,
     "Win": 125,
 }
@@ -76,12 +76,12 @@ Shift = code_map['Shift']
 Caps = code_map['Caps']
 Enter = code_map['Enter']
 Esc = code_map['Esc']
-Backspace = code_map['Bs']
+Backspace = code_map['BS']
 Space = code_map['Space']
 
-LeftMouse = code_map['LeftMouse']
-RightMouse = code_map['RightMouse']
-MiddleMouse = code_map['MiddleMouse']
+LeftMouse = code_map['LeftM']
+RightMouse = code_map['RightM']
+MiddleMouse = code_map['MidM']
 
 
 def append_commands():

@@ -49,6 +49,44 @@ def make_typing_buttons(app):
     app.typing_buttons.fill()
 
 
+# class ButtonParams:
+#     def __init__(self, text='', func=None, buttons=None, button_codes=None) -> None:
+#         if func is None and buttons is None and button_codes is None:
+#             raise ValueError('At least one should be provided')
+#
+#         self.text = text
+#
+#         if func is not None:
+#             self.func = func
+#             self.button_codes = None
+#             return
+#
+#         if buttons is not None:
+#             if not isinstance(buttons, (tuple, list)):
+#                 buttons = tuple([buttons])
+#
+#             button_codes = [code_map[button] for button in buttons]
+#
+#         else:
+#             if not isinstance(button_codes, (tuple, list)):
+#                 button_codes = tuple([button_codes])
+#
+#         self.button_codes = button_codes
+#         self.reverse_codes = tuple(reversed(button_codes))
+#         self.func = None
+#
+#
+# class TypingButton(Button):
+#     def __init__(self, app, mouse_mode_params, typing_mode_params):
+#         def on_press(button):
+#             if app.controller.is_mouse_mode:
+#
+#         super().__init__(
+#             text=mouse_mode_params.text, font_size=app.font_size,
+#             on_press=on_press,
+#         )
+#
+
 class UniversalButton(Button):
     def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=False):
         if func is not None:
