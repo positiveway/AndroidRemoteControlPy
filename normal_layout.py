@@ -100,7 +100,7 @@ def fill_layout(app):
     # app.label.size_hint_x = 0.25
     # app.label.size_hint_y = 0.9
 
-    release_all_layout = Layout(cols=2, rows=2)
+    release_all_layout = Layout(cols=2, rows=2, inverted=True)
     release_all_layout.add(2, 1, app.release_all_btn)
     release_all_layout.fill()
 
@@ -113,12 +113,17 @@ def fill_layout(app):
 
     arrows_compact_layout = Layout(rows=2, cols=1, inverted=True)
     arrows_compact_layout.add(1, 1, arrows_layout)
+    arrows_compact_layout.add(2, 1, app.label)
     arrows_compact_layout.fill()
+
+    clear_layout = Layout(rows=2, cols=1, inverted=True)
+    clear_layout.add(1, 1, app.clear_btn)
+    clear_layout.fill()
 
     typing_layout = Layout(cols=2, rows=2, inverted=True)
     typing_layout.add(1, 1, app.typing_buttons)
     typing_layout.add(1, 2, arrows_compact_layout)
-    typing_layout.add(2, 1, app.label)
+    typing_layout.add(2, 1, clear_layout)
     typing_layout.fill()
 
     touchpad_layout = Layout(cols=2, rows=2, inverted=True)

@@ -98,6 +98,10 @@ class APISenderApp(App):
     def clear_selection(self):
         self.controller.reset_typing()
 
+    def clear_as_button(self, button):
+        self.clear_selection()
+        self.update_label()
+
     def get_typing_btn_func(self, btn_direction):
         def typing_btn_pressed(button):
             letter = self.controller.update_typing_state(btn_direction)
