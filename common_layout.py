@@ -139,13 +139,19 @@ class UniversalButton(Button):
 
 
 class Layout(GridLayout):
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, inverted=False):
         self.grid = [[None for i in range(cols)] for j in range(rows)]
+        self.inverted = inverted
         super().__init__(rows=rows, cols=cols)
 
     def add(self, row, col, widget):
-        row -= 1
         col -= 1
+
+        if self.inverted:
+            row = self.rows - row
+        else:
+            row -= 1
+
         if self.grid[row][col] is not None:
             raise ValueError("Duplicate position")
 

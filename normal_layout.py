@@ -111,17 +111,17 @@ def fill_layout(app):
     arrows_layout.add(2, 3, app.right_btn)
     arrows_layout.fill()
 
-    arrows_compact_layout = Layout(rows=2, cols=1)
+    arrows_compact_layout = Layout(rows=2, cols=1, inverted=True)
     arrows_compact_layout.add(1, 1, arrows_layout)
     arrows_compact_layout.fill()
 
-    typing_layout = Layout(cols=2, rows=2)
+    typing_layout = Layout(cols=2, rows=2, inverted=True)
     typing_layout.add(1, 1, app.typing_buttons)
-    typing_layout.add(2, 1, arrows_compact_layout)
-    typing_layout.add(2, 2, app.label)
+    typing_layout.add(1, 2, arrows_compact_layout)
+    typing_layout.add(2, 1, app.label)
     typing_layout.fill()
 
-    touchpad_layout = Layout(cols=2, rows=2)
+    touchpad_layout = Layout(cols=2, rows=2, inverted=True)
     touchpad_layout.add(1, 1, app.middle_click)
     touchpad_layout.add(1, 2, app.right_click)
 
@@ -129,7 +129,7 @@ def fill_layout(app):
     touchpad_layout.add(2, 2, app.double_click_btn)
     touchpad_layout.fill()
 
-    right_side = Layout(cols=1, rows=2)
+    right_side = Layout(cols=1, rows=2, inverted=True)
     right_side.add(1, 1, app.touchpad)
     right_side.add(2, 1, touchpad_layout)
     right_side.fill()
