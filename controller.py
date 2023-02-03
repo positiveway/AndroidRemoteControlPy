@@ -3,11 +3,45 @@ import socket
 from time import sleep
 
 from code_map import *
+from common import *
 from typing_layout import DIRECTIONS
 
 
 def resole_angle(angle):
     return (angle + 360) % 360
+
+
+class BtnState(LockedMap):
+    def __init__(self) -> None:
+        super().__init__()
+
+        for button in code_map.values():
+            if not is_iterable(button):
+                self.put(button, 0)
+
+        self.lock()
+
+    def press(self, button):
+        state = self.map[button]
+        if state != 1:
+            self.put(button, 1)
+            return True
+        else:
+            return False
+
+    def release(self, button):
+        state = self.map[button]
+        if state != 0:
+            self.put(button, 0)
+            return True
+        else:
+            return False
+
+    def is_pressed(self, button):
+        return self.map[button]
+
+    def all_pressed(self):
+        return [button for button, value in self.map.items() if value != 0]
 
 
 class Controller:
@@ -113,23 +147,17 @@ class Controller:
 
         return command
 
-    def init_pressed(self):
-        self.pressed = {}
-        for button in code_map.values():
-            self.pressed[button] = 0
-
     def release_mouse(self):
         for button in self.mouse_buttons:
             self.msg[0] = button
             self.sock.send(self.msg)
-            self.pressed[button] = 0
+            self.btn_states.release(button)
 
     def release_all_pressed(self):
-        for button in self.pressed.keys():
-            if self.pressed[button] > 0:
-                self.msg[0] = button
-                self.sock.send(self.msg)
-                self.pressed[button] = 0
+        for button in self.btn_states.all_pressed():
+            self.msg[0] = button
+            self.sock.send(self.msg)
+            self.btn_states.release(button)
 
     def release_mouse_and_pressed(self):
         self.release_mouse()
@@ -140,21 +168,20 @@ class Controller:
         self.release_mouse()
         self.release_modifiers()
 
-        for button in self.pressed.keys():
-            if not isinstance(button, (tuple, list)) and button > 0:
-                self.msg[0] = button
-                self.sock.send(self.msg)
-                self.pressed[button] = 0
+        for button in self.btn_states.all():
+            self.msg[0] = button
+            self.sock.send(self.msg)
+            self.btn_states.release(button)
 
     def send_type(self, seq):
-        if not isinstance(seq, (tuple, list)):
+        if not is_iterable(seq):
             self.send_pressed(seq)
             self.send_released(seq)
         else:
             for button in seq:
                 self.send_pressed(button)
 
-            for button in reversed(seq):
+            for button in reverse(seq):
                 self.send_released(button)
 
     def send_pressed(self, button):
@@ -201,9 +228,9 @@ class Controller:
                     ValueError(f'incorrect state: {self.cur_modifier_state}')
                 return
 
-        self.msg[0] = button + 128
-        self.sock.send(self.msg)
-        self.pressed[button] = 1
+        if self.btn_states.press(button):
+            self.msg[0] = button + 128
+            self.sock.send(self.msg)
 
     def send_released(self, button):
         if button == self.Caps:
@@ -214,10 +241,9 @@ class Controller:
         if self.cur_modifier in self.modifiers:
             return
 
-        if self.pressed[button] == 1:
+        if self.btn_states.release(button):
             self.msg[0] = button
             self.sock.send(self.msg)
-            self.pressed[button] = 0
 
             for modifier, state in self.modifiers_state.items():
                 if state == 1:
@@ -281,7 +307,7 @@ class Controller:
         self.Esc = Esc
 
         self.init_modifiers()
-        self.init_pressed()
+        self.btn_states = BtnState()
         self.reset_typing()
 
         self.scroll_cfg = configs['scroll']

@@ -95,7 +95,7 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = Layout(cols=2, rows=1)
+    app.root = Layout(cols=2)
     # app.root = BoxLayout()
     # app.root.padding = 110
 
@@ -114,12 +114,12 @@ def fill_layout(app):
     arrows_layout.add(2, 3, app.right_btn)
     arrows_layout.fill()
 
-    arrows_compact_layout = Layout(rows=2, cols=1, inverted=True)
+    arrows_compact_layout = Layout(rows=2, inverted=True)
     arrows_compact_layout.add(1, 1, arrows_layout)
     arrows_compact_layout.add(2, 1, app.label)
     arrows_compact_layout.fill()
 
-    clear_layout = Layout(rows=2, cols=1, inverted=True)
+    clear_layout = Layout(rows=2, inverted=True)
     clear_layout.add(1, 1, app.clear_btn)
     clear_layout.fill()
 
@@ -139,7 +139,11 @@ def fill_layout(app):
 
     app.touchpad_or_btn_layout = LayeredLayout(app)
 
-    right_side = Layout(cols=1, rows=2, inverted=True)
+    app.r_buttons_layout = Layout(cols=2)
+    app.r_buttons_layout.add(1, 2, app.r_typing_buttons)
+    app.r_buttons_layout.fill()
+
+    right_side = Layout(rows=2, inverted=True)
     right_side.add(1, 1, app.touchpad_or_btn_layout)
     right_side.add(2, 1, touchpad_layout)
     right_side.fill()
@@ -160,7 +164,7 @@ class LayeredLayout(GridLayout):
         if self.app.typing_mode:
             self.app.touchpad.disabled = True
             self.app.r_typing_buttons.disabled = False
-            self.add_widget(self.app.r_typing_buttons)
+            self.add_widget(self.app.r_buttons_layout)
         else:
             self.app.touchpad.disabled = False
             self.app.r_typing_buttons.disabled = True

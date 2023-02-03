@@ -53,7 +53,7 @@ class TouchpadWidget(Widget):
             self.clear_typed_text()
             return True
         else:
-            return super(TouchpadWidget, self).on_touch_down(touch_event)
+            return super().on_touch_down(touch_event)
 
     def update_coord_get_scroll_dir(self, cur, prev):
         scroll_every_n_pixels = self.controller.scroll_every_n_pixels
@@ -118,7 +118,7 @@ class TouchpadWidget(Widget):
             return True
         else:
             self.reset()
-            return super(TouchpadWidget, self).on_touch_move(touch_event)
+            return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
         if self.prev_x != self.value_not_set:  # originated within this element
@@ -129,7 +129,7 @@ class TouchpadWidget(Widget):
             self.clear_canvas()
             return True
         else:
-            return super(TouchpadWidget, self).on_touch_up(touch_event)
+            return super().on_touch_up(touch_event)
 
     def reset(self):
         self.timer.cancel()

@@ -39,7 +39,7 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = Layout(cols=2, rows=1)
+    app.root = Layout(cols=2)
 
     wasd_layout = Layout(cols=3, rows=2)
     wasd_layout.add(1, 1, app.wa_btn)
@@ -54,7 +54,7 @@ def fill_layout(app):
     esc_layout.add(1, 2, app.esc_btn)
     esc_layout.fill()
 
-    shift_layout = Layout(cols=1, rows=2)
+    shift_layout = Layout(rows=2)
     shift_layout.add(1, 1, app.shift_btn)
     shift_layout.fill()
 
@@ -73,12 +73,12 @@ def fill_layout(app):
     lower_left_side.add(3, 3, release_all_layout)
     lower_left_side.fill()
 
-    left_side = Layout(cols=1, rows=2)
+    left_side = Layout(rows=2)
     left_side.add(1, 1, upper_left_side)
     left_side.add(2, 1, lower_left_side)
     left_side.fill()
 
-    right_side = Layout(cols=1, rows=2)
+    right_side = Layout(rows=2)
     right_side.add(1, 1, app.touchpad)
     right_side.fill()
 

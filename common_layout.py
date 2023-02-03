@@ -3,6 +3,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 
 from code_map import *
+from common import *
 
 
 def make_common_buttons(app):
@@ -36,16 +37,16 @@ class UniversalButton(Button):
         if buttons is None and button_codes is None:
             raise ValueError('At least one should be provided')
         elif buttons is not None:
-            if not isinstance(buttons, (tuple, list)):
+            if not is_iterable(buttons):
                 buttons = tuple([buttons])
 
             button_codes = [code_map[button] for button in buttons]
 
         else:
-            if not isinstance(button_codes, (tuple, list)):
+            if not is_iterable(button_codes):
                 button_codes = tuple([button_codes])
 
-        reverse_codes = tuple(reversed(button_codes))
+        reverse_codes = reverse(button_codes)
 
         if on_press_only:
             def on_press(button):
@@ -76,8 +77,8 @@ class UniversalButton(Button):
 
 
 class Layout(GridLayout):
-    def __init__(self, rows, cols, inverted=False):
-        self.grid = [[None for i in range(cols)] for j in range(rows)]
+    def __init__(self, rows=1, cols=1, inverted=False):
+        self.grid = [[None for _ in range(cols)] for _ in range(rows)]
         self.inverted = inverted
         super().__init__(rows=rows, cols=cols)
 

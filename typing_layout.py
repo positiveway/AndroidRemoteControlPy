@@ -1,5 +1,6 @@
 import json
 
+import common
 from code_map import code_map, reverse_code_map, EmptyW_code
 
 langs = ['en', 'ru']
@@ -24,7 +25,7 @@ def _extract_raw_cell_or_block(start_line, rows_amount, input_layout):
     return input_layout[start_line:start_line + rows_amount]
 
 
-def _split_block_or_cell(raw_source, elements_amount):
+def _split_block_or_cell(raw_source, elements_amount, reverse):
     split_source = []
     for dir1, line in enumerate(raw_source):
         if not line.startswith('='):
@@ -32,6 +33,9 @@ def _split_block_or_cell(raw_source, elements_amount):
 
             if len(line) != elements_amount:
                 raise ValueError(len(line))
+
+            if reverse:
+                line = common.reverse(line)
 
             converted = []
             for dir2, letter in enumerate(line):
@@ -47,9 +51,9 @@ def _split_block_or_cell(raw_source, elements_amount):
     return split_source
 
 
-def extract_split_block_or_cell(start_line, rows_amount, elements_amount, process_split_func, input_layout):
+def extract_split_block_or_cell(start_line, rows_amount, elements_amount, process_split_func, input_layout, reverse):
     raw_source = _extract_raw_cell_or_block(start_line, rows_amount, input_layout)
-    split_source = _split_block_or_cell(raw_source, elements_amount)
+    split_source = _split_block_or_cell(raw_source, elements_amount, reverse)
     return process_split_func(split_source)
 
 
@@ -76,11 +80,13 @@ def process_split_block(split_block):
 
 
 def process_cell(start_line, input_layout):
-    return extract_split_block_or_cell(start_line, CELL_ROWS, CELL_ELEMENTS, process_split_cell, input_layout)
+    return extract_split_block_or_cell(start_line, CELL_ROWS, CELL_ELEMENTS, process_split_cell, input_layout,
+                                       reverse=False)
 
 
-def process_block(start_line, input_layout):
-    return extract_split_block_or_cell(start_line, BLOCK_ROWS, BLOCK_ELEMENTS, process_split_block, input_layout)
+def process_block(start_line, input_layout, reverse=False):
+    return extract_split_block_or_cell(start_line, BLOCK_ROWS, BLOCK_ELEMENTS, process_split_block, input_layout,
+                                       reverse)
 
 
 def load_layout():
@@ -92,10 +98,10 @@ def load_layout():
     mouse_mode_layout = process_cell(1, input_layout)
 
     en_left_first = process_block(9, input_layout)
-    en_right_first = process_block(24, input_layout)
+    en_right_first = process_block(24, input_layout, reverse=True)
 
     ru_left_first = process_block(41, input_layout)
-    ru_right_first = process_block(56, input_layout)
+    ru_right_first = process_block(56, input_layout, reverse=True)
 
     left_first_layout = {
         'en': en_left_first,
