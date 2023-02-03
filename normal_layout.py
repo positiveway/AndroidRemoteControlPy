@@ -119,7 +119,7 @@ def fill_layout(app):
     arrows_compact_layout.add(2, 1, app.label)
     arrows_compact_layout.fill()
 
-    clear_layout = Layout(rows=2, inverted=True)
+    clear_layout = Layout(rows=3, inverted=True)
     clear_layout.add(1, 1, app.clear_btn)
     clear_layout.fill()
 
