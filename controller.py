@@ -16,7 +16,7 @@ class BtnState(LockedMap):
         super().__init__()
 
         for button in code_map.values():
-            if not is_iterable(button):
+            if not is_iterable(button) and button > 0:
                 self.put(button, 0)
 
         self.lock()
