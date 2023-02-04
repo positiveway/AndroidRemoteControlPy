@@ -17,11 +17,11 @@
   "scroll": {
     "normal": {
       "move_every_n_pixels": 1,
-      "move_by": 50
+      "move_by": 10
     },
     "fast": {
       "move_every_n_pixels": 1,
-      "move_by": 100
+      "move_by": 20
     }
   },
   "typing": {
