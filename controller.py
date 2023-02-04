@@ -23,9 +23,6 @@ class _State(LockedMap):
     def is_pressed(self, button):
         return self.map[button]
 
-    def all_pressed(self):
-        return [button for button, value in self.map.items() if value != 0]
-
 
 class BtnState(_State):
     def __init__(self) -> None:
@@ -44,6 +41,9 @@ class BtnState(_State):
             return True
         else:
             return False
+
+    def all_pressed(self):
+        return [button for button, value in self.map.items() if value != 0]
 
 
 class ModifiersState(_State):
@@ -70,6 +70,9 @@ class ModifiersState(_State):
     @property
     def cur_state(self):
         return self.map[self.current]
+
+    def all_pressed_except_caps(self):
+        return [button for button, value in self.map.items() if value == 1]
 
 
 class Controller:
@@ -260,7 +263,7 @@ class Controller:
             gc.collect()
 
     def release_all_modifiers(self):
-        for modifier in self.modifiers.all_pressed():
+        for modifier in self.modifiers.all_pressed_except_caps():
             self._send_released(modifier)
             self.modifiers.release(modifier)
 
