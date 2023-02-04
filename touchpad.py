@@ -67,7 +67,7 @@ class TouchpadWidget(Widget):
         if abs(diff) >= scroll_every_n_pixels:  # greater or EQUAL
             multiplier, remainder = divide_with_reminder(diff, scroll_every_n_pixels)
             prev = cur - remainder
-            return prev, multiplier
+            return prev, multiplier * self.controller.scroll_by
         else:
             return prev, 0
 

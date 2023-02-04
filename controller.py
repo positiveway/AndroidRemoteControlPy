@@ -92,20 +92,14 @@ class Controller:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.connect((server_ip, server_port))
 
-    def cycle_profile(self, profile):
-        return (profile + 1) % 2
-
     def set_scroll_profile(self):
-        if self.scroll_speed_profile == 0:
+        if self.is_high_precision:
             profile = "normal"
         else:
             profile = "fast"
 
         self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
-
-    def toggle_scroll_speed(self):
-        self.scroll_speed_profile = self.cycle_profile(self.scroll_speed_profile)
-        self.set_scroll_profile()
+        self.scroll_by = self.scroll_cfg[profile]['move_by']
 
     def set_hold_profile(self):
         if self.is_mouse_mode:
@@ -343,8 +337,9 @@ class Controller:
         self.btn_states = BtnState()
         self.reset_typing()
 
+        self.is_high_precision = True
+
         self.scroll_cfg = configs['scroll']
-        self.scroll_speed_profile = 0
         self.set_scroll_profile()
 
         touchpad_cfg = configs['touchpad']
