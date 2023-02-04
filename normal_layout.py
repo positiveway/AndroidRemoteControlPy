@@ -57,6 +57,11 @@ def make_buttons(app):
         "Space", app,
         button_codes=Space, on_press_only=False
     )
+    app.bs_btn = UniversalButton(
+        "BS", app,
+        buttons='BS', on_press_only=False
+    )
+
     app.copy_btn = UniversalButton(
         "Copy", app,
         buttons='Copy'
@@ -92,10 +97,6 @@ def make_buttons(app):
     app.redo_btn = UniversalButton(
         "Redo", app,
         buttons='Redo'
-    )
-    app.bs_btn = UniversalButton(
-        "BS", app,
-        buttons='BS'
     )
 
 
