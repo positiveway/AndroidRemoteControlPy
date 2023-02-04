@@ -260,7 +260,7 @@ class Controller:
             gc.collect()
 
     def release_all_modifiers(self):
-        for modifier, state in self.modifiers.all_pressed():
+        for modifier in self.modifiers.all_pressed():
             self._send_released(modifier)
             self.modifiers.release(modifier)
 
