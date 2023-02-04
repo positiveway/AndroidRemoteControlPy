@@ -101,7 +101,7 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = Layout(cols=2, inverted='x')
+    app.root = Layout(cols=2, inverted='')
     # app.root = BoxLayout()
     # app.root.padding = 110
 
