@@ -73,6 +73,8 @@ class APISenderApp(App):
                 'Tab': '\t',
                 'Enter': '\n',
                 'Del': '',
+                'Shift': '',
+                'Caps': '',
             }
 
             self.set_typing_mode(False)
