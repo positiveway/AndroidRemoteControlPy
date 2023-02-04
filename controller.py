@@ -104,8 +104,8 @@ class Controller:
         self.scroll_speed_profile = self.cycle_profile(self.scroll_speed_profile)
         self.set_scroll_profile()
 
-    def set_hold_profile(self, profile):
-        if profile == 0:
+    def set_hold_profile(self, is_mouse_mode):
+        if is_mouse_mode:
             profile = "normal"
         else:
             profile = "during_scroll"
@@ -294,6 +294,15 @@ class Controller:
         sleep(self.double_click_delay)
         self.send_type(self.LeftMouse)
 
+    @property
+    def is_mouse_mode(self):
+        return self._is_mouse_mode
+
+    @is_mouse_mode.setter
+    def is_mouse_mode(self, state):
+        self._is_mouse_mode = state
+        self.set_hold_profile(state)
+
     def __init__(self):
         from typing_layout import load_layout, generate_hints, generate_mouse_hints, load_configs
 
@@ -311,7 +320,6 @@ class Controller:
         self.msg = bytearray(1)
         self.connect(configs)
 
-        self.is_mouse_mode = True
         self.lang = 'en'
 
         self.LeftMouse = LeftMouse
@@ -337,7 +345,6 @@ class Controller:
         touchpad_cfg = configs['touchpad']
         self.double_click_delay = touchpad_cfg['double_click_delay']
         self.hold_cfg = touchpad_cfg['hold']
-        self.set_hold_profile(0)
         self.visuals_for_touchpad = touchpad_cfg['visuals']
 
         font_size_cfg = configs['font']['size']
@@ -345,3 +352,6 @@ class Controller:
         self.small_font_size = font_size_cfg['small']
 
         self.is_game_mode = configs['is_game_mode']
+
+        self._is_mouse_mode = True
+        self.is_mouse_mode = True

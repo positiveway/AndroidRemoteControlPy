@@ -9,7 +9,7 @@
       },
       "during_scroll": {
         "dist": 20,
-        "time": 0.7
+        "time": 0.4
       }
     },
     "visuals": false

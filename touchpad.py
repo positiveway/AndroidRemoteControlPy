@@ -181,8 +181,8 @@ class TouchpadWidget(Widget):
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
-        self.timer = Timer(0, self.timer_func)
-        self.start_timer()
+        self.timer = Timer(1000, self.timer_func)
+        self.timer.cancel()
 
         self.offset = 0
         self.prev_x = 0
