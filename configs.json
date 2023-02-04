@@ -16,12 +16,12 @@
   },
   "scroll": {
     "normal": {
-      "move_every_n_pixels": 1,
-      "move_by": 10
+      "move_every_n_pixels": 2,
+      "move_by": 20
     },
     "fast": {
-      "move_every_n_pixels": 1,
-      "move_by": 20
+      "move_every_n_pixels": 2,
+      "move_by": 30
     }
   },
   "typing": {
