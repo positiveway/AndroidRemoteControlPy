@@ -14,6 +14,7 @@ class LockedMap:
 
     def lock(self):
         self.is_locked = True
+        self.all = tuple(self.map.keys())
 
     def get(self, key):
         return self.map[key]
@@ -28,6 +29,3 @@ class LockedMap:
                 raise KeyError(f'Duplicate key: {key}')
 
         self.map[key] = val
-
-    def all(self):
-        return self.map.keys()

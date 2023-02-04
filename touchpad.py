@@ -35,7 +35,7 @@ class TouchpadWidget(Widget):
         if self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set or \
                     hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
-                self.toggle_scroll()
+                self._timer_func()
 
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
@@ -43,6 +43,8 @@ class TouchpadWidget(Widget):
             self.prev_y = round(touch_event.y)
 
             if touch_event.is_double_tap:
+                self.timer.cancel()
+                self.controller.is_mouse_mode = True
                 self.double_tap_func()
             else:
                 # if self.controller.is_mouse_mode:
@@ -169,10 +171,12 @@ class TouchpadWidget(Widget):
 
         self.controller = Controller()
 
+        self.double_tap_func = self.left_press
+
         if self.controller.is_game_mode:
-            self.double_tap_func = self.right_click
+            self._timer_func = self.right_click
         else:
-            self.double_tap_func = self.left_press
+            self._timer_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad

@@ -11,7 +11,23 @@ def resole_angle(angle):
     return (angle + 360) % 360
 
 
-class BtnState(LockedMap):
+class _State(LockedMap):
+    def release(self, button):
+        state = self.map[button]
+        if state != 0:
+            self.put(button, 0)
+            return True
+        else:
+            return False
+
+    def is_pressed(self, button):
+        return self.map[button]
+
+    def all_pressed(self):
+        return [button for button, value in self.map.items() if value != 0]
+
+
+class BtnState(_State):
     def __init__(self) -> None:
         super().__init__()
 
@@ -29,19 +45,31 @@ class BtnState(LockedMap):
         else:
             return False
 
-    def release(self, button):
-        state = self.map[button]
-        if state != 0:
-            self.put(button, 0)
+
+class ModifiersState(_State):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.current = 0
+
+        for code in [Shift, Ctrl, Alt]:
+            self.put(code, 0)
+
+        self.lock()
+
+    def set_state(self, new_state):
+        if not (0 <= new_state <= 2):
+            raise ValueError(f'Incorrect state: {new_state}')
+
+        if self.cur_state != new_state:
+            self.put(self.current, new_state)
             return True
         else:
             return False
 
-    def is_pressed(self, button):
-        return self.map[button]
-
-    def all_pressed(self):
-        return [button for button, value in self.map.items() if value != 0]
+    @property
+    def cur_state(self):
+        return self.map[self.current]
 
 
 class Controller:
@@ -164,7 +192,7 @@ class Controller:
         self.release_mouse()
         self.force_release_modifiers()
 
-        for button in self.btn_states.all():
+        for button in self.btn_states.all:
             self.force_release(button)
 
         self.reset_typing()
@@ -190,30 +218,28 @@ class Controller:
 
         else:
             if button == self.Caps:
-                self.cur_modifier = self.Shift
+                self.modifiers.current = self.Shift
             else:
-                self.cur_modifier = button
+                self.modifiers.current = button
 
-            if self.cur_modifier in self.modifiers:
-                self.cur_modifier_state = self.modifiers_state[self.cur_modifier]
-
-                if self.cur_modifier_state == 0:
+            if self.modifiers.current in self.modifiers.all:
+                if self.modifiers.cur_state == 0:
                     if button == self.Caps:
                         self.press_modifier(2)
                     else:
                         self.press_modifier(1)
 
-                elif self.cur_modifier_state == 1:
+                elif self.modifiers.cur_state == 1:
                     if button == self.Caps:
                         self.release_modifier()
                     else:
                         self.release_modifier()
 
-                elif self.cur_modifier_state == 2:
+                elif self.modifiers.cur_state == 2:
                     if button == self.Caps:
                         self.release_modifier()
                 else:
-                    ValueError(f'incorrect state: {self.cur_modifier_state}')
+                    raise ValueError(f'incorrect state: {self.modifiers.cur_state}')
                 return
 
         if self.btn_states.press(button):
@@ -221,11 +247,11 @@ class Controller:
 
     def send_released(self, button):
         if button == self.Caps:
-            self.cur_modifier = self.Shift
+            self.modifiers.current = self.Shift
         else:
-            self.cur_modifier = button
+            self.modifiers.current = button
 
-        if self.cur_modifier in self.modifiers:
+        if self.modifiers.current in self.modifiers.all:
             return
 
         if self.btn_states.release(button):
@@ -233,34 +259,23 @@ class Controller:
             self.release_all_modifiers()
             gc.collect()
 
-    def init_modifiers(self):
-        self.modifiers_state = {
-            Shift: 0,
-            Ctrl: 0,
-            Alt: 0,
-        }
-        self.modifiers = tuple(self.modifiers_state.keys())
-        self.cur_modifier = 0
-        self.cur_modifier_state = 0
-
     def release_all_modifiers(self):
-        for modifier, state in self.modifiers_state.items():
-            if state == 1:
-                self._send_released(modifier)
-                self.modifiers_state[modifier] = 0
+        for modifier, state in self.modifiers.all_pressed():
+            self._send_released(modifier)
+            self.modifiers.release(modifier)
 
     def force_release_modifiers(self):
-        for modifier in self.modifiers:
+        for modifier in self.modifiers.all:
             self._send_released(modifier)
-            self.modifiers_state[modifier] = 0
+            self.modifiers.release(modifier)
 
     def press_modifier(self, state):
-        self._send_pressed(self.cur_modifier)
-        self.modifiers_state[self.cur_modifier] = state
+        self._send_pressed(self.modifiers.current)
+        self.modifiers.set_state(state)
 
     def release_modifier(self):
-        self._send_released(self.cur_modifier)
-        self.modifiers_state[self.cur_modifier] = 0
+        self._send_released(self.modifiers.current)
+        self.modifiers.release(self.modifiers.current)
 
     def _send_pressed(self, button):
         self.msg[0] = button + 128
@@ -311,7 +326,7 @@ class Controller:
         self.Switch_code = Switch_code
         self.Esc = Esc
 
-        self.init_modifiers()
+        self.modifiers = ModifiersState()
         self.btn_states = BtnState()
         self.reset_typing()
 

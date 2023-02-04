@@ -95,7 +95,7 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = Layout(cols=2)
+    app.root = Layout(cols=2, inverted='x')
     # app.root = BoxLayout()
     # app.root.padding = 110
 
@@ -103,7 +103,7 @@ def fill_layout(app):
     # app.label.size_hint_x = 0.25
     # app.label.size_hint_y = 0.9
 
-    release_all_layout = Layout(cols=2, rows=2, inverted=True)
+    release_all_layout = Layout(cols=2, rows=2, inverted='y')
     release_all_layout.add(2, 1, app.release_all_btn)
     release_all_layout.fill()
 
@@ -114,22 +114,22 @@ def fill_layout(app):
     arrows_layout.add(2, 3, app.right_btn)
     arrows_layout.fill()
 
-    arrows_compact_layout = Layout(rows=2, inverted=True)
+    arrows_compact_layout = Layout(rows=2, inverted='y')
     arrows_compact_layout.add(1, 1, arrows_layout)
     arrows_compact_layout.add(2, 1, app.label)
     arrows_compact_layout.fill()
 
-    clear_layout = Layout(rows=3, inverted=True)
+    clear_layout = Layout(rows=3, inverted='y')
     clear_layout.add(1, 1, app.clear_btn)
     clear_layout.fill()
 
-    typing_layout = Layout(cols=2, rows=2, inverted=True)
+    typing_layout = Layout(cols=2, rows=2, inverted='y')
     typing_layout.add(1, 1, app.l_typing_buttons)
     typing_layout.add(1, 2, arrows_compact_layout)
     typing_layout.add(2, 1, clear_layout)
     typing_layout.fill()
 
-    touchpad_layout = Layout(cols=2, rows=2, inverted=True)
+    touchpad_layout = Layout(cols=2, rows=2, inverted='y')
     touchpad_layout.add(1, 1, app.middle_click)
     touchpad_layout.add(1, 2, app.right_click)
 
@@ -143,7 +143,7 @@ def fill_layout(app):
     app.r_buttons_layout.add(1, 2, app.r_typing_buttons)
     app.r_buttons_layout.fill()
 
-    right_side = Layout(rows=2, inverted=True)
+    right_side = Layout(rows=2, inverted='y')
     right_side.add(1, 1, app.touchpad_or_btn_layout)
     right_side.add(2, 1, touchpad_layout)
     right_side.fill()
