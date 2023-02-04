@@ -48,7 +48,7 @@ class TouchpadWidget(Widget):
                 if self.controller.is_mouse_mode:
                     self.double_tap_func()
                 else:
-                    self.controller.is_mouse_mode = True
+                    self.controller.set_mouse_mode(True)
             else:
                 # if self.controller.is_mouse_mode:
                 self.init_x = self.prev_x
@@ -160,7 +160,7 @@ class TouchpadWidget(Widget):
         self.controller.send_pressed(self.controller.LeftMouse)
 
     def toggle_scroll(self):
-        self.controller.is_mouse_mode = not self.controller.is_mouse_mode
+        self.controller.set_mouse_mode(not self.controller.is_mouse_mode)
 
     def start_timer(self):
         self.timer.cancel()

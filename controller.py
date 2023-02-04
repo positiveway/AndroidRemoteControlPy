@@ -294,13 +294,8 @@ class Controller:
         sleep(self.double_click_delay)
         self.send_type(self.LeftMouse)
 
-    @property
-    def is_mouse_mode(self):
-        return self._is_mouse_mode
-
-    @is_mouse_mode.setter
-    def is_mouse_mode(self, state):
-        self._is_mouse_mode = state
+    def set_mouse_mode(self, state):
+        self.is_mouse_mode = state
         self.set_hold_profile(state)
 
     def __init__(self):
@@ -353,5 +348,5 @@ class Controller:
 
         self.is_game_mode = configs['is_game_mode']
 
-        self._is_mouse_mode = True
         self.is_mouse_mode = True
+        self.set_mouse_mode(True)
