@@ -44,8 +44,11 @@ class TouchpadWidget(Widget):
 
             if touch_event.is_double_tap:
                 self.timer.cancel()
-                self.controller.is_mouse_mode = True
-                self.double_tap_func()
+
+                if self.controller.is_mouse_mode:
+                    self.double_tap_func()
+                else:
+                    self.controller.is_mouse_mode = True
             else:
                 # if self.controller.is_mouse_mode:
                 self.init_x = self.prev_x

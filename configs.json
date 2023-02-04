@@ -5,11 +5,11 @@
     "hold": {
       "normal": {
         "dist": 15,
-        "time": 0.6
+        "time": 0.7
       },
       "during_scroll": {
-        "dist": 20,
-        "time": 0.4
+        "dist": 15,
+        "time": 0.6
       }
     },
     "visuals": false
