@@ -1,3 +1,4 @@
+import gc
 from math import hypot
 from threading import Timer
 
@@ -122,13 +123,15 @@ class TouchpadWidget(Widget):
             self.draw_touch(touch_event)
             return True
         else:
-            self.reset()
+            # don't reset here it will prevent releasing pressed button on touch_up
+            # if finger goes out of touchpad zone and then touch_up happens
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
         if self.prev_x != self.value_not_set:  # originated within this element
             self.reset()
             self.controller.send_released(self.controller.LeftMouse)
+            gc.collect()
 
         if self.is_in_zone(touch_event):
             self.clear_canvas()
