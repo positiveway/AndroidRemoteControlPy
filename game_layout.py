@@ -3,39 +3,42 @@ from code_map import *
 from common_layout import Layout, make_common_buttons, GameButton
 
 
-def make_buttons(app):
+def make_movement_buttons(app, arrows_mode):
     app.w_btn = GameButton(
         "W", app,
-        buttons="W"
+        buttons="W", arrows_mode=arrows_mode
     )
     app.a_btn = GameButton(
         "A", app,
-        buttons="A"
+        buttons="A", arrows_mode=arrows_mode
     )
     app.s_btn = GameButton(
         "S", app,
-        buttons="S"
+        buttons="S", arrows_mode=arrows_mode
     )
     app.d_btn = GameButton(
         "D", app,
-        buttons="D"
+        buttons="D", arrows_mode=arrows_mode
     )
     app.wa_btn = GameButton(
         "WA", app,
-        buttons=["W", "A"]
+        buttons=["W", "A"], arrows_mode=arrows_mode
     )
     app.wd_btn = GameButton(
         "WD", app,
-        buttons=["W", "D"]
+        buttons=["W", "D"], arrows_mode=arrows_mode
     )
     app.sa_btn = GameButton(
         "SA", app,
-        buttons=["S", "A"]
+        buttons=["S", "A"], arrows_mode=arrows_mode
     )
     app.sd_btn = GameButton(
         "SD", app,
-        buttons=["S", "D"]
+        buttons=["S", "D"], arrows_mode=arrows_mode
     )
+
+
+def make_buttons(app):
     app.space_btn = GameButton(
         "Space", app,
         buttons="Space"
@@ -99,5 +102,6 @@ def fill_layout(app):
 
 def build_layout(app):
     make_common_buttons(app)
+    make_movement_buttons(app, False)
     make_buttons(app)
     fill_layout(app)
