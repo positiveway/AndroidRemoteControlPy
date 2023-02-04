@@ -1,53 +1,63 @@
 from kivy.uix.label import Label
 from code_map import *
-from common_layout import Layout, make_common_buttons, UniversalButton
+from common_layout import Layout, make_common_buttons, GameButton
 
 
 def make_buttons(app):
-    app.w_btn = UniversalButton(
+    app.w_btn = GameButton(
         "W", app,
         buttons="W"
     )
-    app.a_btn = UniversalButton(
+    app.a_btn = GameButton(
         "A", app,
         buttons="A"
     )
-    app.s_btn = UniversalButton(
+    app.s_btn = GameButton(
         "S", app,
         buttons="S"
     )
-    app.d_btn = UniversalButton(
+    app.d_btn = GameButton(
         "D", app,
         buttons="D"
     )
-    app.wa_btn = UniversalButton(
+    app.wa_btn = GameButton(
         "WA", app,
         buttons=["W", "A"]
     )
-    app.wd_btn = UniversalButton(
+    app.wd_btn = GameButton(
         "WD", app,
         buttons=["W", "D"]
     )
-    app.space_btn = UniversalButton(
+    app.sa_btn = GameButton(
+        "SA", app,
+        buttons=["S", "A"]
+    )
+    app.sd_btn = GameButton(
+        "SD", app,
+        buttons=["S", "D"]
+    )
+    app.space_btn = GameButton(
         "Space", app,
         buttons="Space"
     )
-    app.shift_btn = UniversalButton(
+    app.shift_btn = GameButton(
         "Shift", app,
-        button_codes=Caps
+        button_codes=Shift
     )
 
 
 def fill_layout(app):
     app.root = Layout(cols=2)
 
-    wasd_layout = Layout(cols=3, rows=2)
+    wasd_layout = Layout(cols=3, rows=3)
     wasd_layout.add(1, 1, app.wa_btn)
     wasd_layout.add(1, 2, app.w_btn)
     wasd_layout.add(1, 3, app.wd_btn)
     wasd_layout.add(2, 1, app.a_btn)
     wasd_layout.add(2, 2, app.s_btn)
     wasd_layout.add(2, 3, app.d_btn)
+    wasd_layout.add(3, 1, app.sa_btn)
+    wasd_layout.add(3, 3, app.sd_btn)
     wasd_layout.fill()
 
     esc_layout = Layout(cols=2, rows=2)

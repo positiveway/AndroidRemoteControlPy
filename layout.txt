@@ -1,8 +1,8 @@
 mouse_mode
 ||========================||
+|| MidM    Enter   Space  ||
+|| RightM  Switch  X2     ||
 || Copy    Cut     Paste  ||
-|| Enter   Switch  Space  ||
-|| X2      RightM  MidM   ||
 ||========================||
 
 EN
@@ -14,7 +14,7 @@ left_first
 ||========================||========================||========================||
 || 1       2       3      || Copy    Cut     Paste  || Caps    Shift   Select ||
 || 4       5       6      || Enter   Switch  Space  || Undo    Redo    Esc    ||
-|| 7       8       9      || EmptyW  RightM  MidM   || Del     BS      Tab    ||
+|| 7       8       9      || EmptyW  EmptyW  EmptyW || Del     BS      Tab    ||
 ||========================||========================||========================||
 || EmptyW  EmptyW  EmptyW || Alt     `       \      || EmptyW  EmptyW  Win    ||
 || EmptyW  EmptyW  EmptyW || Ctrl    =       /      || EmptyW  ;       '      ||
@@ -29,7 +29,7 @@ right_first
 ||========================||========================||========================||
 || 1       2       3      || Copy    Cut     Paste  || Caps    Shift   Select ||
 || 4       5       6      || Enter   Switch  Space  || Undo    Redo    Esc    ||
-|| 7       8       9      || EmptyW  RightM  MidM   || Del     BS      Tab    ||
+|| 7       8       9      || EmptyW  EmptyW  EmptyW || Del     BS      Tab    ||
 ||========================||========================||========================||
 || EmptyW  EmptyW  EmptyW || Alt     `       \      || EmptyW  EmptyW  Win    ||
 || EmptyW  EmptyW  EmptyW || Ctrl    =       /      || EmptyW  ;       '      ||

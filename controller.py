@@ -201,18 +201,25 @@ class Controller:
         self.reset_typing()
         gc.collect()
 
-    def send_type(self, seq):
-        if not is_iterable(seq):
-            self.send_pressed(seq)
-            self.send_released(seq)
+    def send_type(self, buttons):
+        self.send_pressed(buttons)
+        self.send_released(buttons)
+
+    def send_pressed(self, buttons):
+        if not is_iterable(buttons):
+            self._send_pressed_single(buttons)
         else:
-            for button in seq:
-                self.send_pressed(button)
+            for button in buttons:
+                self._send_pressed_single(button)
 
-            for button in reverse(seq):
-                self.send_released(button)
+    def send_released(self, buttons):
+        if not is_iterable(buttons):
+            self._send_released_single(buttons)
+        else:
+            for button in reverse(buttons):
+                self._send_released_single(button)
 
-    def send_pressed(self, button):
+    def _send_pressed_single(self, button):
         if button == self.Esc:
             self.release_mouse_and_pressed()
 
@@ -246,9 +253,9 @@ class Controller:
                 return
 
         if self.btn_states.press(button):
-            self._send_pressed(button)
+            self._send_pressed_raw(button)
 
-    def send_released(self, button):
+    def _send_released_single(self, button):
         if button == self.Caps:
             self.modifiers.current = self.Shift
         else:
@@ -258,38 +265,38 @@ class Controller:
             return
 
         if self.btn_states.release(button):
-            self._send_released(button)
+            self._send_released_raw(button)
             self.release_all_modifiers()
             gc.collect()
 
     def release_all_modifiers(self):
         for modifier in self.modifiers.all_pressed_except_caps():
-            self._send_released(modifier)
+            self._send_released_raw(modifier)
             self.modifiers.release(modifier)
 
     def force_release_modifiers(self):
         for modifier in self.modifiers.all:
-            self._send_released(modifier)
+            self._send_released_raw(modifier)
             self.modifiers.release(modifier)
 
     def press_modifier(self, state):
-        self._send_pressed(self.modifiers.current)
+        self._send_pressed_raw(self.modifiers.current)
         self.modifiers.set_state(state)
 
     def release_modifier(self):
-        self._send_released(self.modifiers.current)
+        self._send_released_raw(self.modifiers.current)
         self.modifiers.release(self.modifiers.current)
 
-    def _send_pressed(self, button):
+    def _send_pressed_raw(self, button):
         self.msg[0] = button + 128
         self.sock.send(self.msg)
 
-    def _send_released(self, button):
+    def _send_released_raw(self, button):
         self.msg[0] = button
         self.sock.send(self.msg)
 
     def force_release(self, button):
-        self._send_released(button)
+        self._send_released_raw(button)
         self.btn_states.release(button)
 
     def double_click(self):

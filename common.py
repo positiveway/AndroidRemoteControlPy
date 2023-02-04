@@ -6,6 +6,21 @@ def reverse(obj):
     return tuple(reversed(obj))
 
 
+def apply_to_seq_or_one(seq, func):
+    if is_iterable(seq):
+        return [func(element) for element in seq]
+    else:
+        return func(seq)
+
+
+def exec_on_seq_or_one(seq, func):
+    if is_iterable(seq):
+        for element in seq:
+            func(element)
+    else:
+        func(seq)
+
+
 class LockedMap:
     def __init__(self, check_duplicates=True) -> None:
         self.map = {}

@@ -17,23 +17,24 @@ def make_buttons(app):
     )
     app.up_btn = UniversalButton(
         "Up", app,
-        buttons="Up"
+        buttons="Up", on_press_only=False
     )
     app.down_btn = UniversalButton(
         "Down", app,
-        buttons="Down"
+        buttons="Down", on_press_only=False
     )
     app.left_btn = UniversalButton(
         "Left", app,
-        buttons="Left"
+        buttons="Left", on_press_only=False
     )
     app.right_btn = UniversalButton(
         "Right", app,
-        buttons="Right"
+        buttons="Right", on_press_only=False
     )
+
     app.left_click = UniversalButton(
         "Left", app,
-        button_codes=LeftMouse
+        button_codes=LeftMouse, on_press_only=False
     )
     app.right_click = UniversalButton(
         "Right", app,
@@ -54,43 +55,47 @@ def make_buttons(app):
     )
     app.space_btn = UniversalButton(
         "Space", app,
-        button_codes=Space, on_press_only=True
+        button_codes=Space, on_press_only=False
     )
     app.copy_btn = UniversalButton(
         "Copy", app,
-        buttons='Copy', on_press_only=True
+        buttons='Copy'
     )
     app.cut_btn = UniversalButton(
         "Cut", app,
-        buttons='Cut', on_press_only=True
+        buttons='Cut'
     )
     app.paste_btn = UniversalButton(
         "Paste", app,
-        buttons='Paste', on_press_only=True
+        buttons='Paste'
     )
     app.select_all_btn = UniversalButton(
         "Select", app,
-        buttons='Select', on_press_only=True
+        buttons='Select'
     )
     app.format_btn = UniversalButton(
         "Format", app,
-        buttons='Format', on_press_only=True
+        buttons='Format'
     )
     app.search_btn = UniversalButton(
         "Search", app,
-        buttons='Search', on_press_only=True
+        buttons='Search'
     )
     app.replace_btn = UniversalButton(
         "Replace", app,
-        buttons='Replace', on_press_only=True
+        buttons='Replace'
     )
     app.undo_btn = UniversalButton(
         "Undo", app,
-        buttons='Undo', on_press_only=True
+        buttons='Undo'
     )
     app.redo_btn = UniversalButton(
         "Redo", app,
-        buttons='Redo', on_press_only=True
+        buttons='Redo'
+    )
+    app.bs_btn = UniversalButton(
+        "BS", app,
+        buttons='BS'
     )
 
 
@@ -129,12 +134,11 @@ def fill_layout(app):
     typing_layout.add(2, 1, clear_layout)
     typing_layout.fill()
 
-    touchpad_layout = Layout(cols=2, rows=2, inverted='y')
-    touchpad_layout.add(1, 1, app.middle_click)
-    touchpad_layout.add(1, 2, app.right_click)
-
-    touchpad_layout.add(2, 1, release_all_layout)
-    touchpad_layout.add(2, 2, app.double_click_btn)
+    touchpad_layout = Layout(cols=2, rows=2)
+    touchpad_layout.add(1, 1, release_all_layout)
+    touchpad_layout.add(1, 2, app.redo_btn)
+    touchpad_layout.add(2, 1, app.undo_btn)
+    touchpad_layout.add(2, 2, app.bs_btn)
     touchpad_layout.fill()
 
     app.touchpad_or_btn_layout = LayeredLayout(app)

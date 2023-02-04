@@ -9,11 +9,11 @@ from common import *
 def make_common_buttons(app):
     app.enter_btn = UniversalButton(
         "Enter", app,
-        button_codes=Enter, on_press_only=True
+        button_codes=Enter
     )
     app.esc_btn = UniversalButton(
         "Esc", app,
-        button_codes=Esc, on_press_only=True
+        button_codes=Esc
     )
     app.release_all_btn = UniversalButton(
         "Release", app,
@@ -26,7 +26,7 @@ def make_common_buttons(app):
 
 
 class UniversalButton(Button):
-    def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=False):
+    def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=True):
         if func is not None:
             super().__init__(
                 text=text, font_size=app.font_size,
@@ -36,25 +36,13 @@ class UniversalButton(Button):
 
         if buttons is None and button_codes is None:
             raise ValueError('At least one should be provided')
+
         elif buttons is not None:
-            if not is_iterable(buttons):
-                buttons = tuple([buttons])
-
-            button_codes = [code_map[button] for button in buttons]
-
-        else:
-            if not is_iterable(button_codes):
-                button_codes = tuple([button_codes])
-
-        reverse_codes = reverse(button_codes)
+            button_codes = apply_to_seq_or_one(buttons, lambda button: code_map[button])
 
         if on_press_only:
             def on_press(button):
-                for button_code in button_codes:
-                    app.controller.send_pressed(button_code)
-
-                for button_code in reverse_codes:
-                    app.controller.send_released(button_code)
+                app.controller.send_type(button_codes)
 
             super().__init__(
                 text=text, font_size=app.font_size,
@@ -62,18 +50,36 @@ class UniversalButton(Button):
             )
         else:
             def on_press(button):
-                for button_code in button_codes:
-                    app.controller.send_pressed(button_code)
+                app.controller.send_pressed(button_codes)
 
             def on_release(button):
-                for button_code in reverse_codes:
-                    app.controller.send_released(button_code)
+                app.controller.send_released(button_codes)
 
             super().__init__(
                 text=text, font_size=app.font_size,
                 on_press=on_press,
                 on_release=on_release,
             )
+
+
+def replace_by_arrow(button):
+    return {
+        'w': 'Up',
+        's': 'Down',
+        'a': 'Left',
+        'd': 'Right',
+    }[button.lower()]
+
+
+class GameButton(UniversalButton):
+    def __init__(self, text, app, buttons=None, button_codes=None, func=None, arrows_mode=False):
+        if arrows_mode:
+            if buttons is None:
+                raise ValueError()
+
+            buttons = apply_to_seq_or_one(buttons, replace_by_arrow)
+
+        super().__init__(text, app, buttons, button_codes, func, on_press_only=False)
 
 
 class Layout(GridLayout):
