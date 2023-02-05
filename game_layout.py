@@ -1,40 +1,65 @@
 from kivy.uix.label import Label
 from code_map import *
-from common_layout import Layout, make_common_buttons, GameButton
+from common import apply_to_seq_or_one
+from common_layout import Layout, make_common_buttons, UniversalButton
 
 
-def make_movement_buttons(app, arrows_mode):
-    app.w_btn = GameButton(
+class GameButton(UniversalButton):
+    def __init__(self, text, app, buttons=None, button_codes=None, func=None):
+        super().__init__(text, app, buttons=buttons,
+                         button_codes=button_codes, func=func,
+                         on_press_only=False)
+
+
+def replace_by_arrow(button):
+    return {
+        'w': 'Up',
+        's': 'Down',
+        'a': 'Left',
+        'd': 'Right',
+    }[button.lower()]
+
+
+class ArrowButton(GameButton):
+    def __init__(self, text, app, buttons):
+        if app.controller.arrows_mode:
+            buttons = apply_to_seq_or_one(buttons, replace_by_arrow)
+
+        super().__init__(text, app, buttons=buttons)
+
+
+def make_movement_buttons(app):
+    app.w_btn = ArrowButton(
         "W", app,
-        buttons="W", arrows_mode=arrows_mode
+        buttons="W",
     )
-    app.a_btn = GameButton(
+    app.a_btn = ArrowButton(
         "A", app,
-        buttons="A", arrows_mode=arrows_mode
+        buttons="A",
     )
-    app.s_btn = GameButton(
+    app.s_btn = ArrowButton(
         "S", app,
-        buttons="S", arrows_mode=arrows_mode
+        buttons="S",
     )
-    app.d_btn = GameButton(
+    app.d_btn = ArrowButton(
         "D", app,
-        buttons="D", arrows_mode=arrows_mode
+        buttons="D",
     )
-    app.wa_btn = GameButton(
+    app.wa_btn = ArrowButton(
         "WA", app,
-        buttons=["W", "A"], arrows_mode=arrows_mode
+        buttons=["W", "A"],
     )
-    app.wd_btn = GameButton(
+    app.wd_btn = ArrowButton(
         "WD", app,
-        buttons=["W", "D"], arrows_mode=arrows_mode
+        buttons=["W", "D"],
     )
-    app.sa_btn = GameButton(
+    app.sa_btn = ArrowButton(
         "SA", app,
-        buttons=["S", "A"], arrows_mode=arrows_mode
+        buttons=["S", "A"],
     )
-    app.sd_btn = GameButton(
+    app.sd_btn = ArrowButton(
         "SD", app,
-        buttons=["S", "D"], arrows_mode=arrows_mode
+        buttons=["S", "D"],
     )
 
 
@@ -107,6 +132,6 @@ def fill_layout(app):
 
 def build_layout(app):
     make_common_buttons(app)
-    make_movement_buttons(app, True)
+    make_movement_buttons(app)
     make_buttons(app)
     fill_layout(app)

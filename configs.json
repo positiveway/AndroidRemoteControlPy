@@ -1,7 +1,8 @@
 {
-  "is_game_mode": true,
+  "is_game_mode": false,
   "game": {
-    "button_delay": 0.1
+    "button_delay": 0.1,
+    "arrows_mode": false
   },
   "touchpad": {
     "double_click_delay": 0.25,

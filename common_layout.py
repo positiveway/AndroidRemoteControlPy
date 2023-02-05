@@ -58,26 +58,6 @@ class UniversalButton(Button):
             )
 
 
-def replace_by_arrow(button):
-    return {
-        'w': 'Up',
-        's': 'Down',
-        'a': 'Left',
-        'd': 'Right',
-    }[button.lower()]
-
-
-class GameButton(UniversalButton):
-    def __init__(self, text, app, buttons=None, button_codes=None, func=None, arrows_mode=False):
-        if arrows_mode:
-            if buttons is None:
-                raise ValueError()
-
-            buttons = apply_to_seq_or_one(buttons, replace_by_arrow)
-
-        super().__init__(text, app, buttons, button_codes, func, on_press_only=False)
-
-
 class Layout(GridLayout):
     def __init__(self, rows=1, cols=1, inverted=''):
         self.grid = [[None for _ in range(cols)] for _ in range(rows)]
