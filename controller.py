@@ -344,6 +344,8 @@ class Controller:
         self.small_font_size = font_size_cfg['small']
 
         self.is_game_mode = configs['is_game_mode']
+        game_cfg = configs['game']
+        self.game_button_delay = game_cfg['button_delay']
 
         self.is_mouse_mode = True
         self.set_hold_profile()

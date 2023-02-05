@@ -1,11 +1,14 @@
 {
-  "is_game_mode": false,
+  "is_game_mode": true,
+  "game": {
+    "button_delay": 0.1
+  },
   "touchpad": {
     "double_click_delay": 0.25,
     "hold": {
       "normal": {
-        "dist": 12,
-        "time": 0.8
+        "dist": 15,
+        "time": 0.7
       }
     },
     "visuals": false

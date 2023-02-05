@@ -91,12 +91,12 @@ def fill_layout(app):
     lower_left_side.add(3, 3, release_all_layout)
     lower_left_side.fill()
 
-    left_side = Layout(rows=2)
+    left_side = Layout(rows=2, inverted='y')
     left_side.add(1, 1, upper_left_side)
     left_side.add(2, 1, lower_left_side)
     left_side.fill()
 
-    right_side = Layout(rows=2)
+    right_side = Layout(rows=2, inverted='y')
     right_side.add(1, 1, app.touchpad)
     right_side.fill()
 
@@ -107,6 +107,6 @@ def fill_layout(app):
 
 def build_layout(app):
     make_common_buttons(app)
-    make_movement_buttons(app, False)
+    make_movement_buttons(app, True)
     make_buttons(app)
     fill_layout(app)
