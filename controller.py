@@ -102,11 +102,7 @@ class Controller:
         self.scroll_by = self.scroll_cfg[profile]['move_by']
 
     def set_hold_profile(self):
-        if self.is_mouse_mode:
-            profile = "normal"
-        else:
-            profile = "during_scroll"
-
+        profile = "normal"
         self.hold_dist = self.hold_cfg[profile]["dist"]
         self.hold_time = self.hold_cfg[profile]["time"]
 
@@ -298,10 +294,6 @@ class Controller:
         sleep(self.double_click_delay)
         self.send_type(self.LeftMouse)
 
-    def set_mouse_mode(self, state):
-        self.is_mouse_mode = state
-        self.set_hold_profile()
-
     def __init__(self):
         from typing_layout import load_layout, generate_hints, generate_mouse_hints, load_configs
 
@@ -353,4 +345,5 @@ class Controller:
 
         self.is_game_mode = configs['is_game_mode']
 
-        self.set_mouse_mode(True)
+        self.is_mouse_mode = True
+        self.set_hold_profile()

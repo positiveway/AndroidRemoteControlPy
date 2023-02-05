@@ -6,10 +6,6 @@
       "normal": {
         "dist": 12,
         "time": 0.8
-      },
-      "during_scroll": {
-        "dist": 15,
-        "time": 0.6
       }
     },
     "visuals": false

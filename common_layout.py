@@ -11,10 +11,6 @@ def make_common_buttons(app):
         "Enter", app,
         button_codes=Enter
     )
-    app.esc_btn = UniversalButton(
-        "Esc", app,
-        button_codes=Esc
-    )
     app.release_all_btn = UniversalButton(
         "Release", app,
         func=app.release_all

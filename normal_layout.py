@@ -99,6 +99,11 @@ def make_buttons(app):
         buttons='Redo'
     )
 
+    app.esc_btn = UniversalButton(
+        "Esc", app,
+        button_codes=Esc
+    )
+
 
 def fill_layout(app):
     app.root = Layout(cols=2, inverted='')

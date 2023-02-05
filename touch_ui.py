@@ -29,7 +29,7 @@ if is_vibro_enabled():
 
 class APISenderApp(App):
     def toggle_scroll(self, button):
-        self.touchpad.is_mouse_mode = not self.touchpad.is_mouse_mode
+        self.touchpad.toggle_scroll()
 
     def release_all(self, button):
         self.controller.release_all()

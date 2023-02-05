@@ -48,6 +48,11 @@ def make_buttons(app):
         button_codes=Shift
     )
 
+    app.esc_btn = GameButton(
+        "Esc", app,
+        button_codes=Esc
+    )
+
 
 def fill_layout(app):
     app.root = Layout(cols=2)

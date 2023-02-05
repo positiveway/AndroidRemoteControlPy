@@ -32,8 +32,7 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def timer_func(self):
-        # if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
-        if self.init_x != self.value_not_set:
+        if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
             if self.cur_x == self.value_not_set or \
                     hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
                 self._timer_func()
@@ -49,12 +48,12 @@ class TouchpadWidget(Widget):
                 if self.controller.is_mouse_mode:
                     self.double_tap_func()
                 else:
-                    self.controller.set_mouse_mode(True)
+                    self.controller.is_mouse_mode = True
             else:
-                # if self.controller.is_mouse_mode:
-                self.init_x = self.prev_x
-                self.init_y = self.prev_y
-                self.start_timer()
+                if self.controller.is_mouse_mode:
+                    self.init_x = self.prev_x
+                    self.init_y = self.prev_y
+                    self.start_timer()
 
             self.clear_typed_text()
             return True
@@ -85,7 +84,6 @@ class TouchpadWidget(Widget):
         self.mouse_bytes[self.offset] = x
 
     def send_if_not_empty(self):
-        # print(move_x, move_y)
         if self.controller.is_mouse_mode:
             self.move_x = self.cur_x - self.prev_x
             self.move_y = self.cur_y - self.prev_y
@@ -156,14 +154,19 @@ class TouchpadWidget(Widget):
         self.reset()
         self.recalc_size()
 
-    def right_click(self):
+    def game_right_click(self):
         self.controller.send_type(self.controller.RightMouse)
+        self.controller.is_mouse_mode = True
 
     def left_press(self):
         self.controller.send_pressed(self.controller.LeftMouse)
 
     def toggle_scroll(self):
-        self.controller.set_mouse_mode(not self.controller.is_mouse_mode)
+        self.timer.cancel()
+        self.is_mouse_mode = not self.is_mouse_mode
+
+    def switch_to_scroll(self):
+        self.controller.is_mouse_mode = False
 
     def start_timer(self):
         self.timer.cancel()
@@ -180,9 +183,9 @@ class TouchpadWidget(Widget):
         self.double_tap_func = self.left_press
 
         if self.controller.is_game_mode:
-            self._timer_func = self.right_click
+            self._timer_func = self.game_right_click
         else:
-            self._timer_func = self.toggle_scroll
+            self._timer_func = self.switch_to_scroll
 
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
