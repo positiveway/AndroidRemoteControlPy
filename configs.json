@@ -34,12 +34,16 @@
   "connection": {
     "via_wifi": true,
     "wifi": {
-      "device_num": 104,
-      "network_num": 1
+      "device_num": 59,
+      "network_num": 12
     },
     "phone": {
       "device_num": 200,
       "network_num": 161
+    },
+    "test": {
+      "device_num": 104,
+      "network_num": 1
     }
   }
 }

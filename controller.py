@@ -78,10 +78,15 @@ class ModifiersState(_State):
 class Controller:
     def connect(self, configs):
         connection_cfg = configs["connection"]
-        if connection_cfg['via_wifi']:
-            connection_cfg = connection_cfg['wifi']
+
+        from kivy.utils import platform
+        if platform == 'android':
+            if connection_cfg['via_wifi']:
+                connection_cfg = connection_cfg['wifi']
+            else:
+                connection_cfg = connection_cfg['phone']
         else:
-            connection_cfg = connection_cfg['phone']
+            connection_cfg = connection_cfg['test']
 
         network_num = connection_cfg["network_num"]
         device_num = connection_cfg["device_num"]
@@ -301,6 +306,7 @@ class Controller:
         self.mouse_hints = generate_mouse_hints(self.mouse_mode_layout)
 
         configs = load_configs()
+
 
         self.msg = bytearray(1)
         self.connect(configs)

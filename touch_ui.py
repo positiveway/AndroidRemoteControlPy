@@ -185,7 +185,6 @@ class APISenderApp(App):
 
 def main():
     APISenderApp().run()
-    Controller().release_mouse()
 
 
 if __name__ == '__main__':
