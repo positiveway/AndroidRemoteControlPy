@@ -177,7 +177,7 @@ class TouchpadWidget(Widget):
         if self.controller.is_game_mode:
             self.two_fingers_func = self.game_right_click
         else:
-            self.two_fingers_func = self.switch_to_scroll
+            self.two_fingers_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
