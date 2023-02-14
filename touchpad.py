@@ -35,8 +35,8 @@ class TouchpadWidget(Widget):
             self.prev_y = round(touch_event.y)
 
             self.touch_down_count += 1
-            if self.touch_down_count > 2:
-                raise ValueError(self.touch_down_count)
+            # if self.touch_down_count > 2:
+            #     raise ValueError(self.touch_down_count)
 
             if touch_event.is_double_tap:
                 if self.controller.is_mouse_mode:
@@ -125,7 +125,7 @@ class TouchpadWidget(Widget):
         if self.prev_x != self.value_not_set:  # originated within this element
             self.reset()
             self.controller.send_released(self.controller.LeftMouse)
-            gc.collect()
+            # gc.collect()
 
         if in_zone:
             # self.clear_canvas()
