@@ -30,7 +30,7 @@ class TouchpadWidget(Widget):
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
     def on_touch_down(self, touch_event):
-        if self.is_in_zone(touch_event):
+        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
             self.prev_x = round(touch_event.x)
             self.prev_y = round(touch_event.y)
 
@@ -97,7 +97,7 @@ class TouchpadWidget(Widget):
                 self.controller.sock.send(self.mouse_bytes)
 
     def on_touch_move(self, touch_event):
-        if self.is_in_zone(touch_event):
+        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
             self.cur_x = round(touch_event.x)
             self.cur_y = round(touch_event.y)
 
@@ -115,19 +115,23 @@ class TouchpadWidget(Widget):
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
-        in_zone = self.is_in_zone(touch_event)
-        if in_zone:
+        self.in_zone = self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
+        if self.in_zone:
             if self.touch_down_count == 2:
                 self.two_fingers_func()
 
             self.touch_down_count -= 1
 
         if self.prev_x != self.value_not_set:  # originated within this element
-            self.reset()
-            self.controller.send_released(self.controller.LeftMouse)
+            # self.reset()
+            self.prev_x = self.value_not_set
+            self.cur_x = self.value_not_set
+
+            self.controller._send_released_single(self.controller.LeftMouse)
+
             # gc.collect()
 
-        if in_zone:
+        if self.in_zone:
             # self.clear_canvas()
             return True
         else:
@@ -141,8 +145,8 @@ class TouchpadWidget(Widget):
         self.reset()
         self.touch_down_count = 0
 
-    def is_in_zone(self, touch_event):
-        return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
+    # def is_in_zone(self, touch_event):
+    #     return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
 
     def recalc_size(self):
         self.max_x = self.x + self.width
@@ -188,6 +192,7 @@ class TouchpadWidget(Widget):
         self.prev_y = 0
         self.move_x = 0
         self.move_y = 0
+        self.in_zone = False
 
         self.full_reset()
 
