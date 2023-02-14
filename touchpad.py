@@ -160,7 +160,7 @@ class TouchpadWidget(Widget):
         self.controller.send_pressed(self.controller.LeftMouse)
 
     def toggle_scroll(self):
-        self.is_mouse_mode = not self.is_mouse_mode
+        self.controller.is_mouse_mode = not self.controller.is_mouse_mode
 
     def switch_to_scroll(self):
         self.controller.is_mouse_mode = False
