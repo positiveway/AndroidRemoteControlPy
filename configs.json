@@ -6,12 +6,6 @@
   },
   "touchpad": {
     "double_click_delay": 0.25,
-    "hold": {
-      "normal": {
-        "dist": 18,
-        "time": 0.6
-      }
-    },
     "visuals": false
   },
   "scroll": {

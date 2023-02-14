@@ -33,7 +33,12 @@ class APISenderApp(App):
 
     def release_all(self, button):
         self.controller.release_all()
-        self.set_typing_mode(False)
+        self.touchpad.full_reset()
+
+        if not self.controller.is_game_mode:
+            self.set_typing_mode(False)
+
+        gc.collect()
 
     def double_click(self, button):
         self.controller.double_click()

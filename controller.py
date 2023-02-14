@@ -101,11 +101,6 @@ class Controller:
         self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
         self.scroll_by = self.scroll_cfg[profile]['move_by']
 
-    def set_hold_profile(self):
-        profile = "normal"
-        self.hold_dist = self.hold_cfg[profile]["dist"]
-        self.hold_time = self.hold_cfg[profile]["time"]
-
     def get_detailed_hints(self):
         direction = self.typing_btn_1
 
@@ -189,7 +184,6 @@ class Controller:
             self.force_release(button)
 
         self.reset_typing()
-        gc.collect()
 
     def send_type(self, buttons):
         self.send_pressed(buttons)
@@ -336,7 +330,6 @@ class Controller:
 
         touchpad_cfg = configs['touchpad']
         self.double_click_delay = touchpad_cfg['double_click_delay']
-        self.hold_cfg = touchpad_cfg['hold']
         self.visuals_for_touchpad = touchpad_cfg['visuals']
 
         font_size_cfg = configs['font']['size']
@@ -350,4 +343,3 @@ class Controller:
         self.arrows_mode = game_cfg['arrows_mode']
 
         self.is_mouse_mode = True
-        self.set_hold_profile()

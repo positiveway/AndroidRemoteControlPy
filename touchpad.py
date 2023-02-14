@@ -1,6 +1,4 @@
 import gc
-from math import hypot
-from threading import Timer
 
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
@@ -31,29 +29,21 @@ class TouchpadWidget(Widget):
             Color(*self.color)
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
-    def timer_func(self):
-        if self.controller.is_mouse_mode and self.init_x != self.value_not_set:
-            if self.cur_x == self.value_not_set or \
-                    hypot(self.cur_x - self.init_x, self.cur_y - self.init_y) <= self.controller.hold_dist:
-                self._timer_func()
-
     def on_touch_down(self, touch_event):
         if self.is_in_zone(touch_event):
             self.prev_x = round(touch_event.x)
             self.prev_y = round(touch_event.y)
 
-            if touch_event.is_double_tap:
-                self.timer.cancel()
+            self.touch_down_count += 1
 
+            if touch_event.is_double_tap:
                 if self.controller.is_mouse_mode:
                     self.double_tap_func()
-                else:
-                    self.controller.is_mouse_mode = True
+                # else:
+                #     self.controller.is_mouse_mode = True
             else:
                 if self.controller.is_mouse_mode:
-                    self.init_x = self.prev_x
-                    self.init_y = self.prev_y
-                    self.start_timer()
+                    pass
 
             self.clear_typed_text()
             return True
@@ -126,6 +116,12 @@ class TouchpadWidget(Widget):
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
+        if self.is_in_zone(touch_event):
+            if self.touch_down_count == 2:
+                self.two_fingers_func()
+
+            self.touch_down_count -= 1
+
         if self.prev_x != self.value_not_set:  # originated within this element
             self.reset()
             self.controller.send_released(self.controller.LeftMouse)
@@ -138,10 +134,12 @@ class TouchpadWidget(Widget):
             return super().on_touch_up(touch_event)
 
     def reset(self):
-        self.timer.cancel()
         self.prev_x = self.value_not_set
         self.cur_x = self.value_not_set
-        self.init_x = self.value_not_set
+
+    def full_reset(self):
+        self.reset()
+        self.touch_down_count = 0
 
     def is_in_zone(self, touch_event):
         return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
@@ -151,7 +149,7 @@ class TouchpadWidget(Widget):
         self.max_y = self.y + self.height
 
     def on_size(self, obj, values):
-        self.reset()
+        self.full_reset()
         self.recalc_size()
 
     def game_right_click(self):
@@ -162,19 +160,13 @@ class TouchpadWidget(Widget):
         self.controller.send_pressed(self.controller.LeftMouse)
 
     def toggle_scroll(self):
-        self.timer.cancel()
         self.is_mouse_mode = not self.is_mouse_mode
 
     def switch_to_scroll(self):
         self.controller.is_mouse_mode = False
 
-    def start_timer(self):
-        self.timer.cancel()
-        self.timer = Timer(self.controller.hold_time, self.timer_func)
-        self.timer.start()
-
     def init(self):
-        self.always_release = True
+        self.always_release = True  # kivy behavior
 
         self.value_not_set = 1000
 
@@ -183,23 +175,21 @@ class TouchpadWidget(Widget):
         self.double_tap_func = self.left_press
 
         if self.controller.is_game_mode:
-            self._timer_func = self.game_right_click
+            self.two_fingers_func = self.game_right_click
         else:
-            self._timer_func = self.switch_to_scroll
+            self.two_fingers_func = self.switch_to_scroll
 
         self.mouse_bytes = bytearray(2)
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
-        self.timer = Timer(1000, self.timer_func)
-        self.timer.cancel()
-
         self.offset = 0
+        self.touch_down_count = 0
         self.prev_x = 0
         self.prev_y = 0
         self.move_x = 0
         self.move_y = 0
 
-        self.reset()
+        self.full_reset()
 
         max_color = 255
         self.color = (80 / max_color, 200 / max_color, 1 / max_color)
