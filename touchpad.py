@@ -72,30 +72,6 @@ class TouchpadWidget(Widget):
 
         self.mouse_bytes[self.offset] = x
 
-    def send_if_not_empty(self):
-        if self.controller.is_mouse_mode:
-            self.move_x = self.cur_x - self.prev_x
-            self.move_y = self.cur_y - self.prev_y
-
-            self.prev_x = self.cur_x
-            self.prev_y = self.cur_y
-
-            if self.move_x != 0 or self.move_y != 0:
-                self.offset = 0
-                self.convert_to_send(self.move_x)
-                self.offset = 1
-                self.convert_to_send(self.move_y)
-                self.controller.sock.send(self.mouse_bytes)
-        else:
-            self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
-            self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
-
-            if self.move_y != 0:
-                self.mouse_bytes[0] = 128
-                self.offset = 1
-                self.convert_to_send(self.move_y)
-                self.controller.sock.send(self.mouse_bytes)
-
     def on_touch_move(self, touch_event):
         if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
             self.cur_x = round(touch_event.x)
@@ -105,7 +81,29 @@ class TouchpadWidget(Widget):
                 self.prev_x = self.cur_x
                 self.prev_y = self.cur_y
             else:
-                self.send_if_not_empty()
+                # self.send_if_not_empty()
+                if self.controller.is_mouse_mode:
+                    self.move_x = self.cur_x - self.prev_x
+                    self.move_y = self.cur_y - self.prev_y
+
+                    self.prev_x = self.cur_x
+                    self.prev_y = self.cur_y
+
+                    if self.move_x != 0 or self.move_y != 0:
+                        self.offset = 0
+                        self.convert_to_send(self.move_x)
+                        self.offset = 1
+                        self.convert_to_send(self.move_y)
+                        self.controller.sock.send(self.mouse_bytes)
+                else:
+                    self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
+                    self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
+
+                    if self.move_y != 0:
+                        self.mouse_bytes[0] = 128
+                        self.offset = 1
+                        self.convert_to_send(self.move_y)
+                        self.controller.sock.send(self.mouse_bytes)
 
             # self.draw_touch(touch_event)
             return True
