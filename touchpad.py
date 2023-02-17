@@ -59,18 +59,21 @@ class TouchpadWidget(Widget):
         else:
             return prev, 0
 
-    def convert_to_send(self, x):
-        if x > 127:
-            x = 127
-            # print(f"value is too much: {x}")
-        elif x < -127:
-            x = -127
-            # print(f"value is too much: {x}")
+    def get_convert_to_send(self, offset):
+        def actual_func(x):
+            if x > 127:
+                x = 127
+                # print(f"value is too much: {x}")
+            elif x < -127:
+                x = -127
+                # print(f"value is too much: {x}")
 
-        if x < 0:
-            x += 256
+            if x < 0:
+                x += 256
 
-        self.mouse_bytes[self.offset] = x
+            self.mouse_bytes[offset] = x
+
+        return actual_func
 
     def on_touch_move(self, touch_event):
         if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
@@ -90,10 +93,8 @@ class TouchpadWidget(Widget):
                     self.prev_y = self.cur_y
 
                     if self.move_x != 0 or self.move_y != 0:
-                        self.offset = 0
-                        self.convert_to_send(self.move_x)
-                        self.offset = 1
-                        self.convert_to_send(self.move_y)
+                        self.convert_offset_0(self.move_x)
+                        self.convert_offset_1(self.move_y)
                         self.controller.sock.send(self.mouse_bytes)
                 else:
                     self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
@@ -101,8 +102,7 @@ class TouchpadWidget(Widget):
 
                     if self.move_y != 0:
                         self.mouse_bytes[0] = 128
-                        self.offset = 1
-                        self.convert_to_send(self.move_y)
+                        self.convert_offset_1(self.move_y)
                         self.controller.sock.send(self.mouse_bytes)
 
             # self.draw_touch(touch_event)
@@ -182,9 +182,11 @@ class TouchpadWidget(Widget):
             self.two_fingers_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
+        self.convert_offset_0 = self.get_convert_to_send(0)
+        self.convert_offset_1 = self.get_convert_to_send(1)
+
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
-        self.offset = 0
         self.touch_down_count = 0
         self.prev_x = 0
         self.prev_y = 0
