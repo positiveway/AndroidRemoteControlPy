@@ -31,18 +31,19 @@ class TouchpadWidget(Widget):
 
     def on_touch_down(self, touch_event):
         if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
-            self.prev_x = round(touch_event.x)
-            self.prev_y = round(touch_event.y)
 
             self.touch_down_count += 1
-            if self.touch_down_count > 2:
+            if self.touch_down_count > self.MAX_FINGERS_SUPPORTED:
                 # self.touch_down_count = 0
-                raise ValueError(self.touch_down_count)
+                raise ValueError(f'Down: {self.touch_down_count}')
 
             elif self.touch_down_count == 2:
                 self.two_fingers_func()
 
             else:
+                self.prev_x = round(touch_event.x)
+                self.prev_y = round(touch_event.y)
+
                 if touch_event.is_double_tap:
                     if self.controller.is_mouse_mode:
                         self.double_tap_func()
@@ -82,11 +83,19 @@ class TouchpadWidget(Widget):
         return actual_func
 
     def on_touch_move(self, touch_event):
-        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
+        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y \
+                and self.touch_down_count <= 1:
+
             self.cur_x = round(touch_event.x)
             self.cur_y = round(touch_event.y)
 
             if self.prev_x == self.value_not_set:
+
+                self.touch_down_count += 1
+                if self.touch_down_count > self.MAX_FINGERS_SUPPORTED:
+                    # self.touch_down_count = 0
+                    raise ValueError(f'Move: {self.touch_down_count}')
+
                 self.prev_x = self.cur_x
                 self.prev_y = self.cur_y
             else:
@@ -172,6 +181,8 @@ class TouchpadWidget(Widget):
 
     def init(self):
         self.always_release = True  # kivy behavior
+
+        self.MAX_FINGERS_SUPPORTED = 2
 
         self.value_not_set = 1000
 
