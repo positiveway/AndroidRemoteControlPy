@@ -128,8 +128,6 @@ class TouchpadWidget(Widget):
 
             self.controller._send_released_single(self.controller.LeftMouse)
 
-            # gc.collect()
-
         if self.in_zone:
             # self.clear_canvas()
             return True

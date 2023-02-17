@@ -190,7 +190,6 @@ class Controller:
         if self.btn_states.release(button):
             self._send_released_raw(button)
             self.release_all_modifiers()
-            # gc.collect()
 
     def release_all_modifiers(self):
         for modifier in self.modifiers.all_pressed_except_caps():

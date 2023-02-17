@@ -43,6 +43,18 @@ class APISenderApp(App):
     def double_click(self, button):
         self.controller.double_click()
 
+    def tune_gc(self):
+        # Clean up what might be garbage so far.
+        gc.collect(2)
+        # Exclude current items from future GC.
+        gc.freeze()
+
+        allocs, gen1, gen2 = gc.get_threshold()
+        allocs = 50_000  # Start the GC sequence every 50K not 700 allocations.
+        gen1 = gen1 * 2
+        gen2 = gen2 * 2
+        gc.set_threshold(allocs, gen1, gen2)
+
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
@@ -84,8 +96,7 @@ class APISenderApp(App):
 
             self.set_typing_mode(False)
 
-        gc.disable()
-        gc.collect()
+        self.tune_gc()
 
     def clear_typed_text(self):
         self.typed_text = ""
