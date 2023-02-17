@@ -65,7 +65,7 @@ class TouchpadWidget(Widget):
         else:
             return prev, 0
 
-    def get_convert_to_send(self, offset):
+    def get_convert_to_send(self, offset, mouse_bytes):
         def actual_func(x):
             if x > 127:
                 x = 127
@@ -77,7 +77,7 @@ class TouchpadWidget(Widget):
             if x < 0:
                 x += 256
 
-            self.mouse_bytes[offset] = x
+            mouse_bytes[offset] = x
 
         return actual_func
 
@@ -119,17 +119,20 @@ class TouchpadWidget(Widget):
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
-        if self.prev_x != self.value_not_set:  # originated within this element
+        in_zone = self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
+
+        if in_zone or self.prev_x != self.value_not_set:
             if self.touch_down_count > 0:
                 self.touch_down_count -= 1
 
+        if self.prev_x != self.value_not_set:  # originated within this element
             # self.reset()
             self.prev_x = self.value_not_set
             self.cur_x = self.value_not_set
 
             self.controller._send_released_single(self.controller.LeftMouse)
 
-        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
+        if in_zone:
             # self.clear_canvas()
             return True
         else:
@@ -182,8 +185,8 @@ class TouchpadWidget(Widget):
             self.two_fingers_func = self.toggle_scroll
 
         self.mouse_bytes = bytearray(2)
-        self.convert_offset_0 = self.get_convert_to_send(0)
-        self.convert_offset_1 = self.get_convert_to_send(1)
+        self.convert_offset_0 = self.get_convert_to_send(0, self.mouse_bytes)
+        self.convert_offset_1 = self.get_convert_to_send(1, self.mouse_bytes)
 
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
