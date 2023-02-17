@@ -39,13 +39,18 @@ class TouchpadWidget(Widget):
                 # self.touch_down_count = 0
                 raise ValueError(self.touch_down_count)
 
-            if touch_event.is_double_tap:
-                if self.controller.is_mouse_mode:
-                    self.double_tap_func()
-                # else:
-                #     self.controller.is_mouse_mode = True
+            elif self.touch_down_count == 2:
+                self.two_fingers_func()
 
-            self.clear_typed_text()
+            else:
+                if touch_event.is_double_tap:
+                    if self.controller.is_mouse_mode:
+                        self.double_tap_func()
+                    # else:
+                    #     self.controller.is_mouse_mode = True
+
+                self.clear_typed_text()
+
             return True
         else:
             return super().on_touch_down(touch_event)
@@ -114,21 +119,17 @@ class TouchpadWidget(Widget):
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
-        self.in_zone = self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
-        if self.in_zone:
-            if self.touch_down_count == 2:
-                self.two_fingers_func()
-
-            self.touch_down_count -= 1
-
         if self.prev_x != self.value_not_set:  # originated within this element
+            if self.touch_down_count > 0:
+                self.touch_down_count -= 1
+
             # self.reset()
             self.prev_x = self.value_not_set
             self.cur_x = self.value_not_set
 
             self.controller._send_released_single(self.controller.LeftMouse)
 
-        if self.in_zone:
+        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
             # self.clear_canvas()
             return True
         else:
@@ -191,7 +192,6 @@ class TouchpadWidget(Widget):
         self.prev_y = 0
         self.move_x = 0
         self.move_y = 0
-        self.in_zone = False
 
         self.full_reset()
 
