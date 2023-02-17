@@ -2,104 +2,104 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from code_map import *
-from common_layout import UniversalButton, Layout, make_common_buttons
+from common_layout import UniversalButtonUI, Layout, make_common_buttons
 from typing_layout import DIRECTIONS
 
 
 def make_buttons(app):
-    app.shift_btn = UniversalButton(
+    app.shift_btn = UniversalButtonUI(
         "Shift", app,
         button_codes=Shift
     )
-    app.caps_btn = UniversalButton(
+    app.caps_btn = UniversalButtonUI(
         "Caps", app,
         button_codes=Caps
     )
-    app.up_btn = UniversalButton(
+    app.up_btn = UniversalButtonUI(
         "Up", app,
         buttons="Up", on_press_only=False
     )
-    app.down_btn = UniversalButton(
+    app.down_btn = UniversalButtonUI(
         "Down", app,
         buttons="Down", on_press_only=False
     )
-    app.left_btn = UniversalButton(
+    app.left_btn = UniversalButtonUI(
         "Left", app,
         buttons="Left", on_press_only=False
     )
-    app.right_btn = UniversalButton(
+    app.right_btn = UniversalButtonUI(
         "Right", app,
         buttons="Right", on_press_only=False
     )
 
-    app.left_click = UniversalButton(
+    app.left_click = UniversalButtonUI(
         "Left", app,
         button_codes=LeftMouse, on_press_only=False
     )
-    app.right_click = UniversalButton(
+    app.right_click = UniversalButtonUI(
         "Right", app,
         button_codes=RightMouse
     )
-    app.middle_click = UniversalButton(
+    app.middle_click = UniversalButtonUI(
         "Middle", app,
         button_codes=MiddleMouse
     )
 
-    app.scroll_btn = UniversalButton(
+    app.scroll_btn = UniversalButtonUI(
         "Scroll", app,
         func=app.toggle_scroll,
     )
-    app.double_click_btn = UniversalButton(
+    app.double_click_btn = UniversalButtonUI(
         "X2", app,
         func=app.double_click
     )
-    app.space_btn = UniversalButton(
+    app.space_btn = UniversalButtonUI(
         "Space", app,
         button_codes=Space, on_press_only=False
     )
-    app.bs_btn = UniversalButton(
+    app.bs_btn = UniversalButtonUI(
         "BS", app,
         buttons='BS', on_press_only=False
     )
 
-    app.copy_btn = UniversalButton(
+    app.copy_btn = UniversalButtonUI(
         "Copy", app,
         buttons='Copy'
     )
-    app.cut_btn = UniversalButton(
+    app.cut_btn = UniversalButtonUI(
         "Cut", app,
         buttons='Cut'
     )
-    app.paste_btn = UniversalButton(
+    app.paste_btn = UniversalButtonUI(
         "Paste", app,
         buttons='Paste'
     )
-    app.select_all_btn = UniversalButton(
+    app.select_all_btn = UniversalButtonUI(
         "Select", app,
         buttons='Select'
     )
-    app.format_btn = UniversalButton(
+    app.format_btn = UniversalButtonUI(
         "Format", app,
         buttons='Format'
     )
-    app.search_btn = UniversalButton(
+    app.search_btn = UniversalButtonUI(
         "Search", app,
         buttons='Search'
     )
-    app.replace_btn = UniversalButton(
+    app.replace_btn = UniversalButtonUI(
         "Replace", app,
         buttons='Replace'
     )
-    app.undo_btn = UniversalButton(
+    app.undo_btn = UniversalButtonUI(
         "Undo", app,
         buttons='Undo'
     )
-    app.redo_btn = UniversalButton(
+    app.redo_btn = UniversalButtonUI(
         "Redo", app,
         buttons='Redo'
     )
 
-    app.esc_btn = UniversalButton(
+    app.esc_btn = UniversalButtonUI(
         "Esc", app,
         button_codes=Esc
     )

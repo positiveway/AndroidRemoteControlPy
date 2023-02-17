@@ -7,21 +7,21 @@ from common import *
 
 
 def make_common_buttons(app):
-    app.enter_btn = UniversalButton(
+    app.enter_btn = UniversalButtonUI(
         "Enter", app,
         button_codes=Enter
     )
-    app.release_all_btn = UniversalButton(
+    app.release_all_btn = UniversalButtonUI(
         "Release", app,
         func=app.release_all
     )
-    app.clear_btn = UniversalButton(
+    app.clear_btn = UniversalButtonUI(
         "Clear", app,
         func=app.clear_as_button
     )
 
 
-class UniversalButton(Button):
+class UniversalButtonUI(Button):
     def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=True):
         if func is not None:
             super().__init__(

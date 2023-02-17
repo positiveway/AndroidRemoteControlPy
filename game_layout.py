@@ -1,10 +1,10 @@
 from kivy.uix.label import Label
 from code_map import *
 from common import apply_to_seq_or_one
-from common_layout import Layout, make_common_buttons, UniversalButton
+from common_layout import Layout, make_common_buttons, UniversalButtonUI
 
 
-class GameButton(UniversalButton):
+class GameButtonUI(UniversalButtonUI):
     def __init__(self, text, app, buttons=None, button_codes=None, func=None):
         super().__init__(text, app, buttons=buttons,
                          button_codes=button_codes, func=func,
@@ -20,7 +20,7 @@ def replace_by_arrow(button):
     }[button.lower()]
 
 
-class ArrowButton(GameButton):
+class ArrowButtonUI(GameButtonUI):
     def __init__(self, text, app, buttons):
         if app.controller.arrows_mode:
             buttons = apply_to_seq_or_one(buttons, replace_by_arrow)
@@ -29,51 +29,51 @@ class ArrowButton(GameButton):
 
 
 def make_movement_buttons(app):
-    app.w_btn = ArrowButton(
+    app.w_btn = ArrowButtonUI(
         "W", app,
         buttons="W",
     )
-    app.a_btn = ArrowButton(
+    app.a_btn = ArrowButtonUI(
         "A", app,
         buttons="A",
     )
-    app.s_btn = ArrowButton(
+    app.s_btn = ArrowButtonUI(
         "S", app,
         buttons="S",
     )
-    app.d_btn = ArrowButton(
+    app.d_btn = ArrowButtonUI(
         "D", app,
         buttons="D",
     )
-    app.wa_btn = ArrowButton(
+    app.wa_btn = ArrowButtonUI(
         "WA", app,
         buttons=["W", "A"],
     )
-    app.wd_btn = ArrowButton(
+    app.wd_btn = ArrowButtonUI(
         "WD", app,
         buttons=["W", "D"],
     )
-    app.sa_btn = ArrowButton(
+    app.sa_btn = ArrowButtonUI(
         "SA", app,
         buttons=["S", "A"],
     )
-    app.sd_btn = ArrowButton(
+    app.sd_btn = ArrowButtonUI(
         "SD", app,
         buttons=["S", "D"],
     )
 
 
 def make_buttons(app):
-    app.space_btn = GameButton(
+    app.space_btn = GameButtonUI(
         "Space", app,
         buttons="Space"
     )
-    app.shift_btn = GameButton(
+    app.shift_btn = GameButtonUI(
         "Shift", app,
         button_codes=Shift
     )
 
-    app.esc_btn = GameButton(
+    app.esc_btn = GameButtonUI(
         "Esc", app,
         button_codes=Esc
     )
