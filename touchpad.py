@@ -1,5 +1,3 @@
-import gc
-
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Ellipse
 
