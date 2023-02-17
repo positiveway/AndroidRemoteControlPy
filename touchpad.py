@@ -35,8 +35,9 @@ class TouchpadWidget(Widget):
             self.prev_y = round(touch_event.y)
 
             self.touch_down_count += 1
-            # if self.touch_down_count > 2:
-            #     raise ValueError(self.touch_down_count)
+            if self.touch_down_count > 2:
+                # self.touch_down_count = 0
+                raise ValueError(self.touch_down_count)
 
             if touch_event.is_double_tap:
                 if self.controller.is_mouse_mode:
@@ -140,8 +141,8 @@ class TouchpadWidget(Widget):
         self.cur_x = self.value_not_set
 
     def full_reset(self):
-        self.reset()
         self.touch_down_count = 0
+        self.reset()
 
     # def is_in_zone(self, touch_event):
     #     return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y

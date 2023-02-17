@@ -32,8 +32,8 @@ class APISenderApp(App):
         self.touchpad.toggle_scroll()
 
     def release_all(self, button):
-        self.controller.release_all()
         self.touchpad.full_reset()
+        self.controller.release_all()
 
         if not self.controller.is_game_mode:
             self.set_typing_mode(False)
