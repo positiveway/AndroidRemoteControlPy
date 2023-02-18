@@ -45,8 +45,9 @@ class TouchpadWidget(Widget):
                 if touch_event.is_double_tap:
                     if self.controller.is_mouse_mode:
                         self.double_tap_func()
-                    # else:
-                    #     self.controller.is_mouse_mode = True
+                    else:
+                        # self.two_fingers_func()
+                        self.controller.is_mouse_mode = True
 
                 self.clear_typed_text()
 
