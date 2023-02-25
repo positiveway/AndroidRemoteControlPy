@@ -1,12 +1,12 @@
 {
-  "is_game_mode": false,
+  "is_game_mode": 0,
   "game": {
     "button_delay": 0.1,
-    "arrows_mode": false
+    "arrows_mode": 0
   },
   "touchpad": {
     "double_click_delay": 0.25,
-    "visuals": false
+    "visuals": 0
   },
   "scroll": {
     "normal": {
@@ -21,7 +21,7 @@
   "typing": {
   },
   "joystick": {
-    "visuals": true,
+    "visuals": 1,
     "thresholdPct": 70,
     "angleMargin": 20
   },
@@ -32,7 +32,7 @@
     }
   },
   "connection": {
-    "via_wifi": true,
+    "via_wifi": 1,
     "wifi": {
       "device_num": 59,
       "network_num": 12

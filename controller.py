@@ -15,7 +15,7 @@ class Controller:
 
         from kivy.utils import platform
         if platform == 'android':
-            if connection_cfg['via_wifi']:
+            if bool(connection_cfg['via_wifi']):
                 connection_cfg = connection_cfg['wifi']
             else:
                 connection_cfg = connection_cfg['phone']
@@ -268,16 +268,16 @@ class Controller:
 
         touchpad_cfg = configs['touchpad']
         self.double_click_delay = touchpad_cfg['double_click_delay']
-        self.visuals_for_touchpad = touchpad_cfg['visuals']
+        self.visuals_for_touchpad = bool(touchpad_cfg['visuals'])
 
         font_size_cfg = configs['font']['size']
         self.font_size = font_size_cfg['normal']
         self.small_font_size = font_size_cfg['small']
 
-        self.is_game_mode = configs['is_game_mode']
+        self.is_game_mode = bool(configs['is_game_mode'])
 
         game_cfg = configs['game']
         self.game_button_delay = game_cfg['button_delay']
-        self.arrows_mode = game_cfg['arrows_mode']
+        self.arrows_mode = bool(game_cfg['arrows_mode'])
 
         self.is_mouse_mode = True
