@@ -27,26 +27,28 @@ class TouchpadWidget(Widget):
             Color(*self.color)
             Ellipse(pos=(touch.x - self.radius, touch.y - self.radius), size=self.ellipse_size)
 
+    def init_prev_and_count(self, touch_event):
+        self.touch_down_count += 1
+        if self.touch_down_count > self.MAX_FINGERS_SUPPORTED:
+            # self.touch_down_count = 0
+            raise ValueError(f'Down or move: {self.touch_down_count}')
+
+        self.prev_x = round(touch_event.x)
+        self.prev_y = round(touch_event.y)
+
     def on_touch_down(self, touch_event):
-        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y:
+        if self.is_in_zone(touch_event):
 
-            self.touch_down_count += 1
-            if self.touch_down_count > self.MAX_FINGERS_SUPPORTED:
-                # self.touch_down_count = 0
-                raise ValueError(f'Down: {self.touch_down_count}')
+            self.init_prev_and_count(touch_event)
 
-            else:
-                self.prev_x = round(touch_event.x)
-                self.prev_y = round(touch_event.y)
+            if touch_event.is_double_tap:
+                if self.controller.is_mouse_mode:
+                    self.double_tap_func()
+                else:
+                    # self.two_fingers_func()
+                    self.controller.is_mouse_mode = True
 
-                if touch_event.is_double_tap:
-                    if self.controller.is_mouse_mode:
-                        self.double_tap_func()
-                    else:
-                        # self.two_fingers_func()
-                        self.controller.is_mouse_mode = True
-
-                self.clear_typed_text()
+            self.clear_typed_text()
 
             return True
         else:
@@ -79,22 +81,14 @@ class TouchpadWidget(Widget):
         return actual_func
 
     def on_touch_move(self, touch_event):
-        if self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y \
-                and self.touch_down_count <= 1:
-
-            self.cur_x = round(touch_event.x)
-            self.cur_y = round(touch_event.y)
+        if self.is_in_zone(touch_event) and self.touch_down_count <= 1:
 
             if self.prev_x == self.value_not_set:
-
-                self.touch_down_count += 1
-                if self.touch_down_count > self.MAX_FINGERS_SUPPORTED:
-                    # self.touch_down_count = 0
-                    raise ValueError(f'Move: {self.touch_down_count}')
-
-                self.prev_x = self.cur_x
-                self.prev_y = self.cur_y
+                self.init_prev_and_count(touch_event)
             else:
+                self.cur_x = round(touch_event.x)
+                self.cur_y = round(touch_event.y)
+
                 # self.send_if_not_empty()
                 if self.controller.is_mouse_mode:
                     self.move_x = self.cur_x - self.prev_x
@@ -124,24 +118,25 @@ class TouchpadWidget(Widget):
             return super().on_touch_move(touch_event)
 
     def on_touch_up(self, touch_event):
-        in_zone = self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
+        in_zone = self.is_in_zone(touch_event)
         originated_within_element = self.prev_x != self.value_not_set  # originated within this element
 
-        if originated_within_element and self.touch_down_count <= 1:
-            self.reset()
+        if self.touch_down_count <= 1:
+            if originated_within_element:
+                self.reset()
+                self.release_func()
+        else:
+            if in_zone or originated_within_element:
+                if not self.mult_fingers_handled:
+                    if self.touch_down_count == 2:
+                        self.mult_fingers_handled = True
+                        self.two_fingers_func()
 
-            self.release_func()
+                    elif self.touch_down_count == 3:
+                        self.mult_fingers_handled = True
+                        self.three_fingers_func()
 
         if in_zone or originated_within_element:
-            if not self.mult_fingers_handled:
-                if self.touch_down_count == 2:
-                    self.two_fingers_func()
-
-                elif self.touch_down_count == 3:
-                    self.three_fingers_func()
-
-                self.mult_fingers_handled = True
-
             if self.touch_down_count > 0:
                 self.touch_down_count -= 1
 
@@ -162,8 +157,8 @@ class TouchpadWidget(Widget):
         self.reset()
         self.cur_game_button = self.LeftMouse
 
-    # def is_in_zone(self, touch_event):
-    #     return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
+    def is_in_zone(self, touch_event):
+        return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
 
     def recalc_size(self):
         self.max_x = self.x + self.width
