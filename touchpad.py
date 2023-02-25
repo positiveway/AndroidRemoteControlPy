@@ -213,7 +213,7 @@ class TouchpadWidget(Widget):
     def init(self):
         self.always_release = True  # kivy behavior
 
-        self.MAX_FINGERS_SUPPORTED = 2
+        self.MAX_FINGERS_SUPPORTED = 3
 
         self.value_not_set = 1000
 
