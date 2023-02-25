@@ -26,14 +26,18 @@ class Controller:
         device_num = connection_cfg["device_num"]
 
         server_ip = f'192.168.{network_num}.{device_num}'
-        udp_port = 5005
-        tcp_port = 5007
 
-        self.udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        mouse_port = 5005
+        scroll_port = 5007
+        button_port = 5009
 
-        self.udp_sock.connect((server_ip, udp_port))
-        self.tcp_sock.connect((server_ip, tcp_port))
+        self.mouse_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.scroll_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.button_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        self.mouse_sock.connect((server_ip, mouse_port))
+        self.scroll_sock.connect((server_ip, scroll_port))
+        self.button_sock.connect((server_ip, button_port))
 
     def set_scroll_profile(self):
         if self.is_high_precision:
@@ -232,15 +236,15 @@ class Controller:
 
     def _send_pressed_raw(self, button):
         self.msg[0] = button + 128
-        self.tcp_sock.send(self.msg)
+        self.button_sock.send(self.msg)
 
     def _send_released_raw(self, button):
         self.msg[0] = button
-        self.tcp_sock.send(self.msg)
+        self.button_sock.send(self.msg)
 
-    def send_terminate_connection(self):
-        self.msg[0] = 128
-        self.tcp_sock.send(self.msg)
+    # def send_terminate_connection(self):
+    #     self.msg[0] = 128
+    #     self.button_sock.send(self.msg)
 
     def force_release(self, button):
         self._send_released_raw(button)

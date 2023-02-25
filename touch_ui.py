@@ -192,7 +192,7 @@ class APISenderApp(App):
 
     def on_stop(self):
         self.controller.release_mouse_and_pressed()
-        self.controller.send_terminate_connection()
+        # self.controller.send_terminate_connection()
 
 
 def main():

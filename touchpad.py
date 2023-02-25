@@ -64,7 +64,7 @@ class TouchpadWidget(Widget):
         else:
             return prev, 0
 
-    def get_convert_to_send(self, offset, mouse_bytes):
+    def get_convert_to_send(self, offset, bytes_msg):
         def actual_func(x):
             if x > 127:
                 x = 127
@@ -76,7 +76,7 @@ class TouchpadWidget(Widget):
             if x < 0:
                 x += 256
 
-            mouse_bytes[offset] = x
+            bytes_msg[offset] = x
 
         return actual_func
 
@@ -98,17 +98,16 @@ class TouchpadWidget(Widget):
                     self.prev_y = self.cur_y
 
                     if self.move_x != 0 or self.move_y != 0:
-                        self.convert_offset_0(self.move_x)
-                        self.convert_offset_1(self.move_y)
-                        self.controller.udp_sock.send(self.mouse_bytes)
+                        self.write_mouse_byte_0(self.move_x)
+                        self.write_mouse_byte_1(self.move_y)
+                        self.controller.mouse_sock.send(self.mouse_bytes)
                 else:
-                    self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
+                    # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
                     self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
 
                     if self.move_y != 0:
-                        self.mouse_bytes[0] = 128
-                        self.convert_offset_1(self.move_y)
-                        self.controller.udp_sock.send(self.mouse_bytes)
+                        self.write_scroll_byte(self.move_y)
+                        self.controller.scroll_sock.send(self.scroll_bytes)
 
             # self.draw_touch(touch_event)
             return True
@@ -239,8 +238,11 @@ class TouchpadWidget(Widget):
             self.release_func = self.release_left
 
         self.mouse_bytes = bytearray(2)
-        self.convert_offset_0 = self.get_convert_to_send(0, self.mouse_bytes)
-        self.convert_offset_1 = self.get_convert_to_send(1, self.mouse_bytes)
+        self.write_mouse_byte_0 = self.get_convert_to_send(0, self.mouse_bytes)
+        self.write_mouse_byte_1 = self.get_convert_to_send(1, self.mouse_bytes)
+
+        self.scroll_bytes = bytearray(1)
+        self.write_scroll_byte = self.get_convert_to_send(0, self.scroll_bytes)
 
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 
