@@ -238,6 +238,10 @@ class Controller:
         self.msg[0] = button
         self.tcp_sock.send(self.msg)
 
+    def send_terminate_connection(self):
+        self.msg[0] = 128
+        self.tcp_sock.send(self.msg)
+
     def force_release(self, button):
         self._send_released_raw(button)
         self.btn_states.release(button)
