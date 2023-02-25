@@ -232,11 +232,11 @@ class Controller:
 
     def _send_pressed_raw(self, button):
         self.msg[0] = button + 128
-        self.tcp_sock.sendall(self.msg)
+        self.tcp_sock.send(self.msg)
 
     def _send_released_raw(self, button):
         self.msg[0] = button
-        self.tcp_sock.sendall(self.msg)
+        self.tcp_sock.send(self.msg)
 
     def force_release(self, button):
         self._send_released_raw(button)
