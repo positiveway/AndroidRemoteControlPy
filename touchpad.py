@@ -35,9 +35,6 @@ class TouchpadWidget(Widget):
                 # self.touch_down_count = 0
                 raise ValueError(f'Down: {self.touch_down_count}')
 
-            elif self.touch_down_count == 2:
-                self.two_fingers_func()
-
             else:
                 self.prev_x = round(touch_event.x)
                 self.prev_y = round(touch_event.y)
@@ -128,16 +125,23 @@ class TouchpadWidget(Widget):
 
     def on_touch_up(self, touch_event):
         in_zone = self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
-        originated_within_element = self.prev_x != self.value_not_set
+        originated_within_element = self.prev_x != self.value_not_set  # originated within this element
 
-        if originated_within_element and self.touch_down_count <= 1:  # originated within this element
-            # self.reset()
-            self.prev_x = self.value_not_set
-            self.cur_x = self.value_not_set
+        if originated_within_element and self.touch_down_count <= 1:
+            self.reset()
 
-            self.controller._send_released_single(self.controller.LeftMouse)
+            self.release_func()
 
         if in_zone or originated_within_element:
+            if not self.mult_fingers_handled:
+                if self.touch_down_count == 2:
+                    self.two_fingers_func()
+
+                elif self.touch_down_count == 3:
+                    self.three_fingers_func()
+
+                self.mult_fingers_handled = True
+
             if self.touch_down_count > 0:
                 self.touch_down_count -= 1
 
@@ -151,9 +155,12 @@ class TouchpadWidget(Widget):
         self.prev_x = self.value_not_set
         self.cur_x = self.value_not_set
 
+        self.mult_fingers_handled = False
+
     def full_reset(self):
         self.touch_down_count = 0
         self.reset()
+        self.cur_game_button = self.LeftMouse
 
     # def is_in_zone(self, touch_event):
     #     return self.x <= touch_event.x <= self.max_x and self.y <= touch_event.y <= self.max_y
@@ -166,18 +173,47 @@ class TouchpadWidget(Widget):
         self.full_reset()
         self.recalc_size()
 
-    def game_right_click(self):
-        self.controller.send_type(self.controller.RightMouse)
-        self.controller.is_mouse_mode = True
+    def empty_func(self):
+        pass
+
+    def game_right_hold(self):
+        self.controller.send_pressed_mouse(self.RightMouse)
+        # self.controller.is_mouse_mode = True
+
+    def game_left_hold(self):
+        self.controller.send_pressed_mouse(self.LeftMouse)
+
+    def game_release_hold(self):
+        self.controller.send_released_mouse(self.LeftMouse)
+        self.controller.send_released_mouse(self.RightMouse)
+
+    def game_right_toggle(self):
+        if self.cur_game_button == self.LeftMouse:
+            self.cur_game_button = self.RightMouse
+        else:
+            self.cur_game_button = self.LeftMouse
+
+    def game_left_toggle(self):
+        self.controller.send_pressed_mouse(self.cur_game_button)
+
+    def game_release_toggle(self):
+        self.controller.send_released_mouse(self.LeftMouse)
+        self.controller.send_released_mouse(self.RightMouse)
 
     def left_press(self):
-        self.controller.send_pressed(self.controller.LeftMouse)
+        self.controller.send_pressed_mouse(self.LeftMouse)
+
+    def right_click(self):
+        self.controller.send_type(self.RightMouse)
 
     def toggle_scroll(self):
         self.controller.is_mouse_mode = not self.controller.is_mouse_mode
 
     def switch_to_scroll(self):
         self.controller.is_mouse_mode = False
+
+    def release_left(self):
+        self.controller.send_released_mouse(self.LeftMouse)
 
     def init(self):
         self.always_release = True  # kivy behavior
@@ -187,13 +223,25 @@ class TouchpadWidget(Widget):
         self.value_not_set = 1000
 
         self.controller = Controller()
-
-        self.double_tap_func = self.left_press
+        self.LeftMouse = self.controller.LeftMouse
+        self.RightMouse = self.controller.RightMouse
 
         if self.controller.is_game_mode:
-            self.two_fingers_func = self.game_right_click
+            if self.controller.game_toggle_right_mouse:
+                self.double_tap_func = self.game_left_toggle
+                self.two_fingers_func = self.game_right_toggle
+                self.three_fingers_func = self.empty_func
+                self.release_func = self.game_release_toggle
+            else:
+                self.double_tap_func = self.game_left_hold
+                self.two_fingers_func = self.game_right_hold
+                self.three_fingers_func = self.empty_func
+                self.release_func = self.game_release_hold
         else:
+            self.double_tap_func = self.left_press
             self.two_fingers_func = self.toggle_scroll
+            self.three_fingers_func = self.right_click
+            self.release_func = self.release_left
 
         self.mouse_bytes = bytearray(2)
         self.convert_offset_0 = self.get_convert_to_send(0, self.mouse_bytes)

@@ -142,54 +142,71 @@ class Controller:
             for button in reverse(buttons):
                 self._send_released_single(button)
 
-    def _send_pressed_single(self, button):
-        if button == self.Esc:
-            self.release_mouse_and_pressed()
-
-        elif not self.is_mouse_mode and button in self.mouse_buttons:
-            return
-
-        else:
-            if button == self.Caps:
-                self.modifiers.current = self.Shift
-            else:
-                self.modifiers.current = button
-
-            if self.modifiers.current in self.modifiers.all:
-                if self.modifiers.cur_state == 0:
-                    if button == self.Caps:
-                        self.press_modifier(2)
-                    else:
-                        self.press_modifier(1)
-
-                elif self.modifiers.cur_state == 1:
-                    if button == self.Caps:
-                        self.release_modifier()
-                    else:
-                        self.release_modifier()
-
-                elif self.modifiers.cur_state == 2:
-                    if button == self.Caps:
-                        self.release_modifier()
-                else:
-                    raise ValueError(f'incorrect state: {self.modifiers.cur_state}')
-                return
-
-        if self.btn_states.press(button):
-            self._send_pressed_raw(button)
-
-    def _send_released_single(self, button):
+    def _modifier_press_handled(self, button):
         if button == self.Caps:
             self.modifiers.current = self.Shift
         else:
             self.modifiers.current = button
 
         if self.modifiers.current in self.modifiers.all:
-            return
+            if self.modifiers.cur_state == 0:
+                if button == self.Caps:
+                    self.press_modifier(2)
+                else:
+                    self.press_modifier(1)
 
+            elif self.modifiers.cur_state == 1:
+                if button == self.Caps:
+                    self.release_modifier()
+                else:
+                    self.release_modifier()
+
+            elif self.modifiers.cur_state == 2:
+                if button == self.Caps:
+                    self.release_modifier()
+            else:
+                raise ValueError(f'incorrect state: {self.modifiers.cur_state}')
+
+            return True
+        else:
+            return False
+
+    def send_pressed_mouse(self, button):
+        if self.is_mouse_mode:
+            if self.btn_states.press(button):
+                self._send_pressed_raw(button)
+
+    def _send_pressed_single(self, button):
+        if button in self.mouse_buttons:
+            self.send_pressed_mouse(button)
+
+        elif not self._modifier_press_handled(button):
+            if button == self.Esc:
+                self.release_mouse_and_pressed()
+
+            if self.btn_states.press(button):
+                self._send_pressed_raw(button)
+
+    def _modifier_release_handled(self, button):
+        if button == self.Caps:
+            self.modifiers.current = self.Shift
+        else:
+            self.modifiers.current = button
+
+        return self.modifiers.current in self.modifiers.all
+
+    def send_released_mouse(self, button):
         if self.btn_states.release(button):
             self._send_released_raw(button)
-            self.release_all_modifiers()
+
+    def _send_released_single(self, button):
+        if button in self.mouse_buttons:
+            self.send_released_mouse(button)
+
+        elif not self._modifier_release_handled(button):
+            if self.btn_states.release(button):
+                self._send_released_raw(button)
+                self.release_all_modifiers()
 
     def release_all_modifiers(self):
         for modifier in self.modifiers.all_pressed_except_caps():
@@ -279,5 +296,6 @@ class Controller:
         game_cfg = configs['game']
         self.game_button_delay = game_cfg['button_delay']
         self.arrows_mode = bool(game_cfg['arrows_mode'])
+        self.game_toggle_right_mouse = game_cfg['toggle_right_mouse']
 
         self.is_mouse_mode = True
