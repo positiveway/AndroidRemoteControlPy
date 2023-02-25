@@ -100,7 +100,7 @@ class TouchpadWidget(Widget):
                     if self.move_x != 0 or self.move_y != 0:
                         self.convert_offset_0(self.move_x)
                         self.convert_offset_1(self.move_y)
-                        self.controller.sock.send(self.mouse_bytes)
+                        self.controller.udp_sock.send(self.mouse_bytes)
                 else:
                     self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
                     self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
@@ -108,7 +108,7 @@ class TouchpadWidget(Widget):
                     if self.move_y != 0:
                         self.mouse_bytes[0] = 128
                         self.convert_offset_1(self.move_y)
-                        self.controller.sock.send(self.mouse_bytes)
+                        self.controller.udp_sock.send(self.mouse_bytes)
 
             # self.draw_touch(touch_event)
             return True
