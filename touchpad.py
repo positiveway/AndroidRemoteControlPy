@@ -64,9 +64,7 @@ class TouchpadWidget(Widget):
         else:
             return prev, 0
 
-    def get_convert_to_send(self, socket):
-        bytes_msg = bytearray(1)
-
+    def get_convert_to_send(self, offset, bytes_msg):
         def actual_func(x):
             if x > 127:
                 x = 127
@@ -78,8 +76,7 @@ class TouchpadWidget(Widget):
             if x < 0:
                 x += 256
 
-            bytes_msg[0] = x
-            socket.send(bytes_msg)
+            bytes_msg[offset] = x
 
         return actual_func
 
@@ -100,18 +97,18 @@ class TouchpadWidget(Widget):
                     self.prev_x = self.cur_x
                     self.prev_y = self.cur_y
 
-                    if self.move_x != 0:
-                        self.send_mouse_x_byte(self.move_x)
-
-                    if self.move_y != 0:
-                        self.send_mouse_y_byte(-self.move_y)
+                    if self.move_x != 0 or self.move_y != 0:
+                        self.write_mouse_x_byte(self.move_x)
+                        self.write_mouse_y_byte(-self.move_y)
+                        self.mouse_sock.send(self.mouse_msg)
 
                 else:
                     # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
                     self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
 
                     if self.move_y != 0:
-                        self.send_scroll_byte(self.move_y)
+                        self.write_scroll_byte(self.move_y)
+                        self.scroll_sock.send(self.scroll_msg)
 
             # self.draw_touch(touch_event)
             return True
@@ -241,10 +238,16 @@ class TouchpadWidget(Widget):
             self.three_fingers_func = self.right_click
             self.release_func = self.release_left
 
-        self.send_mouse_x_byte = self.get_convert_to_send(self.controller.mouse_x_sock)
-        self.send_mouse_y_byte = self.get_convert_to_send(self.controller.mouse_y_sock)
+        self.mouse_sock = self.controller.mouse_sock
+        self.scroll_sock = self.controller.scroll_sock
 
-        self.send_scroll_byte = self.get_convert_to_send(self.controller.scroll_sock)
+        self.mouse_msg = bytearray(2)
+        self.scroll_msg = bytearray(1)
+
+        self.write_mouse_x_byte = self.get_convert_to_send(0, self.mouse_msg)
+        self.write_mouse_y_byte = self.get_convert_to_send(1, self.mouse_msg)
+
+        self.write_scroll_byte = self.get_convert_to_send(0, self.scroll_msg)
 
         self.visuals_for_touchpad = self.controller.visuals_for_touchpad
 

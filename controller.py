@@ -27,18 +27,15 @@ class Controller:
 
         server_ip = f'192.168.{network_num}.{device_num}'
 
-        mouse_x_port = 5004
-        mouse_y_port = 5005
+        mouse_port = 5005
         scroll_port = 5007
         button_port = 5009
 
-        self.mouse_x_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.mouse_y_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.mouse_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.scroll_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.button_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.mouse_x_sock.connect((server_ip, mouse_x_port))
-        self.mouse_y_sock.connect((server_ip, mouse_y_port))
+        self.mouse_sock.connect((server_ip, mouse_port))
         self.scroll_sock.connect((server_ip, scroll_port))
         self.button_sock.connect((server_ip, button_port))
 
