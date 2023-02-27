@@ -104,7 +104,7 @@ class TouchpadWidget(Widget):
                         self.send_mouse_x_byte(self.move_x)
 
                     if self.move_y != 0:
-                        self.send_mouse_x_byte(-self.move_y)
+                        self.send_mouse_y_byte(-self.move_y)
 
                 else:
                     # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
