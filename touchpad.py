@@ -89,25 +89,20 @@ class TouchpadWidget(Widget):
                 self.cur_x = round(touch_event.x)
                 self.cur_y = round(touch_event.y)
 
-                # self.send_if_not_empty()
+                self.move_x = self.cur_x - self.prev_x
+                self.move_y = self.cur_y - self.prev_y
+
+                self.prev_x = self.cur_x
+                self.prev_y = self.cur_y
+
                 if self.controller.is_mouse_mode:
-                    self.move_x = self.cur_x - self.prev_x
-                    self.move_y = self.cur_y - self.prev_y
-
-                    self.prev_x = self.cur_x
-                    self.prev_y = self.cur_y
-
                     if self.move_x != 0 or self.move_y != 0:
                         self.write_mouse_x_byte(self.move_x)
                         self.write_mouse_y_byte(-self.move_y)
                         self.mouse_sock.send(self.mouse_msg)
-
                 else:
-                    # self.prev_x, self.move_x = self.update_coord_get_scroll_dir(self.cur_x, self.prev_x)
-                    self.prev_y, self.move_y = self.update_coord_get_scroll_dir(self.cur_y, self.prev_y)
-
                     if self.move_y != 0:
-                        self.write_scroll_byte(self.move_y)
+                        self.write_scroll_byte(self.move_y * self.scroll_by)
                         self.scroll_sock.send(self.scroll_msg)
 
             # self.draw_touch(touch_event)
@@ -218,6 +213,8 @@ class TouchpadWidget(Widget):
         self.value_not_set = 1000
 
         self.controller = Controller()
+        self.scroll_by = self.controller.scroll_by
+
         self.LeftMouse = self.controller.LeftMouse
         self.RightMouse = self.controller.RightMouse
 

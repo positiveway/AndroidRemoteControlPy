@@ -45,7 +45,6 @@ class Controller:
         else:
             profile = "fast"
 
-        self.scroll_every_n_pixels = self.scroll_cfg[profile]['move_every_n_pixels']
         self.scroll_by = self.scroll_cfg[profile]['move_by']
 
     def get_detailed_hints(self):

@@ -11,11 +11,9 @@
   },
   "scroll": {
     "normal": {
-      "move_every_n_pixels": 2,
-      "move_by": 20
+      "move_by": 30
     },
     "fast": {
-      "move_every_n_pixels": 2,
       "move_by": 30
     }
   },
