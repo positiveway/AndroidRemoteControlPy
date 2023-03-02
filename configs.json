@@ -11,7 +11,7 @@
   },
   "scroll": {
     "normal": {
-      "move_by": 30
+      "move_by": 15
     },
     "fast": {
       "move_by": 30
