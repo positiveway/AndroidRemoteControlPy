@@ -24,17 +24,11 @@
     "thresholdPct": 70,
     "angleMargin": 20
   },
-  "font": {
-    "size": {
-      "normal": 82,
-      "small": 42
-    }
-  },
   "connection": {
     "via_wifi": 1,
     "wifi": {
-      "device_num": 59,
-      "network_num": 12
+      "device_num": 103,
+      "network_num": 0
     },
     "phone": {
       "device_num": 200,
@@ -43,6 +37,12 @@
     "test": {
       "device_num": 104,
       "network_num": 1
+    }
+  },
+  "font": {
+    "size": {
+      "normal": 82,
+      "small": 42
     }
   }
 }
