@@ -21,7 +21,7 @@ export PATH=$PATH:$sdk_dir/ndk-bundle
 sudo dpkg --add-architecture i386
 sudo apt-get update
 sudo apt install -y build-essential git zlib1g-dev python3 python3-dev libncurses5:i386 libstdc++6:i386 zlib1g:i386 unzip ant ccache autoconf libtool libssl-dev
-sudo apt install -y automake libltdl-dev cmake gcc patch zip unzip
+sudo apt install -y automake libltdl-dev cmake gcc patch zip
 
 pip install cython virtualenv python-for-android
 
