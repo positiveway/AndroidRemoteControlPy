@@ -16,25 +16,26 @@ export PATH=$PATH:$sdk_dir/tools/bin
 
 sdkmanager ndk-bundle
 export PATH=$PATH:$sdk_dir/ndk-bundle
+export PATH=$PATH:$sdk_dir/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/
 
 # https://github.com/kivy/python-for-android/blob/0.7.0/pythonforandroid/recipes/libffi/__init__.py#L13
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt install -y build-essential git zlib1g-dev python3 python3-dev libncurses5:i386 libstdc++6:i386 zlib1g:i386 unzip ant ccache autoconf libtool libssl-dev
-sudo apt install -y automake libltdl-dev cmake gcc patch zip
+sudo apt install -y build-essential git zlib1g-dev python3 python3-dev libncurses5:i386 libstdc++6:i386 zlib1g:i386 unzip ant autoconf libtool libssl-dev
+sudo apt install -y lld clang automake libltdl-dev cmake gcc patch zip
 
 pip install cython virtualenv python-for-android
 
 # https://stackoverflow.com/questions/60151351/what-is-the-proper-way-to-get-android-ndk-version
 # https://developer.android.com/ndk/downloads/revision_history
 # https://github.com/kivy/python-for-android/issues/2685
-sdk_version="33"
+sdk_version="30"
 
 sdkmanager "platforms;android-$sdk_version"
 export ANDROIDSDK="$sdk_dir"
 export ANDROIDNDK="$sdk_dir/ndk-bundle"
 export ANDROIDAPI=$sdk_version  # Target API version of your application
-export NDKAPI=$sdk_version  # Minimum supported API version of your application
+export NDKAPI="27"  # Minimum supported API version of your application
 
 echo $ANDROIDSDK
 
