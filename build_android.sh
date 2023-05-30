@@ -18,7 +18,11 @@ sdkmanager ndk-bundle
 export PATH=$PATH:$sdk_dir/ndk-bundle
 
 # https://github.com/kivy/python-for-android/blob/0.7.0/pythonforandroid/recipes/libffi/__init__.py#L13
-sudo apt install -y automake autoconf libltdl-dev ant ccache cmake gcc git libncurses5-dev libncursesw5-dev libtool libssl-dev patch zip unzip zlib1g zlib1g-dev
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt install -y build-essential git zlib1g-dev python3 python3-dev libncurses5:i386 libstdc++6:i386 zlib1g:i386 unzip ant ccache autoconf libtool libssl-dev
+sudo apt install -y automake libltdl-dev cmake gcc patch zip unzip
+
 pip install cython virtualenv python-for-android
 
 # https://stackoverflow.com/questions/60151351/what-is-the-proper-way-to-get-android-ndk-version
