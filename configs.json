@@ -5,6 +5,21 @@
     "arrows_mode": 0,
     "button_delay": 0.1
   },
+  "connection": {
+    "via_wifi": 1,
+    "wifi": {
+      "device_num": 13,
+      "network_num": 0
+    },
+    "phone": {
+      "device_num": 200,
+      "network_num": 174
+    },
+    "test": {
+      "device_num": 104,
+      "network_num": 1
+    }
+  },
   "touchpad": {
     "double_click_delay": 0.25,
     "visuals": 0
@@ -23,21 +38,6 @@
     "visuals": 1,
     "thresholdPct": 70,
     "angleMargin": 20
-  },
-  "connection": {
-    "via_wifi": 1,
-    "wifi": {
-      "device_num": 103,
-      "network_num": 0
-    },
-    "phone": {
-      "device_num": 200,
-      "network_num": 161
-    },
-    "test": {
-      "device_num": 104,
-      "network_num": 1
-    }
   },
   "font": {
     "size": {
