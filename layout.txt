@@ -6,7 +6,6 @@ mouse_mode
 ||========================||
 
 EN
-left_first
 ||========================||========================||========================||
 || A       B       C      || J       K       L      || S       T       U      ||
 || D       E       F      || M       N       O      || V       W       X      ||
@@ -14,56 +13,24 @@ left_first
 ||========================||========================||========================||
 || 1       2       3      || Copy    Cut     Paste  || Caps    Shift   Select ||
 || 4       5       6      || Enter   Switch  Space  || Undo    Redo    Esc    ||
-|| 7       8       9      || EmptyW  EmptyW  EmptyW || Del     BS      Tab    ||
+|| 7       8       9      || Undef   Undef   Undef  || Del     BS      Tab    ||
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || Alt     `       \      || EmptyW  EmptyW  Win    ||
-|| EmptyW  EmptyW  EmptyW || Ctrl    =       /      || EmptyW  ;       '      ||
-|| EmptyW  EmptyW  EmptyW || -       [       ]      || EmptyW  .       ,      ||
+|| Undef   Undef   Undef  || Alt     `       \      || Undef   Undef   Win    ||
+|| Undef   Undef   Undef  || Ctrl    =       /      || Undef   ;       '      ||
+|| Undef   Undef   Undef  || -       [       ]      || Undef   .       ,      ||
 ||========================||========================||========================||
-
-right_first
-||========================||========================||========================||
-|| A       B       C      || J       K       L      || S       T       U      ||
-|| D       E       F      || M       N       O      || V       W       X      ||
-|| G       H       I      || P       Q       R      || Y       Z       0      ||
-||========================||========================||========================||
-|| 1       2       3      || Copy    Cut     Paste  || Caps    Shift   Select ||
-|| 4       5       6      || Enter   Switch  Space  || Undo    Redo    Esc    ||
-|| 7       8       9      || EmptyW  EmptyW  EmptyW || Del     BS      Tab    ||
-||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || Alt     `       \      || EmptyW  EmptyW  Win    ||
-|| EmptyW  EmptyW  EmptyW || Ctrl    =       /      || EmptyW  ;       '      ||
-|| EmptyW  EmptyW  EmptyW || -       [       ]      || EmptyW  .       ,      ||
-||========================||========================||========================||
-
 
 RU
-left_first
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
 ||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-||========================||========================||========================||
-
-right_first
-||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-||========================||========================||========================||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
-|| EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW || EmptyW  EmptyW  EmptyW ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
+|| Undef   Undef   Undef  || Undef   Undef   Undef  || Undef   Undef   Undef  ||
 ||========================||========================||========================||

@@ -1,8 +1,6 @@
 {
   "is_game_mode": 0,
   "game": {
-    "toggle_right_mouse": 1,
-    "arrows_mode": 0,
     "button_delay": 0.1
   },
   "connection": {
@@ -41,8 +39,7 @@
   },
   "font": {
     "size": {
-      "normal": 82,
-      "small": 42
+      "normal": 42
     }
   }
 }

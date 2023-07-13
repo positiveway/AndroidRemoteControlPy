@@ -42,8 +42,6 @@ class TouchpadWidget(Widget):
                     # self.two_fingers_func()
                     self.controller.is_mouse_mode = True
 
-            self.clear_typed_text()
-
             return True
         else:
             return super().on_touch_down(touch_event)
@@ -156,34 +154,28 @@ class TouchpadWidget(Widget):
         self.scroll_sock.send(self.scroll_msg)
         self.scroll_msg[0] = 0
 
-    def empty_func(self):
-        pass
-
-    def game_right_hold(self):
+    def game_aim(self):
         self.controller.send_pressed_mouse(self.RightMouse)
 
-    def game_left_hold(self):
+    def game_release_aim(self):
+        self.controller.send_released_mouse(self.RightMouse)
+
+    def game_toggle_aim(self):
+        pass
+
+    def game_fire(self):
+        self.game_aim()
         self.controller.send_pressed_mouse(self.LeftMouse)
 
-    def game_release_hold(self):
+    def game_release_fire(self):
         self.controller.send_released_mouse(self.LeftMouse)
-        self.controller.send_released_mouse(self.RightMouse)
-
-    def game_right_toggle(self):
-        if self.cur_game_button == self.LeftMouse:
-            self.cur_game_button = self.RightMouse
-        else:
-            self.cur_game_button = self.LeftMouse
-
-    def game_left_toggle(self):
-        self.controller.send_pressed_mouse(self.cur_game_button)
-
-    def game_release_toggle(self):
-        self.controller.send_released_mouse(self.LeftMouse)
-        self.controller.send_released_mouse(self.RightMouse)
+        self.game_release_aim()
 
     def left_press(self):
         self.controller.send_pressed_mouse(self.LeftMouse)
+
+    def release_left(self):
+        self.controller.send_released_mouse(self.LeftMouse)
 
     def right_click(self):
         self.controller.is_mouse_mode = True
@@ -195,8 +187,6 @@ class TouchpadWidget(Widget):
     def switch_to_scroll(self):
         self.controller.is_mouse_mode = False
 
-    def release_left(self):
-        self.controller.send_released_mouse(self.LeftMouse)
 
     def init(self):
         self.always_release = True  # kivy behavior
@@ -212,16 +202,10 @@ class TouchpadWidget(Widget):
         self.RightMouse = self.controller.RightMouse
 
         if self.controller.is_game_mode:
-            if self.controller.game_toggle_right_mouse:
-                self.double_tap_func = self.game_left_toggle
-                self.two_fingers_func = self.game_right_toggle
-                self.three_fingers_func = self.empty_func
-                self.release_func = self.game_release_toggle
-            else:
-                self.double_tap_func = self.game_left_hold
-                self.two_fingers_func = self.game_right_hold
-                self.three_fingers_func = self.empty_func
-                self.release_func = self.game_release_hold
+            self.double_tap_func = self.game_fire
+            self.two_fingers_func = self.game_aim
+            self.three_fingers_func = self.empty_func
+            self.release_func = self.game_release_fire
         else:
             self.double_tap_func = self.left_press
             self.two_fingers_func = self.toggle_scroll

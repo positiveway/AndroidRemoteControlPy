@@ -1,7 +1,7 @@
 from kivy.uix.label import Label
 from code_map import *
 from common import apply_to_seq_or_one
-from common_layout import Layout, make_common_buttons, UniversalButtonUI
+from common_layout import AutoGridLayout, make_common_buttons, UniversalButtonUI
 
 
 class GameButtonUI(UniversalButtonUI):
@@ -80,9 +80,9 @@ def make_buttons(app):
 
 
 def fill_layout(app):
-    app.root = Layout(cols=2)
+    app.root = AutoGridLayout(cols=2)
 
-    wasd_layout = Layout(cols=3, rows=3)
+    wasd_layout = AutoGridLayout(cols=3, rows=3)
     wasd_layout.add(1, 1, app.wa_btn)
     wasd_layout.add(1, 2, app.w_btn)
     wasd_layout.add(1, 3, app.wd_btn)
@@ -93,35 +93,35 @@ def fill_layout(app):
     wasd_layout.add(3, 3, app.sd_btn)
     wasd_layout.fill()
 
-    esc_layout = Layout(cols=2, rows=2)
+    esc_layout = AutoGridLayout(cols=2, rows=2)
     esc_layout.add(1, 2, app.esc_btn)
     esc_layout.fill()
 
-    shift_layout = Layout(rows=2)
+    shift_layout = AutoGridLayout(rows=2)
     shift_layout.add(1, 1, app.shift_btn)
     shift_layout.fill()
 
-    upper_left_side = Layout(cols=2, rows=2)
+    upper_left_side = AutoGridLayout(cols=2, rows=2)
     upper_left_side.add(2, 2, app.space_btn)
     upper_left_side.add(1, 2, esc_layout)
     upper_left_side.add(2, 1, wasd_layout)
     upper_left_side.add(1, 1, shift_layout)
     upper_left_side.fill()
 
-    release_all_layout = Layout(cols=2, rows=2)
+    release_all_layout = AutoGridLayout(cols=2, rows=2)
     release_all_layout.add(2, 2, app.release_all_btn)
     release_all_layout.fill()
 
-    lower_left_side = Layout(cols=3, rows=3)
+    lower_left_side = AutoGridLayout(cols=3, rows=3)
     lower_left_side.add(3, 3, release_all_layout)
     lower_left_side.fill()
 
-    left_side = Layout(rows=2, inverted='y')
+    left_side = AutoGridLayout(rows=2, inverted='y')
     left_side.add(1, 1, upper_left_side)
     left_side.add(2, 1, lower_left_side)
     left_side.fill()
 
-    right_side = Layout(rows=2, inverted='y')
+    right_side = AutoGridLayout(rows=2, inverted='y')
     right_side.add(1, 1, app.touchpad)
     right_side.fill()
 

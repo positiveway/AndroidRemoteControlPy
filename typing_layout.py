@@ -1,7 +1,7 @@
 import json
 
 from common import *
-from code_map import code_map, reverse_code_map, EmptyW_code
+from code_map import code_map, reverse_code_map, EmptyLetterCode
 
 langs = ['en', 'ru']
 
@@ -14,7 +14,7 @@ arrows_to_btn_num = {
 DIRECTIONS = tuple(range(9))
 
 CELL_ROWS = 3
-BLOCK_ROWS = CELL_ROWS * 3 + 2
+BLOCK_ROWS = 9
 
 CELL_ELEMENTS = 3
 BLOCK_ELEMENTS = 9
@@ -28,25 +28,24 @@ def _extract_raw_cell_or_block(start_line, rows_amount, input_layout):
 def _split_block_or_cell(raw_source, elements_amount, is_reverse):
     split_source = []
     for dir1, line in enumerate(raw_source):
-        if not line.startswith('='):
-            line = line.strip().split()
+        line = line.split()
 
-            if len(line) != elements_amount:
-                raise ValueError(len(line))
+        if len(line) != elements_amount:
+            raise ValueError(len(line))
 
-            if is_reverse:
-                line = reverse(line)
+        if is_reverse:  # for right_first layout. no longer needed. left for potential future use
+            line = reverse(line)
 
-            converted = []
-            for dir2, letter in enumerate(line):
+        converted = []
+        for dir2, letter in enumerate(line):
+            if letter not in code_map:
+                letter = letter.lower().capitalize()
                 if letter not in code_map:
-                    letter = letter.lower().capitalize()
-                    if letter not in code_map:
-                        raise ValueError(f'Wrong spelling at position [{dir1 + 1}, {dir2 + 1}]: {letter}')
+                    raise ValueError(f'Wrong spelling at position [{dir1 + 1}, {dir2 + 1}]: {letter}')
 
-                code = code_map[letter]
-                converted.append(code)
-            split_source.append(converted)
+            code = code_map[letter]
+            converted.append(code)
+        split_source.append(converted)
 
     return split_source
 
@@ -91,32 +90,36 @@ def process_block(start_line, input_layout, is_reverse=False):
 
 def load_layout():
     with open("layout.txt", encoding='utf8') as file:
-        input_layout = file.readlines()
+        raw_input_layout = file.readlines()
 
-    input_layout = [line.replace('||', '') for line in input_layout]
+    input_layout = []
+    for line in raw_input_layout:
+        line = line.replace('||', '')
+        line = ' '.join(line.split())
 
-    mouse_mode_layout = process_cell(1, input_layout)
+        if line and not line.startswith('='):
+            input_layout.append(line)
 
-    en_left_first = process_block(9, input_layout)
-    en_right_first = process_block(24, input_layout, is_reverse=True)
+    for ind, line in enumerate(input_layout):
+        if line == 'mouse_mode':
+            mouse_mode_layout = process_cell(ind, input_layout)
 
-    ru_left_first = process_block(41, input_layout)
-    ru_right_first = process_block(56, input_layout, is_reverse=True)
+        elif line == 'EN':
+            en_layout = process_block(ind, input_layout)
 
-    left_first_layout = {
-        'en': en_left_first,
-        'ru': ru_left_first,
+        elif line == 'RU':
+            ru_layout = process_block(ind, input_layout)
+
+    multi_lang_layout = {
+        'en': en_layout,
+        'ru': ru_layout,
     }
-    right_first_layout = {
-        'en': en_right_first,
-        'ru': ru_right_first,
-    }
 
-    return mouse_mode_layout, left_first_layout, right_first_layout
+    return mouse_mode_layout, multi_lang_layout
 
 
 def convert_to_hint(code):
-    if code == EmptyW_code:
+    if code == EmptyLetterCode:
         return ''
     else:
         return reverse_code_map[code]

@@ -1,6 +1,9 @@
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.relativelayout import RelativeLayout
 
 from code_map import *
 from common import *
@@ -15,19 +18,39 @@ def make_common_buttons(app):
         "Release", app,
         func=app.release_all
     )
-    app.clear_btn = UniversalButtonUI(
-        "Clear", app,
-        func=app.clear_as_button
-    )
+
+
+class Pair:
+    def __init__(self, x, y) -> None:
+        self.x = x
+        self.y = y
+
+    def as_tuple(self):
+        return self.x, self.y
 
 
 class UniversalButtonUI(Button):
-    def __init__(self, text, app, buttons=None, button_codes=None, func=None, on_press_only=True):
-        if func is not None:
-            super().__init__(
+    def set_pos(self, x, y):
+        self.pos = (x, y)
+
+    def __init__(
+            self, text, app,
+            size_rel: Pair = None,
+            buttons=None, button_codes=None, func=None,
+            on_press_only=True
+    ):
+        if size_rel is None:
+            size_rel = Pair(10, 10)
+
+        def self_init(**kwargs):
+            super(UniversalButtonUI, self).__init__(
+                size_hint=size_rel.as_tuple(),
                 text=text, font_size=app.font_size,
-                on_press=func,
+                **kwargs,
             )
+
+        if func is not None:
+            self_init(on_press=func)
             return
 
         if buttons is None and button_codes is None:
@@ -40,10 +63,7 @@ class UniversalButtonUI(Button):
             def on_press(button):
                 app.controller.send_type(button_codes)
 
-            super().__init__(
-                text=text, font_size=app.font_size,
-                on_press=on_press
-            )
+            self_init(on_press=on_press)
         else:
             def on_press(button):
                 app.controller.send_pressed(button_codes)
@@ -51,14 +71,14 @@ class UniversalButtonUI(Button):
             def on_release(button):
                 app.controller.send_released(button_codes)
 
-            super().__init__(
-                text=text, font_size=app.font_size,
+            self_init(
                 on_press=on_press,
                 on_release=on_release,
             )
 
 
-class Layout(GridLayout):
+
+class AutoGridLayout(GridLayout):
     def __init__(self, rows=1, cols=1, inverted=''):
         self.grid = [[None for _ in range(cols)] for _ in range(rows)]
         self.inverted = inverted

@@ -1,8 +1,14 @@
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.stacklayout import StackLayout
+
 from code_map import *
-from common_layout import UniversalButtonUI, Layout, make_common_buttons
+from common_layout import UniversalButtonUI, AutoGridLayout, make_common_buttons
 from typing_layout import DIRECTIONS
 
 
@@ -52,6 +58,10 @@ def make_buttons(app):
     app.double_click_btn = UniversalButtonUI(
         "X2", app,
         func=app.double_click
+    )
+    app.switch_btn = UniversalButtonUI(
+        "Switch", app,
+        button_codes=Switch_code
     )
     app.space_btn = UniversalButtonUI(
         "Space", app,
@@ -105,62 +115,63 @@ def make_buttons(app):
     )
 
 
+PANEL_WIDTH = 10
+
+
+def resize_layout(app, max_window_size):
+    app.l_buttons_panel.size_hint_max_x = PANEL_WIDTH
+    app.r_buttons_panel.size_hint_max_x = PANEL_WIDTH
+    actual_width = app.l_buttons_panel.width
+    app.r_buttons_panel.pos = (max_window_size.x - actual_width, 0)
+
+    app.touchpad.size_hint_max_x = max_window_size.x - actual_width * 2
+    app.touchpad.pos = (actual_width, 0)
+
+    app.background.size_hint_max_x = max_window_size.x - actual_width * 2
+    app.background.pos = (actual_width, 0)
+
+    app.root.do_layout()
+    # app.root.canvas.ask_update()
+
 def fill_layout(app):
-    app.root = Layout(cols=2, inverted='')
-    # app.root = BoxLayout()
+    app.root = FloatLayout()
     # app.root.padding = 110
 
-    app.label = Label(font_size=app.font_size)
-    # app.label.size_hint_x = 0.25
-    # app.label.size_hint_y = 0.9
+    app.background = Image(source="background.jpg", allow_stretch=True, keep_ratio=False)
 
-    release_all_layout = Layout(cols=2, rows=2, inverted='y')
-    release_all_layout.add(2, 1, app.release_all_btn)
-    release_all_layout.fill()
+    overlay_layout = FloatLayout()
 
-    arrows_layout = Layout(cols=3, rows=2)
-    arrows_layout.add(1, 2, app.up_btn)
-    arrows_layout.add(2, 1, app.left_btn)
-    arrows_layout.add(2, 2, app.down_btn)
-    arrows_layout.add(2, 3, app.right_btn)
-    arrows_layout.fill()
+    l_buttons_panel = BoxLayout(orientation='vertical')
+    r_buttons_panel = BoxLayout(orientation='vertical')
+    app.l_buttons_panel = l_buttons_panel
+    app.r_buttons_panel = r_buttons_panel
 
-    arrows_compact_layout = Layout(rows=2, inverted='y')
-    arrows_compact_layout.add(1, 1, arrows_layout)
-    arrows_compact_layout.add(2, 1, app.label)
-    arrows_compact_layout.fill()
 
-    clear_layout = Layout(rows=3, inverted='y')
-    clear_layout.add(1, 1, app.clear_btn)
-    clear_layout.fill()
+    r_buttons_panel.add_widget(app.cut_btn)
+    r_buttons_panel.add_widget(app.copy_btn)
+    r_buttons_panel.add_widget(app.paste_btn)
+    r_buttons_panel.add_widget(app.right_click)
+    r_buttons_panel.add_widget(app.switch_btn)
+    r_buttons_panel.add_widget(app.format_btn)
+    r_buttons_panel.add_widget(app.enter_btn)
+    r_buttons_panel.add_widget(app.space_btn)
 
-    typing_layout = Layout(cols=2, rows=2, inverted='y')
-    typing_layout.add(1, 1, app.l_typing_buttons)
-    typing_layout.add(1, 2, arrows_compact_layout)
-    typing_layout.add(2, 1, clear_layout)
-    typing_layout.fill()
+    l_buttons_panel.add_widget(app.release_all_btn)
 
-    touchpad_layout = Layout(cols=2, rows=2)
-    touchpad_layout.add(1, 1, release_all_layout)
-    touchpad_layout.add(1, 2, app.redo_btn)
-    touchpad_layout.add(2, 1, app.undo_btn)
-    touchpad_layout.add(2, 2, app.bs_btn)
-    touchpad_layout.fill()
+    l_buttons_panel.add_widget(app.up_btn)
+    l_buttons_panel.add_widget(app.down_btn)
+    l_buttons_panel.add_widget(app.left_btn)
+    l_buttons_panel.add_widget(app.right_btn)
 
-    app.touchpad_or_btn_layout = LayeredLayout(app)
+    l_buttons_panel.add_widget(app.bs_btn)
+    l_buttons_panel.add_widget(app.undo_btn)
 
-    app.r_buttons_layout = Layout(cols=2)
-    app.r_buttons_layout.add(1, 2, app.r_typing_buttons)
-    app.r_buttons_layout.fill()
+    overlay_layout.add_widget(l_buttons_panel)
+    overlay_layout.add_widget(app.touchpad)
+    overlay_layout.add_widget(r_buttons_panel)
 
-    right_side = Layout(rows=2, inverted='y')
-    right_side.add(1, 1, app.touchpad_or_btn_layout)
-    right_side.add(2, 1, touchpad_layout)
-    right_side.fill()
-
-    app.root.add(1, 1, typing_layout)
-    app.root.add(1, 2, right_side)
-    app.root.fill()
+    app.root.add_widget(app.background)
+    app.root.add_widget(overlay_layout)
 
 
 class LayeredLayout(GridLayout):
@@ -181,27 +192,7 @@ class LayeredLayout(GridLayout):
             self.add_widget(self.app.touchpad)
 
 
-class TypingButton(Button):
-    def __init__(self, btn_direction, is_left, app):
-        self.direction = btn_direction
-        self.is_left = is_left
-        super().__init__(on_press=app.typing_btn_pressed)
-
-
-def make_typing_buttons(app):
-    app.l_typing_buttons = GridLayout(cols=3, rows=3)
-    app.r_typing_buttons = GridLayout(cols=3, rows=3)
-
-    for num in DIRECTIONS:
-        setattr(app, f'l_typing_btn_{num}', TypingButton(num, True, app))
-        app.l_typing_buttons.add_widget(getattr(app, f'l_typing_btn_{num}'))
-
-        setattr(app, f'r_typing_btn_{num}', TypingButton(num, False, app))
-        app.r_typing_buttons.add_widget(getattr(app, f'r_typing_btn_{num}'))
-
-
 def build_layout(app):
     make_common_buttons(app)
     make_buttons(app)
-    make_typing_buttons(app)
     fill_layout(app)

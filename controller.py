@@ -67,7 +67,7 @@ class Controller:
 
     def detect_letter(self):
         if self.is_left:
-            layout = self.left_first_layout
+            layout = self.typing_layout
         else:
             layout = self.right_first_layout
 
@@ -241,10 +241,6 @@ class Controller:
         self.msg[0] = button
         self.button_sock.send(self.msg)
 
-    # def send_terminate_connection(self):
-    #     self.msg[0] = 128
-    #     self.button_sock.send(self.msg)
-
     def force_release(self, button):
         self._send_released_raw(button)
         self.btn_states.release(button)
@@ -255,16 +251,13 @@ class Controller:
         self.send_type(self.LeftMouse)
 
     def __init__(self):
-        from typing_layout import load_layout, generate_hints, generate_mouse_hints, load_configs
+        from typing_layout import load_layout, load_configs, generate_mouse_hints, generate_hints
 
         self.CentralDir = 5 - 1
 
-        self.mouse_mode_layout, self.left_first_layout, self.right_first_layout = load_layout()
-
-        self.left_detailed_hints, self.left_preview_hints = generate_hints(self.left_first_layout)
-        self.right_detailed_hints, self.right_preview_hints = generate_hints(self.right_first_layout)
-        self.empty_hints = tuple(['' for _ in DIRECTIONS])
+        self.mouse_mode_layout, self.typing_layout = load_layout()
         self.mouse_hints = generate_mouse_hints(self.mouse_mode_layout)
+        self.detailed_hints, self.preview_hints = generate_hints(self.typing_layout)
 
         configs = load_configs()
 
@@ -300,13 +293,10 @@ class Controller:
 
         font_size_cfg = configs['font']['size']
         self.font_size = font_size_cfg['normal']
-        self.small_font_size = font_size_cfg['small']
 
         self.is_game_mode = bool(configs['is_game_mode'])
 
         game_cfg = configs['game']
         self.game_button_delay = game_cfg['button_delay']
-        self.arrows_mode = bool(game_cfg['arrows_mode'])
-        self.game_toggle_right_mouse = game_cfg['toggle_right_mouse']
 
         self.is_mouse_mode = True
