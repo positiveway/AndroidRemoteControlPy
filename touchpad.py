@@ -96,14 +96,10 @@ class TouchpadWidget(Widget):
                 self.prev_y = self.cur_y
 
                 if self.controller.is_mouse_mode:
-                    if self.move_x != 0 or self.move_y != 0:
-                        self.write_mouse_x_byte(self.move_x)
-                        self.write_mouse_y_byte(-self.move_y)
-                        self.mouse_sock.send(self.mouse_msg)
+                    self.write_mouse_x_byte(self.move_x)
+                    self.write_mouse_y_byte(-self.move_y)
                 else:
-                    if self.move_y != 0:
-                        self.write_scroll_byte(self.move_y * self.scroll_by)
-                        self.scroll_sock.send(self.scroll_msg)
+                    self.write_scroll_byte(self.move_y * self.scroll_by)
 
             # self.draw_touch(touch_event)
             return True
@@ -162,6 +158,16 @@ class TouchpadWidget(Widget):
     def on_size(self, obj, values):
         self.full_reset()
         self.recalc_size()
+
+    def send_buffer(self, dt):
+        if self.mouse_msg[0] != 0 or self.mouse_msg[1] != 0:
+            self.mouse_sock.send(self.mouse_msg)
+            self.mouse_msg[0] = 0
+            self.mouse_msg[1] = 0
+
+        if self.scroll_msg[0] != 0:
+            self.scroll_sock.send(self.scroll_msg)
+            self.scroll_msg[0] = 0
 
     def empty_func(self):
         pass

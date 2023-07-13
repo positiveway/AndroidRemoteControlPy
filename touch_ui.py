@@ -1,8 +1,8 @@
 import gc
 
 from kivy.app import App
+from kivy.clock import Clock
 
-from controller import Controller
 from normal_layout import *
 from touchpad import TouchpadWidget
 
@@ -58,6 +58,7 @@ class APISenderApp(App):
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
+        Clock.schedule_interval(self.touchpad.send_buffer, 0.004)
 
         self.controller = self.touchpad.controller
 
