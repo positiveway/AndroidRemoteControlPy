@@ -58,7 +58,7 @@ class APISenderApp(App):
     def build(self):
         self.touchpad = TouchpadWidget()
         self.touchpad.init()
-        Clock.schedule_interval(self.touchpad.send_buffer, 0.004)
+        Clock.schedule_interval(self.touchpad.send_buffer, 0.001)
 
         self.controller = self.touchpad.controller
 
