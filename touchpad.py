@@ -160,14 +160,12 @@ class TouchpadWidget(Widget):
         self.recalc_size()
 
     def send_buffer(self, dt):
-        if self.mouse_msg[0] != 0 or self.mouse_msg[1] != 0:
-            self.mouse_sock.send(self.mouse_msg)
-            self.mouse_msg[0] = 0
-            self.mouse_msg[1] = 0
+        self.mouse_sock.send(self.mouse_msg)
+        self.mouse_msg[0] = 0
+        self.mouse_msg[1] = 0
 
-        if self.scroll_msg[0] != 0:
-            self.scroll_sock.send(self.scroll_msg)
-            self.scroll_msg[0] = 0
+        self.scroll_sock.send(self.scroll_msg)
+        self.scroll_msg[0] = 0
 
     def empty_func(self):
         pass
