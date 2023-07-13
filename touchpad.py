@@ -66,6 +66,11 @@ class TouchpadWidget(Widget):
 
     def get_convert_to_send(self, offset, bytes_msg):
         def actual_func(x):
+            if bytes_msg[offset] > 128:
+                bytes_msg[offset] -= 256
+
+            x = bytes_msg[offset] + x
+
             if x > 127:
                 x = 127
                 # print(f"value is too much: {x}")
