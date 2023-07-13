@@ -4,12 +4,6 @@ from kivy.graphics import Color, Ellipse
 from controller import Controller
 
 
-def divide_with_reminder(a, b: int):
-    multiplier = int(a / b)
-    reminder = a - (multiplier * b)
-    return multiplier, reminder
-
-
 class TouchpadWidget(Widget):
     def clear_canvas(self):
         if not self.visuals_for_touchpad:
@@ -53,16 +47,6 @@ class TouchpadWidget(Widget):
             return True
         else:
             return super().on_touch_down(touch_event)
-
-    def update_coord_get_scroll_dir(self, cur, prev):
-        scroll_every_n_pixels = self.controller.scroll_every_n_pixels
-        diff = cur - prev
-        if abs(diff) >= scroll_every_n_pixels:  # greater or EQUAL
-            multiplier, remainder = divide_with_reminder(diff, scroll_every_n_pixels)
-            prev = cur - remainder
-            return prev, multiplier * self.controller.scroll_by
-        else:
-            return prev, 0
 
     def get_convert_to_send(self, offset, bytes_msg):
         def actual_func(x):
